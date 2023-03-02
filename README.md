@@ -3,16 +3,16 @@
 
 ### Usage
  1) Copy the folder mybash/ where you want
-     git clone https://github.com/arita37/myutil.git
-     cd myutil
-     git checkout devtorch
+     git clone https://github.com/arita37/mybash.git
+     cd mybash
+     git checkout prod
      echo $pwd  ### copy this below
 
 
 
  2) in your bashrc or zshrc,  add those lines
 
-     export mybashdir=YOURFOLDER/myutil/utilmy/tools/mybash/mybash/
+     export mybashdir=YOURFOLDER/mybash/
      export PATH="$mybashdir:$PATH"
      chmod -R 777 $mybashdir                    ### exec
      source $mybashdir/__init/init_all.sh       ##### Init all the alias
