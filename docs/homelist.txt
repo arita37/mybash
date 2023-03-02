@@ -1,0 +1,10 @@
+/zscript/
+/zs3drive/global_task.json
+/.bashrc
+/.bash_history
+/.profile
+/zbatch.sh
+/.conda/
+/.jupyter/
+/.ssh/
+

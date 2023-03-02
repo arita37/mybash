@@ -1,0 +1,149 @@
+#!/bin/bash
+USAGE=$(
+      cat <<-END
+     Perform various useful operations on the folders/directories
+
+     folder
+     folder size        ./            						#### Print folder size in Gb
+     folder topfile     ./   20   "dir1 dir2 dir3"    		#### Print 20 biggest size files
+     folder recentifle  ./   10       						#### Print recently modified files   
+
+                                
+     folder backup   mypathXYZ/                           	#### copied into default path ~/zarchive/mypath_suffix_20230202/
+     folder backup   ~/mypathXYZ   ~/mypath_target/      	#### copied from mypathXYZ to mypath_target/
+
+
+     folder copysmallfile   mypathFROm/   mypathTO/   100       ### copy files recursively, filter big files
+
+     folder copyfolderonly   mypathFROm/   mypathTO/       ### copy folder only
+
+
+END
+)
+
+#### Global Config. #################################
+# set -x  # Output commands being run.
+set -e # Exit on error.å
+
+#### Global vars ###################################
+FUNAME=$(basename "$0")
+YMD=$(date '+%Y%m%d')
+
+#### Import utils #################################
+source utils/util_stable.sh
+
+### Input Params and Defaults ##################################
+[ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
+task=$1 && [ -z $1 ] && task="size"      ###  print folder size
+ppath=$2 && [ -z $2 ] && ppath="$PWD"    ###  current path as default
+
+### Core ###########################################
+if [[ "$task" = size ]]; then
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      df -h $ppath
+      echo # Newline
+      du -h -d 10 $ppath 2>&1 |
+            # grep '[0-9]G\>'			|\
+            grep -v 'denied' |
+            sort -hr |
+            head -n $ssize
+
+      exit 0
+elif [[ "$task" = topfile ]]; then
+      ssize=$3 && [ -z $3 ] && ssize=20
+      for val in $4; do eexcludedirs+="--exclude=$val "; done && [ -z $4 ] && excludedirs="~/zzzzz"
+
+      df -H $ppath
+      echo # Newline
+
+      while read -r str; do du -d 0 -h $str; done < \
+            <(du -a $ppath $eexcludedirs |
+                  sort -n -r |
+                  head -n $ssize |
+                  awk '{print $2}')
+
+      #   du -a $ppath  $eexcludedirs     |\
+      #      sort -n -r					  |\
+      #      head -n $ssize
+
+
+exit 0
+elif [[ "$task" = recentfile ]]; then
+      ### recent file modified files + created
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+            ### MacoS
+            while read -r str; do echo -e "$(date -r "$str" +'%F %T') \t $str"; done < \
+                  <(find $ppath -type f -exec stat -lt "%F %T" {} \+ |
+                        cut -d' ' -f6- |
+                        sort -n |
+                        tail -n $ssize |
+                        sort -r)
+
+            #  find $ppath -type f -exec stat -lt "%F %T" {} \+ | cut -d' ' -f6- | sort -n | tail -n $ssize
+      else
+            ### Linux
+            while read -r str; do echo -e "$(date -r "$str" +'%F %T') \t $str"; done < \
+                  <(find $ppath -type f -printf "%T@ %p\n" |
+                        sort -n |
+                        tail -n $ssize |
+                        sort -r |
+                        cut -d' ' -f2-)
+
+            # find $ppath -type f -printf "%T@ %p\n" | sort -n | cut -d' ' -f2- | tail -n $ssize
+
+      fi
+
+
+exit 0
+elif [[ "$task" = backup ]]; then
+      ### backup quickly currently folder, skip big files.
+      pathbase="backup_$YMD"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+
+      rsync -ar $ppath $dir_to
+
+
+
+exit 0
+elif [[ "$task" = copysmallfile ]]; then
+      ### Copy only small files, exclude big one cplwf
+      pathbase="backup_$YMD"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+      max_file_size="-$4c" && [ -z $4 ] && max_file_size="-1000c"
+
+      #### Add File filtering
+      # echo "find $ppath -mindepth 1 -maxdepth 10 -type f -size $max_file_size -exec cp -t $dir_to"
+      cmd=$(find $ppath -mindepth 1 -maxdepth 10 -type f -size $max_file_size -exec cp {} $dir_to \;)
+
+	  #   printf '%q ' "${cmd[@]}"
+      #   "${cmd[@]}"   ### Execute the command
+
+
+exit 0
+elif [[ "$task" = copyfolderonly ]]; then
+      ### Copy only folder
+      pathbase="backup_$YMD"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+      eexclude="-$4c" && [ -z $4 ] && eexclude="*"
+
+      #### Add File filtering
+      #   rsync -a --include '*/' --exclude  $eexclude  $ppath $dir_to
+	  rsync -a -f"+ */" -f"- *" $ppath $dir_to
+
+
+
+
+
+exit 0
+else
+      echo $USAGE
+fi
+
+### https://stackoverflow.com/questions/2005192/how-to-execute-a-bash-command-stored-as-a-string-with-quotes-and-asterisk
+# cmd=( mysql AMORE -u username -ppassword -h localhost -e "SELECT  host  FROM amoreconfig" )
+# printf 'Proposing to run: '
+# printf '%q ' "${cmd[@]}"
+# printf '\n'

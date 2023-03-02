@@ -1,0 +1,1 @@
+for p in $(cat requirements.txt | awk -F '==' '{print $1}'); do echo "$p==$(curl -s "https://pypi.org/pypi/$p/json" | jq  -r '.releases | keys | .[]' | sort  -V | tail -n 1)"; done

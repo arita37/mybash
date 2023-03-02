@@ -1,0 +1,495 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+#python dircwd path
+#export DIRCWD=${HOME}/project27/
+#export CONFIGMY_ROOT_FILE=${HOME}/project27/__config/CONFIGMY_ROOT_FILE.py
+#  Need to put ONLY in /etc/environment
+
+# ok
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+######################################################################################
+######################################################################################
+
+
+
+
+######################################################################################
+#### Cloud 9 config ##################################################################
+export PATH="${HOME}/anaconda3/bin/pylint:$PATH"
+
+
+
+######################################################################################
+# added by Anaconda3 4.4.0 installer
+export PATH="${HOME}/anaconda3/bin:$PATH"
+
+# CUDA Toolkit
+export CUDA_HOME=/usr/local/cuda-8.0
+export LD_LIBRARY_PATH=${CUDA_HOME}/lib64:$CUDA_HOME/extras/CUPTI/lib64/:$LD_LIBRARY_PATH
+export PATH=${CUDA_HOME}/bin:${PATH}
+# export CONFIGMY_ROOT_FILE=${HOME}/project27/__config/CONFIGMY_ROOT_FILE.py
+
+
+
+#### Common Shell Scripts  #########################################################
+chmod -R 777 ${HOME}/zscript
+export PATH="${HOME}/zscript:$PATH"
+
+#find ${HOME}/zs3drive/zscript/ -type f -iname "*" -exec chmod +x {} \;
+#export PATH="${HOME}/zs3drive/zscript:$PATH"
+# cp     
+
+export PIP_REQUIRE_VIRTUALENV=false
+
+
+
+###################################################################################
+########## Alias   ################################################################
+alias bashe="c9 open ${HOME}/.bashrc"
+alias bashs="source ${HOME}/.bashrc"
+alias bashe2="nano ${HOME}/.bashrc"
+
+alias shorten="PS1='\u:\W\$ '"
+
+alias home="cd ${HOME}/"
+alias aapackage="cd ${HOME}/aagit/aapackage/"
+
+
+
+
+
+#################################################################################
+####### Python conda ############################################################
+alias python2="source activate python2"
+alias tf_gpu_12="source activate tf_gpu_12"
+
+
+alias base="source activate base"
+alias py27="source activate py27"
+alias py35="source activate py35"
+alias py36="source activate py36"
+alias py36b="source activate py36b"
+alias py36c="source activate py36c"
+alias py36d="source activate py36d"
+alias py36e="source activate py36e"
+alias py37="source activate py37"
+# alias pybases="source activate root"
+
+
+### Give access to script
+alias chmodall="find ${HOME}/*.sh -type f -exec chmod 777 '{}' \;  "
+
+alias topc="top -c -p $(pgrep -d',' -f python)  "
+
+
+topc2() {
+  top -c -p $(pgrep -d',' -f $1)     
+}
+
+
+chmodc() {
+  echo  "Execute access to ${HOME}/zscript"    
+  chmod -R  +x  "${HOME}/zscript"
+}
+
+
+alias etc="sudo nano /etc/environment"     
+ 
+
+
+finds() {
+    find $1 -type f -name "$2*"  -exec sh -c 
+}
+
+
+
+###############################################################################
+### Git  ######################################################################
+alias gitaapackage="cd ${HOME}/aagit/aapackage && git stash && git pull --all && git checkout dev && cd ${HOME}/ "
+alias gitupdate=" gitaapackage "
+
+#alias gitpush="git add --all && git commit -m "ok" && git push --all "
+#gitpush() { git add --all && git commit -m  "ok" && git push --all  }
+gitpush2()  {
+  git add --all && git commit -m  "o $1" && git push --all  
+  # git add --all && gitcommit && git push --all    
+}
+
+alias gitpull="git stash  && git pull --all "
+
+
+git config --global  user.name "arita37"
+git config --global  user.email "noelkev0@gmail.com"
+git config --global credential.helper 'store --file ~/.git-credentials'
+
+
+foldersize() {
+    echo "Folder size $1"
+    du -a  $1 | sort -n -r | head -n 20
+}
+
+
+
+
+
+
+
+#########  S3 zs3drive system  ############################################
+##### Mount S3 as drive
+#  aws s3 ls s3://
+#  aws s3 mb s3://ztasks
+### Check if a directory does not exist ###
+if [ ! -d "${HOME}/zs3drive" ] 
+then
+    echo "mouting S3 on ${HOME}/zs3drive" 
+    # exit 9999 # die with error code 9999
+    ${HOME}/zconda/goofys ztasks ${HOME}/zs3drive
+    
+    ##Global Bash scripts
+    # export PATH="${HOME}/zs3drive/zscript:$PATH"
+fi
+
+
+rename() { #Copy and delete old folder
+   cp  $1   $2  --recursive  && rm $1     --recursive 
+    
+}
+
+
+########## Batch Systems############################################################################
+# alias zbatch="${HOME}/zbatch.sh "
+zbatch() {
+ source activate py36
+ cd ${HOME}/
+
+ ###### Global Drive
+ batch_daemon_launch_cli.py  --task_folder zs3drive/tasks/  --log_file   zlog/batchdaemong.log  --mode daemon  --waitsec 30 &
+
+ ### using ${HOME}/tasks (local drive)
+ # batch_daemon_launch_cli.py  --task_folder  tasks  --log_file   zlog/batchdaemong.log  --mode daemon  --waitsec 60  &
+ sleep 5
+
+  batch_daemon_monitor_cli.py --monitor_log_file zlog/process_log_file.log   --log_file zlog/batchdaemon_monitor.log    --mode daemon   --waitsec 30
+}
+
+
+
+zbatch_nohup() {
+  #### no hup mode for batch launcher    
+  cd ${HOME}/
+  nohup  ${HOME}/zbatch.sh  >/dev/null 2>&1 & 
+  
+}
+
+
+zbatch_kill() {
+  pkill -f batch_daemon_launch_cli.py
+  pkill -f batch_daemon_monitor_cli.py
+  ps -ef | grep python
+}
+####################################################################################################
+####################################################################################################
+
+
+
+
+
+############# TFlow Keras  #########################################################################
+export KERAS_BACKEND=tensorflow
+
+
+
+####### Conda  #####################################################################################
+toenv() {
+    source activate $1
+}
+
+conda_install() {
+  conda create -n  $1    python=3.6.7
+  source activate $1
+
+  conda install --yes   mkl tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn   \
+                   chainer  dask     
+
+  pip install optuna
+
+  #pip install arrow==0.10.0 attrdict==2.0.0 backports.shutil-get-terminal-size==1.0.0 configmy==0.14.87 \ 
+  #            github3.py==1.2.0 jwcrypto==0.6.0 kmodes==0.9 rope-py3k==0.9.4.post1 tables==3.3.0 \ 
+  #            tabulate==0.8.2 uritemplate==3.0.0
+
+  # pip install pytest==4.3.0 toml
+
+  # pip install dcgpy
+
+
+  ##Install TF with AVEC AVX TF 1.9
+  conda uninstall --yes tensorflow  --force
+  pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl 
+   
+   
+  python ztest_conda.py 
+
+  #  pip uninstall tensorflow --no-deps
+}
+
+
+conda_export() {
+  dd1=`date +%Y%m%d`
+  echo $dd1  
+
+  source activate base  
+  conda env export -n $1  > ${HOME}/zconda/$1_$dd1-env.yml         # | grep -v "^prefix: "
+  conda list --explicit -n $1  > ${HOME}/zconda/$1_$dd1-link.txt
+  ls ${HOME}/zconda/     
+}
+
+
+conda_export_all() {
+  NOW=$(date "+%Y%m%d")
+
+  echo $NOW
+  mkdir ${HOME}/zconda/env-$NOW
+  ENVS=$(conda env list | grep '^\w' | cut -d' ' -f1)
+  for env in $ENVS; do
+     #source activate $env
+     # conda env export > $HOME/tmp/envs-$NOW/$env.yml
+     echo "Exporting $env"
+     conda env export -n $env  > ${HOME}/zconda/env-$NOW/$env-$NOW-env.yml         # | grep -v "^prefix: "
+     conda list --explicit -n $env  > ${HOME}/zconda/env-$NOW/$env-$NOW-link.txt
+  done
+}
+
+
+
+conda_pack() {
+  dd1=`date +%Y%m%d`
+  echo $dd1 
+  source activate base  
+  echo "Conda pack " $1
+  mkdir -p ${HOME}/zconda/$1_$dd1
+  ls ${HOME}/zconda/$1_$dd1   
+  
+  conda pack -n $1   -o ${HOME}/zconda/$1_$dd1/$1_$dd1.tar.gz
+  conda env export -n $1  > ${HOME}/zconda/$1_$dd1/$1_$dd1-env.yml         # | grep -v "^prefix: "
+  conda list --explicit -n $1  > ${HOME}/zconda/$1_$dd1/$1_$dd1-link.txt
+  ls ${HOME}/zconda/$1_$dd1     
+}
+
+
+
+conda_unpack() {
+  dd1=`date +%Y%m%d`
+  echo $dd1 
+  source activate base  
+  
+  echo "Create Folder + Unzip"
+  mkdir -p $2
+  tar -xzf $1 -C $2
+  
+  source $2/bin/activate
+  
+  conda-unpack
+  python --version
+  ls $2
+  conda list
+    
+}
+
+
+
+
+
+condaclone() {
+  conda create --name $2 --clone $1
+}
+
+
+condac() {
+  source activate  $1
+}
+
+# catboost 0.14.2 requires enum34, which is not installed.
+# catboost 0.14.2 requires graphviz, which is not installed.
+# keras 2.2.4 has requirement keras_applications>=1.0.6, but you'll have keras-applications 1.0.4 which is incompatible.
+#  keras 2.2.4 has requirement keras_preprocessing>=1.0.5, but you'll have keras-preprocessing 1.0.2 which is incompatible.
+
+
+# conda env remove --name ENVIRONMENT
+
+
+conda_backup_all() {
+  NOW=$(date "+%Y%m%d")
+  new= "${HOME}/zconda/env-$NOW" 
+  mkdir $new
+  for file in $(${HOME}/zconda/zbackup_file_list.txt); do
+    cp "$file"  $new; 
+  done
+}
+
+####################################################################################################
+####################################################################################################
+
+
+
+
+pwd
+shorten
+
+
+
+
+
+test2() {
+ # source activate py36
+ # cd ${HOME}/
+
+ ###### Global Drive
+ batch_daemon_autoscale_cli.py  --task_folder ${HOME}/zs3drive/tasks/  --log_file   ${HOME}/zlog/batchautoscale.log  --mode nodaemon  --waitsec 30  
+
+}
+
+
+alias optim="cd ${HOME}/proj/optim"
+alias proj="cd ${HOME}/proj"
+alias condaenv="conda env list "
+alias dlearning="cd proj/notebook_script/tfcode/deep-learning "
+
+
+alias batch="cd ${HOME}/aagit/aapackage/aapackage/batch"
+
+
+alias control="cd ${HOME}/aagit/aapackage/aapackage/control"
+
+
+
+####################################################################################################
+####################################################################################################
+wgetlist() {
+   # Donwload from list of urls on disk    
+   cat $1 | parallel --gnu "wget {}"
+}
+
+
+
+
+
+
+
+
+

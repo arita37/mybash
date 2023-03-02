@@ -1,0 +1,142 @@
+#!/bin/bash
+USAGE=$(cat <<-END
+     Perform various useful operations on the findstrs/directories
+     
+     ### https://www.baeldung.com/linux/bash-substring
+
+     findstr
+     findstr size        ./            #### Print findstr size in Gb
+     findstr topfile     ./   20       #### Print 20 biggest size files
+     findstr recentifle  ./   10       #### Print recently modified files   
+
+                                
+     findstr backup   mypathXYZ/                           #### copied into default path ~/zarchive/mypath_suffix_20230202/
+     findstr backup   ~/mypathXYZ   ~/mypath_target/       #### copied from mypathXYZ to mypath_target/
+
+
+     findstr copysmallfile   mypathFROm/   mypathTO/   100       ### copy files recursively, filter big files
+     
+
+END
+)
+
+#### Global Config. #################################
+# set -x  # Output commands being run.
+set -e  # Exit on error.
+
+
+#### Global vars ###################################
+FUNAME=`basename "$0"`
+YMD=$(date '+%Y%m%d')
+
+
+
+### Input Params and Defaults ##################################
+[ $# -eq 0 ] &&    echo -e "$USAGE" && exit       ###  No input print doc
+task=$1    &&  [ -z $1 ] && task="size"           ###  print findstr size
+ppath=$2   &&  [ -z $2 ] && ppath="$PWD"          ###  current path as default
+
+
+### Core ###########################################
+if [[ "$task" = size ]]; then
+      ssize=$3   &&  [ -z $3 ] &&  ssize=20 
+
+      df -h $ppath
+      echo  # Newline
+      du -h -d 10 $ppath     2>&1   |\
+         # grep '[0-9]G\>'         |\
+         grep -v 'denied'           |\ 
+         sort -hr                   |\
+         head -n $ssize 
+
+
+
+exit 0
+elif [[ "$task" = topfile ]]; then
+      ssize=$3          &&  [ -z $3 ] &&  ssize=20 
+      eexcludedirs=$4   &&  [ -z $4 ] &&  excludedirs="~/zzzzz" 
+
+      df -H $ppath
+      echo  # Newline
+      du -a $ppath  --exclude='${eexcludedirs}' |\
+         sort -n -r |\
+         head -n $ssize  
+
+
+
+exit 0
+elif [[ "$task" = recentfile ]]; then
+      ### recent file modified files + created
+      ssize=$3   &&  [ -z $3 ] &&  ssize=20 
+
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+         ### MacoS
+         find $ppath -type f -exec stat -lt "%F %T" {} \+ | cut -d' ' -f6- | sort -n | tail -n $ssize
+      else 
+          ### Linux 
+          find $ppath -type f -printf "%T@ %p\n" | sort -n | cut -d' ' -f 2- | tail -n $ssize
+
+      fi
+
+
+exit 0
+elif [[ "$task" =  backup ]]; then
+      ### backup quickly currently findstr, skip big files.
+      pathbase="backup_$YMD"
+      dir_to=$3  &&  [ -z $3 ]  &&  dir_to="~/zbackup/$pathbase"
+
+      rsync -ar $ppath  $dir_to
+
+
+
+
+exit 0
+elif [[ "$task" =  copysmallfile ]]; then
+      ### Copy only small files, exclude big one cplwf
+      pathbase="backup_$YMD"
+      dir_to=$3  &&  [ -z $3 ]  &&  dir_to="~/zbackup/$pathbase"
+      max_file_size="-$4c"  &&  [ -z $4 ] &&    max_file_size="-1000c"
+
+      #### Add File filtering
+      # echo "find $ppath -mindepth 1 -maxdepth 10 -type f -size $max_file_size -exec cp -t $dir_to"
+      cmd= (find $ppath -mindepth 1 -maxdepth 10 -type f -size $max_file_size -exec cp -t $dir_to )
+      
+      printf '%q ' "${cmd[@]}"
+      "${cmd[@]}"   ### Execute the command
+
+
+
+
+exit 0
+else
+   echo $USAGE
+fi
+
+
+
+function exists_in_list() {
+    # https://www.baeldung.com/linux/check-variable-exists-in-list
+    # list1="banana pear apple strawberry lime"
+    # if exists_in_list "pear"   "$list1" ","; then
+    #     echo "pear is in the list"
+    # else
+    #     echo "pear is not in the list"
+    # fi    
+
+    VALUE=$1
+    LIST=$2
+    DELIMITER=$3  &&  [ -z $3 ] &&    DELIMITER=","
+
+    echo $LIST | tr "$DELIMITER" '\n' | grep -F -q -x "$VALUE"
+}
+
+alias exists=exists_in_list
+
+
+
+### https://stackoverflow.com/questions/2005192/how-to-execute-a-bash-command-stored-as-a-string-with-quotes-and-asterisk
+# cmd=( mysql AMORE -u username -ppassword -h localhost -e "SELECT  host  FROM amoreconfig" )
+# printf 'Proposing to run: '
+# printf '%q ' "${cmd[@]}"
+# printf '\n'
+

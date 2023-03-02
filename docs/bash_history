@@ -1,0 +1,2000 @@
+[ ! -e ~/go/ ] && mkdir ~/go
+export GOPATH=$HOME/go
+export PATH="$PATH:$GOPATH/bin"
+ls
+del zs3drive
+rm zs3drive
+cd zconda
+go get github.com/kahing/goofys
+go install github.com/kahing/goofys
+goofys -h
+go get  https://github.com/kahing/goofys/tree/943e017724ea820eb4185419ef3c41d6f921a324
+go get  github.com/kahing/goofys/tree/943e017724ea820eb4185419ef3c41d6f921a324
+go get github.com/kahing/goofys
+rm -rf /usr/local/go
+sudo su rm -rf /usr/local/go
+sudo root
+sudo su root
+wget https://bit.ly/goofys-latest goofys
+ls
+cd goofys-latest
+goofys-latest
+./goofys-latest
+chmod 777 goofys-latest
+./goofys-latest
+goofys s3tasks ${HOME}/zs3tasks
+ls
+goofys s3tasks ${HOME}/zs3tasks
+./goofys s3tasks ${HOME}/zs3tasks
+./goofys s3tasks ${HOME}/zs3tasks2
+aws s3 ls s3://
+awscli s3 ls s3://
+aws s3 ls s3://
+which python
+awscli
+pip list
+aws
+sudo apt install awscli
+aws
+aws help
+aws s3 ls s3://
+./goofys s3tasks ${HOME}/zs3tasks
+./goofys s3tasks ${HOME}/zs3tasks2
+./goofys s3tasks ${HOME}/zs3tasks3
+./goofys s3task.task ${HOME}/zs3tasks3
+aws s3 mb s3://ztasks
+./goofys ztasks  ${HOME}/zs3tasks3
+syslog
+nano syslog
+mkdir ${HOME}/zs3tasks
+mkdir ${HOME}/zs3drive
+goofys ztasks ${HOME}/zs3drive
+./goofys ztasks ${HOME}/zs3drive
+cd ..
+ls
+cd zs3drive
+ls
+mkdir tasks
+mkdir tasks_out
+mkdir zlog
+cp -r tasks/ztask_test1_ignore/     zs3drive/tasks
+cd..
+cd ..
+cp -r tasks/ztask_test1_ignore/     zs3drive/tasks
+ls
+cp -r tasks/ztask_test1_ignore/     zs3drive/tasks
+ls
+sudo tar -C /usr/local -xzf go1.8.3.linux-amd64.tar.gz
+add-apt-repository ppa:longsleep/golang-backports
+sudo su ubuntu
+rm zs3tasks
+rm -rf  zs3tasks
+ls
+py36
+python
+cd proj
+cd optuna
+cd optim
+ls
+git clone https://github.com/pfnet/optuna.git 
+py36
+conda update sklearn
+conda upgrade  sklearn
+conda list
+conda upgrade  scikit-learn
+conda install  scikit-learn
+conda list
+which conda
+conda install  scikit-learn
+python
+pyt36
+py36
+pip install optuna --no-deps
+pip install colorlog
+rm -rf go
+top -c
+df
+df -h
+conda install plotly
+pwd
+git status
+git diff 
+git sttaus
+git status
+git add util_cpu.py
+git commit
+export VISUAL=vi
+git commit
+git 
+git status
+git push origin dev
+git status
+cd 
+ls
+cd tasks
+ls
+cd task_test2/
+ls
+cd ../
+history | grep source
+source activate py36
+python -V
+python tasks/task_test2/main.py 
+ls zlog/
+ls -lrt
+ls -lrt zlog
+date
+ls tasks/task_test2828/
+cd tasks/task_test2828/
+python main.py 
+cd ../
+ls *.sh
+vi zbatch.sh 
+cat zbatch
+pwd
+py36
+batch_daemon_launch_cli.py --task_folder tasks --log_file zlog/batchdaemong.log --mode daemon --waitsec 60 &
+ls
+conda env list
+conda env remove -n tf_gpu_13
+conda env list
+conda env remove -n tf_gpu_12
+conda create -n py36base  --clone py36
+conda list
+conda env list
+py36
+source activate py36
+cd tasks
+ls
+cd task_test2_qdone/
+ls
+cd ../
+mv task_test2_qdone task_test2
+cstall tensorflow --force
+conda  install tensorflow==1.3.6
+conda  install tensorflow=1.3.6
+conda  install tensorflow==1.11
+python pruning/keras_integration.py
+python pruning/keras_integration.py   2>&1 | tee keras_log.txt
+conda list
+which gcc
+gcc --version
+conda uninstall tensorflow --force
+conda update conda
+source activate base
+conda update conda
+py36
+conda uninstall tensorflow --no-deps
+conda uninstall tensorflow --force
+pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl --user  --no-deps
+python
+python pruning/keras_integration.py   2>&1 | tee keras_log.txt
+zbatch_kill
+top -c
+pylint
+ls /usr/bin/pylint
+/usr/bin/pylint
+/usr/local/bin/pylint
+ls
+python xgboost_simple.py
+py36
+python xgboost_simple.py
+bashs
+py36
+python xgboost_simple.py
+conda install optuna
+pip install optuna
+python xgboost_simple.py
+pip install dcgpy
+conda install pygmo
+conda lsit
+conda list
+pip install dcgpy
+conda install dask
+conda install dask --no-update-dependencies 
+conda install dask --no-update-deps
+ls
+aapackage
+gitpush
+zbatch_kill
+gitpush
+conda install xgboost
+conda list
+py36
+conda list
+conda install xgboost
+conda install xgboost --force
+conda create -n py36b -python 3.6.5
+python
+conda create -n py36b  python 3.6.7
+conda create -n py36b  python=3.6.7
+pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl --user 
+source activate py36b
+pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl --user 
+conda install xgboost  keras  lightgbm catboost scikit-learn   chainer 
+pip list
+conda list
+pip uninstall tensorflow
+pip list
+conda uninstall numpy
+pip uninstall  tensorboard    numpy
+pip list
+pip uninstall astor protobuf six termcolor 
+pip list
+conda list
+pip uninstall --all
+pip uninstall -all
+pip freeze | xargs pip uninstall -y
+pip list
+base
+source activate base
+conda remove -n py36b
+conda env remove -n py36b
+conda env list
+conda create -n  py36b    python=3.6.7
+conda install xgboost  keras  lightgbm catboost pytorch scikit-learn   chainer  tensorflow=1.9.0
+source activate py36b
+conda install xgboost  keras  lightgbm catboost pytorch scikit-learn   chainer  tensorflow=1.9.0
+conda install mkl tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn   chainer  
+conda install mkl tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn   chainer  pip install arrow==0.10.0 attrdict==2.0.0 backports.shutil-get-terminal-size==1.0.0 configmy==0.14.87 github3.py==1.2.0 jwcrypto==0.6.0 kmodes==0.9 rope-py3k==0.9.4.post1 tables==3.3.0 tabulate==0.8.2 uritemplate==3.0.0
+pip install arrow==0.10.0 attrdict==2.0.0 backports.shutil-get-terminal-size==1.0.0 configmy==0.14.87 github3.py==1.2.0 jwcrypto==0.6.0 kmodes==0.9 rope-py3k==0.9.4.post1 tables==3.3.0 tabulate==0.8.2 uritemplate==3.0.0
+pip install pytest==4.3.0 toml
+conda lost
+conda list
+conda uninstall tensorflow --force
+pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl 
+python
+bashs
+py36
+gitpush
+gitpsuh
+gitpush
+git status
+git diff util_cpu.py
+git status
+git checkout -- __pycache__/util_cpu.cpython-36.py
+git checkout -- __pycache__/util_cpu.cpython-36.pyc
+git status
+git add util_cpu.py
+export VISUAL=vi
+git commit
+git push origin  dev
+ps -aef  | grep main
+cd 
+source activate py36
+ps -aef | grep main
+cd tasks
+ls
+cd task_test2828_qdone
+ls
+ls -l main.py 
+cd ../
+ls
+mv  task_test2828_qdone task_test2828
+cd ../../
+history | grep launcer
+history | grep launcher
+cd
+pwd
+vi zbatch.sh
+batch_daemon_launch_cli.py  --task_folder  tasks  --log_file   zlog/batchdaemong.log  --mode daemon  --waitsec 60  &
+ps -aef | grep main
+ls
+ls zlog/
+ls -lrt zlog
+cat zlog/task_test_1
+cat zlog/task_test_11710.log
+pwd
+jobs
+ls
+vi zbatch_kill.sht2828
+ls
+vi main.py 
+cd ../../
+history | grep launch
+batch_daemon_launch_cli.py  --task_folder  tasks  --log_file   zlog/batchdaemong.log  --mode daemon  --waitsec 60  &
+ps -aef | grep main
+python
+jobs
+zbatch_kill.sh
+pwd
+./zbatch_kill.sh 
+jobs
+pw
+pwd
+cd aagit/aapackage/
+ls
+cd aapackage
+ls
+cd batch/
+git status
+git diff util_cpu.py
+gs
+git diff util_cpu.py
+q
+git diff util_cpu.py
+git add  util_cpu.py
+git status
+git commit -m "Updated regex for stricter matches"
+git status
+git push origin dev
+git status
+git diff util_cpu.py
+git add util_cpu.py
+gs
+git status
+git commit -m 'Removed cmdline parameter from the method'
+gs
+git status
+git push origin dev
+us
+git status
+git diff batch_daemon_monitor_cli.py
+git  add  batch_daemon_monitor_cli.py
+git commit -m 'Calling function updated for regex patter'
+git status
+git push origin dev
+history  | grep monitor
+cd
+batch_daemon_monitor_cli.py --monitor_log_folder   tasks_out/   --monitor_log_file monitor_log_file.log   --log_file   zlog/batchdaemon_monitor.log    --mode daemon 
+batch_daemon_monitor_cli.py   --monitor_log_file monitor_log_file.log   --log_file   zlog/batchdaemon_monitor.log    --mode daemon 
+git log --oneline
+cd -
+git log --oneline
+pwd
+cd
+cd .aws
+ls
+cat credentials 
+cd -
+cd ~//aagit/aapackage/aapackage/batc
+cd ~/aagit/aapackage/aapackage/batc
+cd ~/aagit/aapackage/aapackage/batch
+pwd
+cd proj
+ls
+mkdir tf
+cd tf
+cd ..
+git clone https://github.com/arita37/reinforcement_agents.git tfcode
+git clone https://github.com/huseinzol05/NLP-Models-Tensorflow.git tf_nlp
+git clone https://github.com/huseinzol05/Machine-Learning-Numpy.git ml_numpy
+git clone https://github.com/huseinzol05/Gather-Tensorflow-Serving.git tf_serving
+git clone https://github.com/huseinzol05/Deep-Learning-Tensorflow.git tfcode2
+git clone https://github.com/huseinzol05/Machine-Learning-Data-Science-Reuse.git dscience
+which pylint
+ls
+aapackage
+gitpush
+ls
+cd ..
+ls
+which pylint
+/usr/local/bin/python
+ls /usr/local/bin/
+ls /usr/local/bin
+ls /usr/local
+ls /usr/local/bin
+sudo apt install pylint3
+ls /usr/local/bin/
+ls /usr/local
+ls /usr/local/bin
+which pylint
+which python
+nano
+cd ..
+ls
+cd usr
+cd bin
+ls
+nano pylint3
+nano pylint
+sudo su root
+aapackage
+gitpush
+jupyter
+gitpull
+gitpush
+git lfs install
+git lfs
+which git
+git --version
+sudo apt-get install git-lfs
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+git lfs
+gitpush
+git pull --all
+git push --all
+git checkout master
+git pull --all
+git checkout dev
+git push --all
+gitpush
+git add --all
+git commit -m "ok"
+git push --all
+git add  aapackage/ml/m/tf_nlp
+git commit -m "ok"
+gitpush
+git gc --auto
+gitpush
+nvidia-smi 
+top
+cd proj
+ls
+conda install PyQt5
+conda install pyqt5
+conda install pyqt
+cd notebook/
+ls ..
+python convert_ipny_cli.py ../notebook/ ../notebook_script/
+python check.py ../notebook_script/
+source activate py36b
+python convert_ipny_cli.py ../notebook/ ../notebook_script/
+pip install nbformat
+python convert_ipny_cli.py ../notebook/ ../notebook_script/
+pip install nbconvert
+python convert_ipny_cli.py ../notebook/ ../notebook_script/
+pip install ipython
+python convert_ipny_cli.py ../notebook/ ../notebook_script/
+pip install tqdm
+python convert_ipny_cli.py ../notebook/ ../notebook_script/
+python auto_check_package.py ../notebook_script/
+cp zs3drive/tasks/ztask_test1_ignore   zs3drive/tasks/task_test1 --recursive
+rm zs3drive/tasks/ztask_test1_ignore  --recursive
+bashe
+bashs
+rename zs3drive/tasks/task_test1  zs3drive/tasks/task_testb 
+rename zs3drive/tasks/task_testc  zs3drive/tasks/task_testd 
+rename zs3drive/tasks/task_testb  zs3drive/tasks/task_testd 
+which pylint
+$path
+echo $path
+ls /usr/bin/pylint
+/usr/bin/pylint
+/usr/bin/pylint ztest.py
+top -c
+aapackage
+gitpush
+git pull --all
+gitpush
+zbatch_kill
+cp zs3drive/tasks/ztask_test1_ignore   zs3drive/tasks/task_test1 --ignore
+cp zs3drive/tasks/ztask_test1_ignore   zs3drive/tasks/task_test1 --recursive
+zbatch_kill
+gitpush
+which python
+pip install aapackage
+pip uninstall aapackage
+source activate py36
+pip uninstall aapackage
+pip   install . -e
+pip   install -e .
+gitpush
+pylint3
+which pylint3
+ls /mnt/share/bin
+ls /mnt/shared/bin
+shorten
+python  1.lstm.py
+py36
+python  1.lstm.py
+zbatch_kill
+top -c
+topc
+zbatch_kill
+topc
+uname -a
+lsb_release
+lsb_release -a
+cat /proc/meminfo 
+aws ec2 describe-instances
+aws ec2 describe-spot-price-history  > /tmp/spotprices.json
+aws ec2 describe-images --image-id ami-005c8c01a65e8ada0
+git status
+pwd
+git status
+pwd
+git status
+git add batch_daemon_autoscale.py batch_daemon_
+git add batch_daemon_autoscale.p
+git add batch_daemon_autoscale.py
+git status
+git commit
+export VISUAL=vi
+git commit
+git status
+git push origin dev
+gs
+git status
+git diff ${HOME}/aagit/aapackage/aapackage/batch/batch_daemon_autoscale.py
+git status
+git checkout -- batch_daemon_autoscale.py
+git status
+git pull origin dev
+git status
+git add ${HOME}/aagit/aapackage/aapackage/batch/batch_daemon_autoscale.py
+git commit
+git push origin dev
+top
+kill 18722
+pip -V
+tp
+top
+conda
+conda env list
+pip -V
+top
+pip install PyQt5
+top
+pip list
+pip install tensorflow=1.4.0
+pip install tensorflow==1.4.0
+pip install scikit-learn=0.17.0
+pip install scikit-learn==0.17.0
+pip install --upgrade pip
+pip install scikit-learn==0.17.0
+pip list
+top
+kill 24787
+top
+kill 24787
+top
+kill 25315
+cd proj/notebook
+ls
+source activate py36b
+top
+python auto_check_package.py ../notebook_script/
+pip install cv2
+pip --version
+pip install pip --upgrade
+pip install tensorflow_serving
+conda install tensorflow_serving
+ztbatch_kill
+zbatch_kill
+c9 open .bashrc
+which c9
+npm install -g c9
+sudo apt install npm
+npm install -g c9
+sudo npm install -g c9
+which c9
+c9 open .bashrc
+bashs
+bashe
+bashs
+zbatch
+bashs
+zbatch
+bashs
+zbatch
+bashs
+zbatch
+bashs
+zbatch
+bashs
+conda_install py36c
+source activate py36c
+python
+conda list
+conda remove
+conda remove -n py36c
+conda env  remove -n py36c
+source activate base
+conda env  remove -n py36c
+conda list
+bashs
+which python
+conda_install py36c
+base
+root
+bashs
+base
+conda env remove -n py36c
+conda_install py36c
+conda list
+xgboost.core.XGBoostError: XGBoost Library (libxgboost.so) could not be loaded.
+Likely causes:
+bashs
+bashs
+bashe
+bashs
+ls
+gitpull
+source activate py36
+bashs
+test
+which test
+bashs
+cd test
+git clone https://github.com/arita37/a_aapackage.git aapackage
+cd aapackage
+git checkout dev
+cd ..
+ls
+./test_git.sh dev aapackage test_aapackage.sh
+chmod 777 test_git.sh
+./test_git.sh dev aapackage test_aapackage.sh
+conda create --clone py36 --name test_py36
+conda list
+conda env list
+py36
+conda list
+conda uninstall libfortran-ng
+conda list
+./test_git.sh dev aapackage test_aapackage.sh
+ls
+./test_git.sh dev aapackage test_aapackage.sh
+exit
+py36
+test3
+test2
+bahs
+bashs
+which python
+py36
+which python
+source activate  py36
+which python
+exit
+which python
+source activate py36b
+which python
+source activate py36
+which python
+exit
+aapackage
+gitpush
+bashs
+topc
+top -c
+zbatch_kill
+top -c
+topc
+bashs
+zbatch_kill
+bashs
+gitpus2 new
+gitpush2 new
+gitpull
+gitpush
+bashe
+gitpush
+gitpush2  backup
+gitpush cpuram
+gitpush 
+gitpush2 d
+git push --all
+gitpull
+short
+shorten
+ls
+which python
+py36
+bashs
+shorten
+which python
+py36
+python autoencoder.py
+python lstm.py
+python 1.lstm.py
+conda list
+bashe
+bashs
+shorten
+bashs
+toenv py36c
+python 1.lstm.py
+pip uninstall tensorflow --no-deps
+pip uninstall tensorflow --force
+pip uninstall tensorflow
+pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl 
+python 1.lstm.py
+zbatch_kill
+top -c
+which  bashs
+alis  bashs
+alias bashs
+alias bashe
+vi ~/.bashrc
+git status
+git diff ${HOME}/aagit/aapackage/aapackage/batch/batch_daemon_autoscale_cli.py
+git status
+ls
+pwd
+ls
+gitpush
+gitpush2
+bashs
+aapackage
+cd batch
+cd aapckage
+cd aapackage
+ls
+cd batch
+ls
+gitpush
+gitpush2
+gitpush minor
+gitpush2  minor
+bashs
+gitpush
+gitcommit
+bashs
+gitpush
+pwd
+cd
+pwd
+ls
+git status
+cd -
+goit status
+git status
+cat batchdaemon_autoscale.log 
+cd -
+ls
+vi batch_daemon_autoscale_cli.py 
+history |grep source
+source activate py36
+pwd
+cd ~/zs3drive/
+ls
+cat global_task.json 
+history | grep autoscale
+ls
+cd -
+git status
+git pull origin dev
+python batch_daemon_autoscale_cli.py --help
+python
+aws ec2 describe-spot-instance-requests
+aws ec2 describe-instances
+aws ec2  describe-spot-fleet-instances
+aws ec2 describe-spot-instance-requests
+aws ec2 describe-instance-status --instance-id i-0ba901c302d4c36cf
+aws ec2 describe-instance --instance-id i-0ba901c302d4c36cf
+aws ec2 describe-instances --instance-id i-0ba901c302d4c36cf
+cat /proc/meminfo  | egrep 'MemTotal|MemFree' | awk '
+{
+  val[NR-1]=$2;
+  total=NR;
+}
+END {
+  pct=0.0;
+  if(total==2){
+     pct=val[1]/val[0] * 100.0;
+  };
+  printf("%.2f\n", pct);
+}
+'
+aws ec2 describe-instances --instance-id i-0ba901c302d4c36cf
+aws ec2 describe-spot-instance-requests
+aws ec2 describe-instances --instance-id i-0ba901c302d4c36cf
+free | grep Mem | awk '{print $3/$2 * 100.0}'
+cat /proc/meminfo  | egrep 'MemTotal|MemFree' | awk '
+{
+  val[NR-1]=$2;
+  total=NR;
+}
+END {
+  pct=0.0;
+  if(total==2){
+     pct=val[1]/val[0] * 100.0;
+  };
+  printf("%.2f\n", pct);
+}
+'
+free | grep Mem | awk '{print $3/$2 * 100.0}'
+cat /proc/meminfo  | egrep 'MemTotal|MemFree' | awk '
+{
+  val[NR-1]=$2;
+  total=NR;
+}
+END {
+  pct=0.0;
+  if(total==2){
+     pct=val[1]/val[0] * 100.0;
+  };
+  printf("%.2f\n", pct);
+}
+'
+free
+free | grep Mem
+free | grep Mem | awk '{print $4/$2 * 100.0}'
+cat /proc/meminfo  | egrep 'MemTotal|MemFree' | awk '
+{
+  val[NR-1]=$2;
+  total=NR;
+}
+END {
+  pct=0.0;
+  if(total==2){
+     pct=val[1]/val[0] * 100.0;
+  };
+  printf("%.2f\n", pct);
+}
+'
+iotat
+git status
+git diff batch_daemon_autoscale_cli.py
+aws ec2 describe-instances --instance-id i-0ba901c302d4c36cf
+id
+ssh ubuntu@ec2-52-26-181-200.us-west-2.compute.amazonaws.com
+ifconfig
+aws ec2 describe-spot-instance-requests
+cd ~/zs3drive/
+ls
+vi global_task.json 
+cd -
+ls
+cat aws_spot_price.sh 
+curl -s 'http://spot-price.s3.amazonaws.com/spot.js' | sed 's/callback(//g;s/)\;//g' | jq -r '[.config.regions[] | {region:.region, size:(.instanceTypes[].sizes[])}] | map("Price: \(.size.valueColumns[0].prices.USD). Size: \(.size.size). Region: \(.region).")|.[]' | grep -v 'N/A*' | sort -nrk2     2>&1 | tee spotprice_list.txt
+cat spotprice_list.txt  | grep us-west-2
+cat spotprice_list.txt  | grep us-west-2 | egrep 'medium|smal'
+python
+vi /tmp/ec_spot_config
+python
+aws ec2 describe-key-pairs
+python
+aws ec2 describe-spot-instance-requests
+python
+aws ec2 describe-instances
+ssh ubuntu@ec2-34-214-31-46.us-west-2.compute.amazonaws.com
+aws ec2 create-key-pair --key-name aws_ec2_ajey
+python
+vi ~/aws_ec2_ajey 
+mv ~/aws_ec2_ajey ~/.ssh/
+ls -l ~/.ssh/
+chmod 600 ~/.ssh/aws_ec2_ajey 
+python
+aws ec2 describe-instances
+aws ec2 stop-instances --instance-ids i-0156235b606d66a86
+aws ec2 terminate-instances --instance-ids i-0156235b606d66a86 --dry-run
+aws ec2 terminate-instances --instance-ids i-0156235b606d66a86
+history | grep cancel
+aws ec2 describe-spot-instance-requests
+aws ec2 aws ec2 describe-spot-instance-requests --spot-instance-request-ids sir-ak2raamm
+aws ec2 aws ec2 cancel-spot-instance-requests --spot-instance-request-ids sir-ak2raamm
+aws ec2 describe-spot-instance-requests
+python
+aws ec2 describe-instances
+aws ec2 describe-spot-instance-requests
+ls
+cat aws_spot_price.sh 
+curl -s 'http://spot-price.s3.amazonaws.com/spot.js' | sed 's/callback(//g;s/)\;//g' | jq -r '[.config.regions[] | {region:.region, size:(.instanceTypes[].sizes[])}] | map("Price: \(.size.valueColumns[0].prices.USD). Size: \(.size.size). Region: \(.region).")|.[]' | grep -v 'N/A*' | sort -nrk2     2>&1 | tee spotprice_list.txt
+cat spotprice_list.txt  | egrep 'medium|small
+'
+cat spotprice_list.txt  | egrep 'medium|small' | grep 'us-west-2'
+python
+aws ec2 describe-spot-instance-requests
+aws ec2 describe-instances --instances-id i-00e39e341d1484c1
+aws ec2 describe-instances --instance-id i-00e39e341d1484c1
+aws ec2 describe-instances
+ssh -i ~/.ssh/aws_ec2_ajey ubuntu@34.222.218.45
+vi ~/.ssh/config
+ssh ubuntu@34.222.218.45
+pwd
+ls
+git status
+python
+cat spotprice_list.txt 
+ls
+cat aws_spot_price.sh
+python
+cat aws_spot_price.sh
+git  status
+git status
+git checkout  --     __pycache__/batch_daemon_autoscale_cli.cpython-36.pyc
+git checkout -- __pycache__/batch_daemon_autoscale_cli.cpython-36.pyc
+\rm __pycache__/batch_daemon_autoscale_cli.cpython-36.pyc
+\rm spotprice_list.txt
+git status
+git diff batch_daemon_autoscale_cli.py
+python
+git diff batch_daemon_autoscale_cli.py
+git status
+\rm __pycache__/batch_daemon_autoscale_cli.cpython-36.pyc
+git add batch_daemon_autoscale_cli.py
+export VISUAL=vi
+git  commit
+git push origin dev
+python
+git status
+git checkout -- batch_daemon_autoscale_cli.py
+gs
+git status
+git pull origin dev
+ls
+python batch_daemon_autoscale.py
+python batch_daemon_autoscale_cli.py 
+cat ~/.ssh/config
+vi ~/.ssh/config
+cat ~/.ssh/config
+python batch_daemon_autoscale_cli.py 
+cat ~/.ssh/config
+vi ~/.ssh/config
+git status
+git diff batch_daemon_autoscale_cli.py
+gs
+git status
+git checkout -- batch_daemon_autoscale_cli.py
+git pull origin dev
+vi ~/.ssh/config
+ssh 34.222.218.45
+git status
+python
+pip freeze | grep paramiko
+pip install -U pip
+pip install paramiko
+python
+exit()
+pwd
+python
+ssh 34.222.218.45
+python
+top -b -n 10 -d.2 | grep 'Cpu' | awk 'NR==3{ print($2)}'
+top -b -n 10 -d.2 | grep 'Cpu' | awk 'BEGIN{val=0.0}{ if( $2 > val ) val = $2} END{print(val)}'
+python
+git status
+git diff batch_daemon_autoscale_cli.py
+git add batch_daemon_autoscale_cli.py
+export VISUAL=vi
+git commit
+git push origin dev
+python
+git status
+git diff batch_daemon_autoscale_cli
+git diff batch_daemon_autoscale_cli.py
+git add batch_daemon_autoscale_cli.py
+export VISUAL=vi
+git commit
+git push origin dev
+ls
+./aws_spot_price.sh
+chmod +x aws_spot_price.sh
+./aws_spot_price.sh
+git status
+vi aws_spot_price.sh 
+./aws_spot_price.sh  t2.small t2.medium t2.micro
+git status
+git checkout -- ../__pycache__/util_aws.cpython-36.pyc  __pycache__/batch_daemon_autoscale_cli.cpython-36.pyc  ../util_aws.py
+git status
+\rm spotprice_list.txt 
+git add aws_spot_price.sh
+git commit
+git push origin dev
+./aws_spot_price.sh
+python ztest.py
+source activate py36c
+python ztest.py
+python ztest_conda.py
+conda list
+python ztest_conda.py
+bashs
+conda_export_all py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+bashs
+conda_export  py36c
+conda_export  py36
+conda_export  base
+bashs
+conda_export_all
+bashs
+bashs && conda_export_all
+basgs
+bashs
+conda_export_all
+bashs && conda_export_all
+pylint
+pylint3
+which pylint3
+which pylint
+bashe
+which pylint
+bashs
+which pylint
+sudo apt get pylint
+sudo aptget pylint
+sudo aptget pylintsudo apt-get install pylint
+sudo apt-get install pylint
+which pylint
+/usr/local/bin/pylint
+/usr/local/bin/
+/usr/local/bin
+ls /usr/local/bin
+ls /usr/local/bin/
+ls /usr/local/bin/c9
+ls /usr/local/bin/c9/
+pwd
+which pyint3
+which pylint3
+ls /usr/bin/pylin3
+ls /usr/bin/pylint3
+ls /usr/bin/pylint
+crontab -e
+top -c
+pwd
+git status
+pwd
+git status
+ls
+vi batch_daemon_autoscale_cli.py
+ls /tmp
+crontab -e
+aapackage
+gitpush
+bashs
+bashe
+cd
+pwd
+cd -
+source activate py36
+cd zs3drive
+ls
+vi global_task.json 
+pwd
+ls
+cd -
+cd ${HOME}/aagit/aapackage/aapackage/batch
+pwd
+ls
+./aws_spot_price.sh t2.small
+./aws_spot_price.sh t3.small
+./aws_spot_price.sh small
+./aws_spot_price.sh medium
+./aws_spot_price.sh small
+ls -l ~/.ssh
+cat /.ssh/config
+cat ~/.ssh/config
+ssh 34.222.218.45
+top -b -n 10 -d.2 | grep 'Cpu' | awk 'BEGIN{val=0.0}{ if( $2 > val ) val = $2} END{print(val)}
+'
+ssh 34.222.218.45
+python
+git status
+git checkout -- spotprice_list.txt
+git diff batch_daemon_autoscale_cli.py
+git add  batch_daemon_autoscale_cli.py
+export VISULA=vi
+export VISUAL=vi
+git commit
+git push origin dev
+python
+ls
+./aws_spot_price.sh t3.medium
+./aws_spot_price.sh t3.medium | grep Price
+./aws_spot_price.sh t3.medium | grep Price | awk '{print $2}'
+./aws_spot_price.sh t3.small | grep Price | awk '{print $2}'
+python
+gs
+git status
+git diff batch_daemon_autoscale_cli.py
+python
+git status
+\rm spotprice_list.txt 
+git diff batch_daemon_autoscale_cli.py
+git add  batch_daemon_autoscale_cli.py
+git commit
+git push origin dev
+ls
+ls ztest
+ls ztest/tasks/
+python
+pwd
+ls
+ls ztest/tasks/
+python
+python -m pdb
+python
+git status
+cd ztest//tasks/
+git status
+mv task_demoxx1 task_demoxx1_qstart
+mv task_demoxx2 task_demoxx2_qstart
+git status
+cd ../../
+\rm spotprice_list.txt
+pwd
+ls
+git status
+\rm spotprice_list.
+\rm spotprice_list.txt
+ls
+git status
+./aws_spot_price.sh 
+git status
+git checkout -- spotprice_list.txt
+git status
+git diff batch_daemon_autoscale_cli.py
+ls ~/zs3drive/
+cat ~/zs3drive/global_task.json 
+python
+source activate py36
+cd ${HOME}/aagit/aapackage/aapackage/batch
+pwd
+git status
+git diff batch_daemon_autoscale_cli.py
+cd ztest/
+cd tasks/
+ls
+ls task_aws_template/
+mv task_demoxx2_qstart task_demoxx2
+ls task_demoxx1
+cd ../
+ls
+pwd
+cd ../
+ls
+cd ztest/tasks/
+ls
+cd task_demoxx3/
+vi main.sh
+chmod +x main.sh
+pwd
+ls
+cd ../
+cp -R task_demoxx3 task_demoxx4
+cp -R task_demoxx3 task_demoxx5
+cp -R task_demoxx3 task_demoxx6
+cp -R task_demoxx3 task_demoxx7
+cp -R task_demoxx3 task_demoxx8
+cp -R task_demoxx3 task_demoxx9
+cp -R task_demoxx3 task_demoxx10
+cp -R task_demoxx3 task_demoxx11
+cp -R task_demoxx3 task_demoxx12
+cp -R task_demoxx3 task_demoxx13
+python
+cd ../../
+git status
+git diff batch_daemon_autoscale_cli.py
+git status
+git add batch_daemon_autoscale_cli.py 
+export VISUAL=vi
+git commit
+git push origin dev
+git status
+cd ~
+source activate py36
+cd -
+cat ~/.ssh/config
+ssh 34.222.218.45
+ls
+which python
+py36
+which python
+python 1.lstm.py
+py36b
+py36c
+python 1.lstm.py
+bashe
+bashs
+py36b
+python 1.lstm.py
+py36c
+conda install protobuf
+conda install protobuf --no-update-deps
+python 1.lstm.py
+bashe
+source activate py36d
+python 1.lstm.py
+conda upgrade keras
+conda upgrade keras  --no-update-deps
+conda list
+pip updgrade keras
+pip upgrade keras
+pip update  keras
+pip install --upgrade keras
+python 1.lstm.py
+pip install --upgrade keras
+source activate py36e
+python 1.lstm.py
+source activate py36e
+python 1.lstm.py
+source activate py36
+cd ${HOME}/aagit/aapackage/aapackage/batch
+git status
+git diff batch_daemon_autoscale_cli.py
+git add batch_daemon_autoscale_cli.py
+git commit
+git pull origin dev
+git status
+git push origin dev
+python
+git status
+git diff batch_daemon_autoscale_cli.py
+git add  batch_daemon_autoscale_cli.py
+git commit
+git push origin dev
+git status
+git diff batch_daemon_autoscale_cli.py
+git add batch_daemon_autoscale_cli.py
+git commit
+git push origin dev
+which python
+py36
+which python
+which pip
+echo $PATH
+codnaenv
+condaenv
+conda env remove -n sandbox
+condaenv
+crontab e
+crontab -e
+proj
+bashe
+proj
+cd proj
+ls
+mkdir misgan
+cd misgan
+git clone https://github.com/steveli/misgan.git 
+wget https://drive.google.com/open?id=0B7EVK8r0v71pZjFTYXZWM3FlRnM
+ls
+unzip celeb.zip
+top -c
+bashe
+conda_export_all
+cd ..
+git clone https://github.com/inkawhich/pt-distributed-tutorial.git torch_distri
+cd torch_distri
+./zconda.sh
+chmod 777 zconda.sh
+./zconda.sh
+conda activate py36d
+source  activate py36d
+./zconda.sh
+conda env remove -n py36e
+./zconda.sh
+source activate py36e
+chmod 777 zconda.sh
+pip install --upgrade keras
+conda list
+python
+optim
+aapackage
+gitpull
+py36
+pip install -e .
+cd
+cd /tmp
+ls
+py36
+which python
+batch_daemon_autoscale.py
+conda lost
+conda list
+pip uninstall aapackage
+batch_daemon_autoscale.py
+batch_daemon_autoscal_clie.py
+batch_daemon_autoscal_cli.py
+batch_daemon_autoscale_cli.py
+${HOME}/zbatch.sh
+zbatch_kill
+crontab e
+crontab -e
+ls
+chmod 777 zbatch_clean.sh
+chmod 777 zbatch_cleanup.sh
+${HOME}/zbatch_cleanup.sh
+py36
+batch_daemon_autoscale_cli.py
+batch_daemon_autoscale_cli --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   
+batch_daemon_autoscale_cli.py --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   
+batch_daemon_autoscale_cli.py --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+aapackage
+gitpush spotprice_update
+gitpush instance_launch
+gitpush bash_shell_remote
+bashe
+bashs
+aapackage
+git add --all && gitcommit && git push --all
+bashs
+git add --all && gitcommit && git push --all
+bashs
+git add --all && gitcommit && git push --all
+bashs
+git add --all && gitcommit && git push --all
+chmod +x ${HOME}/zs3drive/zscript/gitcommit
+git add --all && gitcommit && git push --all
+chmod 777 ${HOME}/zs3drive/zscript/gitcommit
+git add --all && gitcommit && git push --all
+git add --all
+gitcommit
+gitcommit.sh
+gitcommit
+gitcommit.sh
+chmod -r 777 ${HOME}/zs3drive/zscript/
+chmod -r 777 ${HOME}/zs3drive/zscript
+chmod -R  777 ${HOME}/zs3drive/zscript
+gitcommit.sh
+bashs
+gitcommit.sh
+chmod R 777 ${HOME}/zscript
+chmod -R 777 ${HOME}/zscript
+gitcommit.sh
+gitpush zs3sdrive_blockingissue1
+git add --all
+gitcommit.sh
+git push --all
+gitcommit.sh
+git push --all
+gitcommit
+gitcommit  coucou
+gitcommit  coucou2
+gitcommit  coucou3
+gitcommit  coucou4
+git add --all
+git commit -m "ok"
+git push --all
+gitcommit  coucou5
+git status
+git add --all
+git commit -m "ok"
+git push --all
+gitcommit  coucou6
+gitcommit  coucou7
+bashs
+gitpush nono1
+bashs
+gitpush nono2
+batch_daemon_autoscale_cli.py --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+py36
+batch_daemon_autoscale_cli.py --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+crontab -e
+batch_daemon_autoscale_cli.py --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+echo "Start Batch Daemon shell script"
+bashe
+batch_daemon_autoscale_cli.py --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+cd ..
+cd..
+cd ..
+ls
+cd ..
+pwd
+cd ..
+ls
+cd ..
+ls
+cd ..
+pwd
+ssh ubuntu@http://18.237.190.140 " ${HOME}/zbatch_cleanup.sh    && nohup  ${HOME}/zbatch.sh   "
+ssh ubuntu@18.237.190.140 " ${HOME}/zbatch_cleanup.sh    && nohup  ${HOME}/zbatch.sh   "
+which conda
+which python
+conda install virtualenv
+conda list
+conda install virtualenv
+which virtualenv
+which python
+which pylint
+which pylint3
+ls .c9
+ls .c9/bin
+ls .c9/lib
+pwd
+whoami
+aapackage
+gitpush
+gitpush github_tasks
+gitpush github_tasks2
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+py36
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+git clone https://github.com/arita37/tasks_out.git  ${HOME}/data/github_tasks_out
+cd ${HOME}/data/github_tasks_out/ && git add --all  && git commit -m ''   && git push --all 
+cd ${HOME}/data/github_tasks_out/ && git add --all  && git commit -m 'oo'   && git push --all 
+git branches
+git branch
+ls
+git add --all
+git commit -m "ok"
+git push --all
+git config global credential.helper store
+git config  credential.helper store
+git config --global credential.helper 'cache --timeout 7209990'
+git push --all
+git pull --all
+ls
+cd t_github_template
+ls
+aapackage
+gitpush Task_template_added
+gitpush Task_template_added2
+gitpush Task_template_added3
+screen
+bashs
+screen
+py36
+python /zs3drive/tasks/t_github_test02/main.py
+python zs3drive/tasks/t_github_test02/main.py
+cp -r ${HOME}/tasks_out/t_github_test02  ${HOME}/zs3drive/tasks_out/
+python zs3drive/tasks/t_github_test02/main.py
+bashe
+${HOME}/aagit/aapackage/aapackage/batch/task_template/main.sh
+nano /etc/environment
+sudo nano /etc/environment
+source /etc/environnment
+sudo source /etc/environment
+source /etc/environment
+py36
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+ls .c9
+ls .c9/bin
+which virtualenv
+which python
+which virtualenv
+which python3
+$ENV
+virtualenv $VERSION $ENV
+${HOME}/.c9/python
+${HOME}/.c9/python/bin
+${HOME}/.c9/python/bin/python --version
+${HOME}/.c9/python/bin/python2 --version
+${HOME}/.c9/python/bin/pip
+${HOME}/.c9/python/bin/pip list
+${HOME}/.c9/python/bin/pip install virtualenv
+${HOME}/.c9/python/bin/pip install list
+${HOME}/.c9/python/bin/pip list
+/usr/bin/python3
+/usr/bin/pip
+/usr/bin/pip3
+/usr/bin/pip3 list
+/usr/bin/pip3 install virtualenv
+/usr/bin/python3
+/usr/bin/pip3 list
+/usr/bin/pip3 install pylint==1.8.1 jedi=0.8.1
+/usr/bin/pip3 install pylint==1.8.1 jedi==0.8.1
+/usr/bin/pip3 list
+${HOME}/.c9/
+${HOME}/.c9/python/bin
+${HOME}/.c9/python/bin/python
+${HOME}/.c9/python/bin/python/pip 
+${HOME}/.c9/python/bin/python/bin/pip
+${HOME}/.c9/python/bin/pip
+${HOME}/.c9/python/bin/pip install virtualenv
+${HOME}/.c9/python/bin/pip inst
+$ENV
+$PYTHON
+which virtualenv
+virtualenv list
+virtualenv --help
+lsvirtualenv
+which pip
+conda env list
+pip install virtualenvwrapper
+lsvirtualenv
+bashs
+batch
+ls
+py36
+python task_template/util_taskconfig.py
+python task_template/util_taskconfig.py --do ncu
+python task_template/util_taskconfig.py --do ncpu
+python ${HOME}/aagit/aapckage/aapckage/batch/task_template/util_taskconfig.py --do ncpu
+bashe
+py36
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+folder_main +"/" + f 
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+py36
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+bashe
+git clone https://github.com/arita37/script.git script
+ls
+git clone https://github.com/arita37/script.git zscript
+conda list
+conda upgrade cffi
+source activate py36f
+conda_export_all
+py36d
+condac py36d
+bashs
+condac py36d
+conda uninstall tensorflow --force
+pip install --ignore-installed --upgrade https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl 
+python
+pip install --ignore-installed --upagrade  https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl  --user
+pip install --ignore-installed --upgrade  https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl  --user
+which pip
+which conda
+conda activate py36d
+which conda
+which pip
+conda list
+/anaconda3/envs/py36d/bin/pip list
+/anaconda3/envs/py36d/bin/pip 
+anaconda3/envs/py36d/bin/pip 
+anaconda3/envs/py36d/bin/pip install --ignore-installed --upgrade  https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl  --user
+anaconda3/envs/py36d/bin/pip install --ignore-installed --upgrade  https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl  
+bashe
+bashs
+chmodc
+bashs
+chmodc
+aapackage
+ls
+cd aapackage
+ls
+py36d
+condac py36d
+pip install -e .
+cd ..
+pip install -e .
+bashe
+conda list
+which conda
+base
+conda list
+bashe
+bashs
+condac py36d
+anaconda3/envs/py36c/bin/pip install -e .
+${HOME}/anaconda3/envs/py36c/bin/pip install -e .
+${HOME}/anaconda3/envs/py36d/bin/pip install -e .
+${HOME}/anaconda3/envs/py36d/bin/pip install toml
+${HOME}/anaconda3/envs/py36c/bin/pip install toml
+${HOME}/anaconda3/envs/py36d/bin/pip install toml
+gitpush mlmodels
+which python
+python
+screen -r 4544
+py36
+conda list
+bashe
+pip install toml
+py36c
+ls
+conda create -n  py36f    python=3.6.7
+conda activate py36f
+conda install -y mkl tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn  optuna  chainer  dask  ipykernel        
+conda install -y mkl tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn  chainer  dask  ipykernel        
+bashs
+homecopy
+mkdir -p /tmp/home_ubuntu///zs3drive
+ls  /tmp/home_ubuntu///zs3drive
+ls  /tmp/home_ubuntu
+homecopy
+/usr/bin/mkdir -p 
+/usr/bin/mkdir 
+/usr/bin/
+ls which mkdir
+which mkdir
+homecopy
+which cp
+which bash
+homecopy
+ls /tmp/home_ubuntu///zscript/
+homecopy
+ls /tmp/home_ubuntu///.ssh/
+rm -rf /tmp/home_ubuntu/
+git clone https://github.com/arita37/home_ubuntu.git  /tmp/home_ubuntu
+bashs
+homecopy
+homepush
+cd /tmp/home_ubuntu
+git add --all && git commit -m "ok" && git push --all
+git add --all
+git commit -m "ok"
+git add zscript
+git commit -m "ok"
+git tash
+git stash
+git push --all
+ls /tmp/home_ubuntu///zscript/
+rm -rf /tmp/home_ubuntu///zscript/zscript
+ls /tmp/home_ubuntu///zscript/
+git push --all
+git add --all && git commit -m "ok" && git push --all
+cd ..
+homepush
+ls 
+homepush
+crontab -e
+conda_export_all
+bashe
+bashs
+conda_backup_all
+homepush
+conda env list
+conda_export_all
+cd ~/.c9/python3
+cd ~/.c9/
+ls
+cd python
+pip list
+which pip
+source /etc/environment ; head -n1 `which virtualenv`
+which python3
+which python
+which pip
+cd ~/.c9/
+cd python
+which python
+which pip
+ls
+which virtualenv
+cd ..
+which python3
+ls
+virtualenv --python $(which python3) python3
+ls
+cd python3
+ls
+source bin/activate
+pip list
+ls -ls bin
+/bin/bash -c "${HOME}/.c9/python3/bin/pylint --enable all -r n --msg-template={line}:{column}:\ [{msg_id}]\ {msg} --load-plugins pylint_flask,pylint_django '${HOME}/test.py'"
+/bin/bash -c "${HOME}/.c9/python3/bin/pylint --enable all -r n --msg-template={line}:{column}:\ [{msg_id}]\ {msg} --load-plugins pylint_flask,pylint_django '${HOME}/ztest_conda.py'"
+bin/pylint --version
+bin/python -c 'import django;import pylint;import pylint_flask;import pylint_django;import jedi;print("django: " + django.__version__ + "\n\rpylint: " + pylint.__version__ + "\n\rjedi: " + jedi.__version__)'
+pip upgrade  django
+pip install  django
+bin/python -c 'import django;import pylint;import pylint_flask;import pylint_django;import jedi;print("django: " + django.__version__ + "\n\rpylint: " + pylint.__version__ + "\n\rjedi: " + jedi.__version__)'
+find -xdev ${HOME}/.c9/python3 > ${HOME}/venv.txt
+nano /etc/environnment
+nano /etc/environment
+sudo nano /etc/environment
+sudo source  /etc/environment
+source  /etc/environment
+aapackage
+gitlfs
+gitpush gitlfs_test
+gitpush gitlfs_test_remove
+gitpush bug_ssh_issue_screen
+gitpush  Tested_worked_version
+gitpush  Tested_worked_version2
+gitpush  Tested_worked_version3
+gitpush  Tested_worked_version4
+gitpush  v1.0_add_param_load
+gitpush  v1.0_add_param_load2
+gitpush  v1.0_add_param_load3
+gitpush  v1.0_add_ml_models
+gitpush  v1.0_add_toml_batch
+gitpush
+homecopy /tmp/  ${HOME}/zscript/homelist.txt  home_ubuntu
+chmod +x ${HOME}/zscript/
+homecopy /tmp/  ${HOME}/zscript/homelist.txt  home_ubuntu
+chmod +x ${HOME}/zscript
+homecopy /tmp/  ${HOME}/zscript/homelist.txt  home_ubuntu
+chmod +x ${HOME}/zscript/homecopy
+homecopy /tmp/  ${HOME}/zscript/homelist.txt  home_ubuntu
+ls /tmp/
+homecopy /tmp/home_ubuntu  ${HOME}/zscript/homelist.txt  ${HOME}/
+ls /tmp/
+ls /tmp/home_ubuntu
+ls /tmp/home_ubuntu/
+homecopy /tmp/home_ubuntu  ${HOME}/zscript/homelist.txt  ${HOME}/
+ls /tmp/home_ubuntu/
+ls /tmp
+homecopy /tmp/home_ubuntu  ${HOME}/zscript/homelist.txt  /home/ubuntu
+ls /tmp/home_ubuntu/
+ls /tmp/home_ubuntu
+ls /tmp
+homecopy /tmp/home_ubuntu  ${HOME}/zscript/homelist.txt  /home/ubuntu
+mkdir
+mkdir -p ok
+gitpush lstm_model
+conda env list
+conda env remove -n py36e
+conda env remove -n py36d
+conda env list
+condabackup_all
+condabackup
+bashe
+which python
+./zbach.sh
+./zbatch.sh
+zbatch_kill
+${HOME}/zs3drive//zbatch.sh
+bash ${HOME}/zs3drive//zbatch.sh
+bash ./zbatch.sh
+./zbatch.sh
+zbatch
+bash ${HOME}/zs3drive/zbatch.sh
+screen -d -m bash ${HOME}/zs3drive/zbatch.sh
+screen ls
+screen -ls
+screen -d -m bash ${HOME}/zs3drive/zbatch.sh
+screen -ls
+screen -d -m bash ${HOME}/zs3drive/zbatch.sh && screen -ls
+screen -ls
+bash ${HOME}/zs3drive/zbatch.sh && screen -ls
+screen -d -m bash ${HOME}/zs3drive/zbatch.sh && screen -ls
+screen -ls
+bash /ho/zbatch.sh && screen -ls
+screen -d -m bash ${HOME}/zbatch.sh && screen -ls
+screen -ls
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+screen -ls
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 1
+batch_daemon_autoscale_cli.py --mode daemon  --reset_global_task_file 1
+ls
+cd aagit
+bashs
+bashe
+optim
+ls
+cd ..
+ls
+cd ..
+aapackage
+ls
+cd aapackage
+ls
+cd   mlmodel
+ls
+conda env
+conda env list
+source activate py36b
+ls
+python models.py
+source activate py36e
+python models.py
+py36c
+python models.py
+source activate py36f
+python models.py
+conda env remove -n py36f
+base
+conda env remove -n py36f
+conda create -n  py36f    python=3.6.7
+conda install -y  tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn  chainer  dask  ipykernel        
+bashe
+bashs
+conc py36f
+condac py36f
+bashs
+condac py36f
+bashe
+bashs
+condac py36f
+python models.py
+conda install -c conda-forge pandas
+python models.py
+conda install -y  tensorflow=1.9.0 xgboost  keras  lightgbm catboost pytorch scikit-learn  chainer  dask  ipykernel pandas        
+python models.py
+conda install matplotlib
+conda install matplotlib seaborn --no-update-deps
+python models.py
+conda list
+condaclone
+condaclone py36f  py36d
+py36d
+condac py36d
+condaclone py36f  py36d
+python models.py
+conda list
+py36c
+python models.py
+anaconda3/envs/py36c/bin/pip install 
+python models.py
+anaconda3/envs/py36c/bin/pip install toml
+ls
+cd aagit
+cd aapackage
+source activate py36c
+ls
+cd mlmodel
+zip -r model_rl model_rl.zip
+zip -r model_rl.zip model_rl
+zip -r model_dl.zip model_dl
+cd model_dl/
+python3 1.lstm.py 
+python3 2.encoder-lstm.py 
+python3 1_lstm.py 
+cd ..
+python3 model.py
+python3 models.py
+top -c
+homepush
+aapackage
+homepush
+gitpush folderBatch_rename
+bashe
+py36
+py36d
+batch_daemon_autoscale_cli.py  --mode daemon  --reset_global_task_file 1  --param_mode test
+batch_daemon_autoscale_cli.py  --mode daemon  --reset_global_task_file 1  --param_mode prod
+batch_daemon_launch_cli.py --param_file /zs3drive/config_batch.toml --param_mode test_launch
+batch_daemon_launch_cli.py --param_file zs3drive/config_batch.toml --param_mode test_launch
+batch_daemon_launch_cli.py --param_file zs3drive/config_batch.toml --param_mode launch_test
+./zbatch.sh
+bashe
+la
+ls
+ls
+py36
+batch_daemon_autoscale_cli.py  --mode daemon  --reset_global_task_file 1  --param_mode test
+virtualenv py36d
+rm -r py36d/
+locate py36d
+py36c
+exit
+condatest
+py36d
+condatest
+py36c
+condatest
+py36f
+py36e
+conda info --envs
+source activate py36f
+condatest
+pythin
+python
+exit();
+conda remove -n py36f
+conda env remove  -n py36f
+base
+conda env remove  -n py36f
+conda env remove  -n py36d
+conda create -n  py36d    python=3.6.7
+conda install -y  mkl tensorflow=1.9.0 keras pandas xgboost  lightgbm catboost pytorch scikit-learn  chainer  dask  ipykernel 
+py36
+batch_daemon_autoscale_cli.py  --mode daemon  --reset_global_task_file 1  --param_mode test   --param_file zs3drive/config_batch.toml  
+py36d
+python ztest_conda.py
+bashs
+condatest
+which python
+/usr/bin/python
+/usr/bin/pip
+/bin/pip
+/usr/bin/python3
+/usr/bin/pip3
+/usr/bin/pip3 --list
+/usr/bin/pip3 list
+/usr/bin/pip3 install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+pkill -f vfs-worker
+cd .c9
+ls
+cd python3
+ls
+bin/pip list
+-xdev ${HOME}/.c9/python3 > ${HOME}/venv.txt
+find -xdev ${HOME}/.c9/python3 > ${HOME}/venv.txt
+ps auxw | grep vfs-worker
+node --version
+which node
+cd ..
+cd node
+ls
+cd bin
+ls
+node --version
+which node
+cd ..
+bin/node --version
+cd ...
+cd ..
+/usr/bin/pip3
+/usr/bin/pip3 list
+/usr/bin/pip3 uninstall jedi
+/usr/bin/pip3 uninstall pylint
+cd python
+pkill -f vfs-worker
+/usr/bin/pip3 install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+which python3
+base
+which python
+which python3
+which pip3
+pip3 install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+ls
+pwd
+py36d
+python zconda.py
+python ztest_conda.py
+condatest
+conda install botorch 
+conda install xgboost  lightgbm catboost chainer  dask
+pip install optuna
+pip install botorch
+anaconda3/envs/py36d/bin/pip install botorch  # all systems
+aapackage
+gitpush batch
+py36d
+ls
+cd aagit/aapackage/aapackage
+ls
+cd mlmodel/
+ls
+cd model_dl/
+python3 2_encoder-lstm.py 
+python3 3.bidirectional-lstm.py 
+py36d
+conda list
+conda install -y  mkl tensorflow=1.9.0 keras pytorch   pandas  scikit-learn    ipykernel 
+conda install matplotlib seaborn --no-update-deps
+condatest
+conda uninstall tensorflow --force
+anaconda3/envs/py36d/bin/pip install --ignore-installed --upgrade  https://github.com/lakshayg/tensorflow-build/releases/download/tf1.9.0-ubuntu16.04-py36/tensorflow-1.9.0-cp36-cp36m-linux_x86_64.whl  
+condatest
+pip install -e ${HOME}/aagit/aapackage 
+pip3 install ax-platform  # all systems
+which pip3
+anaconda3/envs/py36d/bin/pip install ax-platform  # all systems
+conda install botorch -c pytorch
+conda list
+condaenv
+condatest
+anaconda3/envs/py36d/bin/pip install botorch  # all systems
+condatest
+anaconda3/envs/py36d/bin/pip install ax-platform 
+condatest
+condaenv
+condatest
+anaconda3/envs/py36d/bin/pip  install arrow==0.10.0 attrdict==2.0.0 backports.shutil-get-terminal-size==1.0.0  github3.py==1.2.0 jwcrypto==0.6.0 kmodes==0.9 rope-py3k==0.9.4.post1 tables==3.3.0 tabulate==0.8.2 uritemplate==3.0.0             
+conda install scikit-learn 
+conda install scikit-learn  --no-deps-update
+conda install scikit-learn  --no-update-deps
+conda list
+conda upgrade  scikit-learn  --no-update-deps
+conda upgrade  sklearn   --no-update-deps
+conda install  sklearn   --no-update-deps
+conda uninstall scikit-learn --force
+conda uninstall sklearn  --force
+anaconda3/envs/py36d/bin/pip uninstall sklearn     --no-update-deps
+anaconda3/envs/py36d/bin/pip uninstall sklearn  
+conda install sklearn  --no-update-deps
+conda install scikit-learn  --no-update-deps
+condatest
+homepush
+anaconda3/envs/py36d/bin/pip  install paramiko
+conda install horovod
+conda create --clone py35d --name py35d2
+conda create --clone py36d --name py36d2
+py36d
+cd aagit/
+cd aapackage/aapackage/mlmodel/model_dl/
+python3 1_lstm.py 
+bashe
+aapackage
+gitpush ox
+py36d
+cd aagit/aapackage/aapackage/mlmodel/model_dl
+python3 1_lstm.py 
+python3 6.encoder-gru.py 
+bashe
+py36d
+ls
+cd aagit/aapackage/aapackage/mlmodel/model_dl/
+python3 4.lstm-2path.py 
+python3 5.gru.py 
+base
+conda install -c conda-forge conda-pack
+py36d
+condatest
+pip uninstall aapackage
+bashs
+conda_pack py36d
+df
+du -a /home | sort -n -r | head -n 5
+du -a /home/ubuntu | sort -n -r | head -n 5
+conda env list
+conda env remove -n nlp
+conda env remove -n py2_nlp
+ls
+conda env list
+conda clean -t
+conda clean -p
+df -H

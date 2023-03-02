@@ -1,0 +1,277 @@
+############################################################################
+nano /etc/environment
+# PATH="${HOME}/anaconda3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/loca$
+
+
+source /etc/environment
+rm -rf .cp/python3
+
+cd .c9
+virtualenv   --python=${HOME}/anaconda3/bin/python3 python3
+
+cd python3
+source bin/activate
+which pip3
+pip3 install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+
+Package             Version
+------------------- -------
+astroid             1.6.6  
+Django              1.11.10
+isort               4.3.20 
+jedi                0.11.1 
+lazy-object-proxy   1.4.1  
+mccabe              0.6.1  
+parso               0.1.1  
+pip                 19.1.1 
+pylint              1.8.1  
+pylint-django       0.8.0  
+pylint-flask        0.5    
+pylint-plugin-utils 0.5    
+pytz                2019.1 
+setuptools          41.0.1 
+six                 1.12.0 
+wheel               0.33.4 
+wrapt               1.11.1 
+
+
+
+
+(python3) ubuntu:python3$ /bin/bash -c "${HOME}/.c9/python3/bin/pylint --enable all -r n --msg-template={line}:{column}:\ [{msg_id}]\ {msg} --load-plugins pylint_flask,pylint_django '${HOME}/ok.py'"
+No config file found, using default configuration
+************* Module ok
+10:0: [C0303] Trailing whitespace
+12:0: [C0303] Trailing whitespace
+13:0: [C0303] Trailing whitespace
+14:0: [C0303] Trailing whitespace
+1:0: [C0111] Missing module docstring
+6:0: [W0404] Reimport 'os' (imported line 3)
+3:0: [W0611] Unused import os
+
+-----------------------------------------------------------------------
+Your code has been rated at -25.00/10 (previous run: -50.00/10, +25.00)
+
+
+
+(python3) ubuntu:python3$ bin/python -c 'import django;import pylint;import pylint_flask;import pylint_django;import jedi;print("django: " + django.__version__ + "\n\rpylint: " + pylint.__version__ + "\n\rjedi: " + jedi.__version__)'
+django: 1.11.10
+pylint: 1.8.1
+jedi: 0.11.1
+(python3) ubuntu:python3$ 
+
+
+(python3) ubuntu:python3$ ls
+bin  include  lib  pip-selfcheck.json
+(python3) ubuntu:python3$ pwd
+${HOME}/.c9/python3
+(python3) ubuntu:python3$ 
+
+
+Pylint is working now
+http://prntscr.com/nqg9od
+
+
+But JEDI failed
+http://prntscr.com/nqg9he
+
+
+## Running manually JEDI in terminal :
+import jedi
+source = '''import json; json.l'''
+script = jedi.Script(source, 1, 19, '')
+script
+<jedi.api.Script object at 0x2121b10>
+completions = script.completions()
+completions
+completions[1]
+<Completion: loads>
+
+
+
+
+
+
+
+
+
+Built the C9 environment in the C9 console -- How can I build C9 ?
+- In this case I was simply referencing creating a new SSH C9 environment in the AWS console, build may have been the wrong term to use there.  
+
+Can you explicitly tell me which python path that Cloud9 nodejs is USING by Default ?
+- There is no specific path that the C9 nodeJS uses to execute Python for the creation of the virtual environment, it's based on the contents of the virtualenv file.  Cloud9 executes the first executable 'virtualenv' file found in the path from /etc/environment.  Depending on which virtualenv file is run, the definition in that file determines which Python binary is used to run it (see the hashbang on the first line of the file).
+
+Eg, in my case (note the source /etc/environment might break things for your current session as it replaces $PATH with what the C9 VFS worker would be using, to restore your default you should be able to 'source ~/.bashrc' or restart the ssh connection):
+(base) ubuntu@ip-172-31-41-233:~$ source /etc/environment ; head -n1 `which virtualenv`
+#!${HOME}/anaconda2/bin/python
+
+- Once the virtual environment has been created, C9 uses the binaries in $ENV/bin (eg, ~/.c9/python3/bin), 
+followed by any paths in /etc/environment, eg PATH in most cases will be (in my case with the modified environment file to include ~/anaconda2/bin): ${HOME}/.c9/python3/bin:${HOME}/anaconda2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+- Some executed commands will be done with using the PATH, some will have absolute paths to the executable, 
+for example when running pylint for the purposes of the gathering information to display in the IDE, 
+it runs ${HOME}/.c9/python3/pylint explicitly, that file runs the python binary '${HOME}/.c9/python3/bin/python3' explicitly (based on the hashbang in the file).
+
+
+As for the current situation, can you please let me know what you did to resolve the issue previously noted (the missing virtualenv)?
+
+From the error it looks like it has created the virtual environment, installed pylint and is able to run the commands (or at least not showing an error) but unable to execute the linter command successfully (either it does not return or does not return correct data).
+
+Lets test and make sure the installed linter in the environment works as expected here, as mentioned previously, the only thing that matters after the virtual environment has been created is what's installed into that environment:
+
+1) Lets enter the virtual environment here (assuming python3 is set in the IDE):
+- source /etc/environment
+- cd ~/.c9/python3
+- source bin/activate
+
+
+    pip install --upgrade jedi pylint pylint-flask pylint-django 
+
+
+2) Now that we're in the virtual environment as would be seen by the VFS worker, lets validate that the pylint command is available:
+- ls -la bin
+
+
+
+#### Missing
+/usr/bin/pip3   install virtualenv
+
+
+
+
+
+
+3) Assuming it exists, lets try running it same as the IDE would (replace path to test.py  with some python file in the following command):
+/bin/bash -c "${HOME}/.c9/python3/bin/pylint --enable all -r n --msg-template={line}:{column}:\ [{msg_id}]\ {msg} --load-plugins pylint_flask,pylint_django '${HOME}/ok.py'"
+
+
+ok
+
+
+If this worked, please let me know, and if it throws an error as well, please let me know the error.
+
+
+
+While we're in this virtual environment, lets also validate the versions installed in this virtual environment of various libraries and binaries (please provide the output of the following commands):
+- bin/python --version
+- bin/pylint --version
+- bin/python -c 'import django;import pylint;import pylint_flask;import pylint_django;import jedi;print("django: " + django.__version__ + "\n\rpylint: " + pylint.__version__ + "\n\rjedi: " + jedi.__version__)'
+
+(python3) ubuntu:python3$  bin/python --version
+Python 3.6.7
+
+(python3) ubuntu:python3$ bin/pylint --version
+pylint 2.3.1
+astroid 2.2.5
+Python 3.6.7 | packaged by conda-forge | (default, Feb 28 2019, 09:07:38) 
+[GCC 7.3.0]
+
+(python3) ubuntu:python3$ bin/python -c 'import django;import pylint;import pylint_flask;import pylint_django;import jedi;print("django: " + django.__version__ + "\n\rpylint: " + pylint.__version__ + "\n\rjedi: " + jedi.__version__)'
+django: 2.2.1
+pylint: 2.3.1
+jedi: 0.13.3
+(python3) ubuntu:python3$ 
+
+
+
+
+Lets also validate the contents of the virtual environment, can you please run the following command and attach the resulting ~/venv.txt file to the case here?
+find -xdev ${HOME}/.c9/python3 > ${HOME}/venv.txt
+
+Again, please be aware that your PATH environment variable at this point is likely not accurate, and you should 'source ~/.bashrc' to restore it.
+
+It is possible if you still have --enable all in the Pylint command line options in the IDE that full linting is simply taking longer than expected.  
+If all of the above looks ok, can you try removing the entry from the Pylint options in the IDE? (It should go back to the default -d all -e E -e F).  Alternatively as well could you try a smaller test file?  Eg just a simple three line Python function with a bad indent or so?
+
+Please let me know the above information and we can go from there to resolve this issue.  I look forward to hearing back from you, and if you have any questions in the meantime, please feel free to let me know.
+
+
+
+if [[ -d $SHAREDENV ]]; then
+ ENV=$SHAREDENV
+ source $ENV/bin/activate
+ PYTHON="$ENV/bin/$PYTHON"
+elif which virtualenv &>/dev/null; then
+ ENV=$FALLBACKENV
+ if ! [[ -d $ENV ]]; then
+ VERSION=--python=python
+ if [ "$PYTHON" = "python3" ]; then
+ VERSION=--python=python3
+ fi
+ fi
+ 
+ if ! [ -f $ENV/bin/activate ]; then
+ virtualenv $VERSION $ENV
+ fi
+ 
+ source $ENV/bin/activate
+ PYTHON=$ENV/bin/$PYTHON
+ 
+ if ! $PYTHON -c 'import jedi' &>/dev/null; then
+ echo "Installing python support dependencies" >&2
+ pip install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10 >&2
+ fi
+else
+ echo "Python support fatal error: virtualenv not installed" >&2
+ echo "try 'pip install virtualenv' or 'sudo pip install virtualenv'" >&2
+ exit 1
+fi
+
+
+
+############################################################################
+which python3
+>> /usr/local/bin/python3
+virtualenv venv --python=/usr/local/bin/python3
+
+##Using Anaconda
+
+
+
+
+
+
+
+
+
+
+
+
+virtualenv --python $(which python3) python3
+
+
+
+pip3 install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+
+
+
+
+/usr/bin/pip3 install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+
+
+
+
+In specific, the script should be running and installing these associated versions via the following command in the virtual environment: pip install pylint==1.8.1 pylint-flask==0.5 pylint-django==0.8.0 jedi==0.11.1 Django==1.11.10
+
+This makes me think the environment creation may have failed part of the way through and it is using either the system installed packages from the defined PYTHONPATH instead perhaps causing this error.
+
+Can you please perform the following steps from within the C9 IDE to try to resolve this (we'll remove the python3 virtual environment and allow it to be recreated from scratch):
+- Open the browser developer console
+- Close all open files in the IDE
+- Uninstall jedi from the system level: pip uninstall jedi (sudo pip uninstall jedi), etc...
+- Run: rm -rf ${HOME}/.c9/python3
+- Run: pkill -f python3
+- Run: pkill -f vfs-worker
+- (IDE will disconnect and automatically reconnect here a moment later)
+- Open a simply .py file in the editor (eg, just one line: import os with a tab at the beginning of the line to cause an error in the linter)
+- Wait 1 minute
+- Copy the resulting browser console output into a text file and attach it to this case.
+- Run: find -xdev ${HOME}/.c9/python3 > ${HOME}/venv.txt
+- Attach the resulting venv.txt to this case
+- Run and attach the output of: ps auxw | grep vfs-worker
+- Run and attach the output of: 'node --version' as well as running --version
+against the Node.js binary path in the Cloud9 AWS Console (if set)
+
+
+
+
+
+

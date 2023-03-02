@@ -1,0 +1,34 @@
+#!/bin/bash
+
+## ${HOME}/zbatch.sh
+### nohup  ${HOME}/zbatch.sh  2>&1 | tee -a ${HOME}/zlog/zbatch_log.log
+
+####################################################################################################
+### Need to source when using SSH   !!!!!!!!!!!!!
+echo "-Start Batch Daemon shell script-"
+source ${HOME}/.bashrc
+
+
+export PATH="${HOME}/anaconda3/bin:$PATH"
+
+source activate py36
+cd ${HOME}/
+whoami
+pwd
+which python
+which conda
+
+
+####################################################################################################
+###### Task Launcher  ##############################################################################
+# batch_daemon_launch_cli.py  --task_folder  zs3drive/tasks/  --log_file   zlog/batchdaemon.log  --mode daemon  --waitsec 60  &
+
+
+# batch_daemon_launch_cli.py --param_file zs3drive/config_batch.toml --param_mode launch_prod
+
+
+batch_daemon_autoscale_cli.py --mode daemon --task_folder  zs3drive/tasks/  --log_file zlog/batchautoscale.log   --reset_global_task_file 0
+
+
+
+

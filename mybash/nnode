@@ -1,0 +1,86 @@
+#!/bin/bash
+USAGE=$(
+      cat <<-END
+Perform various useful operations on the node infod
+
+nnode
+nnode all
+nnode cpu
+nnode ram
+nnode ip
+
+sh -c 'ps -e -o pcpu h | { LANG=C s=0; while read a; do s=$(echo "$s + $a" | bc); done; printf "%s\n" $s; }'
+
+https://www.tecmint.com/check-linux-cpu-information/ 
+
+END
+)
+
+#### Global Config. ################################
+# set -x  # Output commands being run.
+set -e # Exit on error.å
+
+#### Global vars ###################################
+FUNAME=$(basename "$0")
+YMD=$(date '+%Y%m%d')
+
+#### Import utils #################################
+source utils/util_stable.sh
+
+### Input Params and Defaults ##################################
+[ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
+task=$1 && [ -z $1 ] && task="size"      ###  print nnode size
+ppath=$2 && [ -z $2 ] && ppath="$PWD"    ###  current path as default
+
+### Core ###########################################
+if [[ "$task" = cpu ]]; then
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      cat /proc/cpuinfo
+
+      echo
+
+      exit 0
+elif [[ "$task" = ram ]]; then
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      exit 0
+elif [[ "$task" = ip ]]; then
+      ### recent file modified files + created
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+            #### Local in MacOS
+            # export IP_HOST="$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')"
+            # export  LOCAL_IP=$(ifconfig | awk '/inet /&&!/127.0.0.1/{print $2;exit}')
+            export IP_HOST__=$(osascript -e "IPv4 address of (system info)")
+            # ipconfig getifaddr en0  172.20.10.3  ### on Macos
+            #export IP_HOST="172.20.10.3"
+            echo -e "\n\nIP_HOST: $IP_HOST__"
+
+      else
+
+            ### Linux
+
+      fi
+
+      exit 0
+elif [[ "$task" = all ]]; then
+
+      exit 0
+elif [[ "$task" = copysmallfile ]]; then
+      ### Copy only small files, exclude big one cplwf
+      pathbase="backup_$YMD"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+      max_file_size="-$4c" && [ -z $4 ] && max_file_size="-1000c"
+
+      exit 0
+else
+      echo $USAGE
+fi
+
+### https://stackoverflow.com/questions/2005192/how-to-execute-a-bash-command-stored-as-a-string-with-quotes-and-asterisk
+# cmd=( mysql AMORE -u username -ppassword -h localhost -e "SELECT  host  FROM amoreconfig" )
+# printf 'Proposing to run: '
+# printf '%q ' "${cmd[@]}"
+# printf '\n'

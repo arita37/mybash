@@ -1,0 +1,1 @@
+ps x | grep ssh | grep <long-account> | awk '{print $1}' | xargs kill -9

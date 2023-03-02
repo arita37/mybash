@@ -1,0 +1,47 @@
+#!/bin/bash
+USAGE=$(
+      cat <<-END
+     Perform various useful operations on the filess/directories
+
+     files find "*/.py"                   
+     files findinside   "./*.py"   "*myword*" 
+
+END
+)
+
+#### Global Config. #################################
+# set -x  # Output commands being run.
+set -e # Exit on error.
+
+#### Global vars ###################################
+FUNAME=$(basename "$0")
+YMD=$(date '+%Y%m%d')
+
+### Input Params and Defaults ##################################
+[ $# -eq 0 ] && echo -e "$USAGE" && exit ### No input print doc
+task=$1 && [ -z $1 ] && task="size"      ### print files size
+ppath=$2 && [ -z $2 ] && ppath="$PWD"    ### current path as default
+
+### Core ###########################################
+if [[ "$task" = find ]]; then
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      exit 0
+elif [[ "$task" = findsinside ]]; then
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      exit 0
+elif [[ "$task" = recentfile ]]; then
+      ### recent file modified files + created
+      ssize=$3 && [ -z $3 ] && ssize=20
+
+      exit 0
+elif [[ "$task" = backup ]]; then
+
+      exit 0
+elif [[ "$task" = copysmallfile ]]; then
+
+      exit 0
+else
+      echo $USAGE
+fi

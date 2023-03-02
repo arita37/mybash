@@ -1,0 +1,6 @@
+
+
+
+echo 'export PATH' >>
+
+

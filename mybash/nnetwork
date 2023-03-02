@@ -1,0 +1,18 @@
+#!/bin/bash
+# set -x  # Output commands being run.
+set -e # Exit on error.
+
+USAGE="
+./$(basename $0) size | topfile | rename from to
+"
+
+echo " ######### $(basename "$0") #############################"
+NOW=$(date '+%Y%m%d')
+echo "$NOW"
+
+if [[ "$1" = listen ]]; then
+   sudo lsof -i -P -n | grep LISTEN
+else
+   echo -e "\nInvalid arguments. Usage:" 1>&2
+   echo ${USAGE}
+fi
