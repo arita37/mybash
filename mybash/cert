@@ -31,7 +31,7 @@ certfile=$2 && [ -z $2 ] && print_usage
 
 
 
-### Core ###########################################
+######  ???   ########################################
 if [[ "$task" = get ]]; then
 	artifacts=$3 && [ -z $3 ] && print_usage
 
@@ -46,7 +46,7 @@ if [[ "$task" = get ]]; then
 
 
 
-
+##### ?????  ########################################
 elif [[ "$task" = gen ]]; then
 	clcert=$3 && [ -z $3 ] && print_usage	
 	cmd="openssl pkcs12 -out $certfile -in $clcert -export"
