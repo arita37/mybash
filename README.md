@@ -18,9 +18,6 @@
      source $mybashdir/__init/init_all.sh       ##### Init all the alias
 
 
- 3) Initlize all alias,vars,...
-     source $mybash/__init/init_all.sh
-
 
 #### Example
      folder size        ./             #### Print folder size in Gb
@@ -32,8 +29,6 @@
      folder backup   ~/mypathXYZ   ~/mypath_target/
 
 
-  4) you can debug bash script online here
-     https://www.onlinegdb.com/online_bash_shell
 
 
 
