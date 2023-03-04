@@ -5,9 +5,14 @@ USAGE=$(
 
      files find "*/.py"                   
      files findinside   "./*.py"   "*myword*" 
+     files replace <seq1> <seq2> [file]                           #### Replace seq1 with seq2 at all places in <file>(default=* i.e. all files in the directory)
 
 END
 )
+
+#### Import utils ##################################
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/utils/utils.sh
 
 #### Global Config. #################################
 # set -x  # Output commands being run.
@@ -16,6 +21,7 @@ set -e # Exit on error.
 #### Global vars ###################################
 FUNAME=$(basename "$0")
 YMD=$(date '+%Y%m%d')
+
 
 ### Input Params and Defaults ##################################
 [ $# -eq 0 ] && echo -e "$USAGE" && exit ### No input print doc
@@ -42,6 +48,18 @@ elif [[ "$task" = backup ]]; then
 elif [[ "$task" = copysmallfile ]]; then
 
       exit 0
+
+elif [[ "$task" = replace ]]; then
+      src=$2 && [ -z $2 ] && print_usage
+      dst=$3 && [ -z $3 ] && print_usage
+      file=$4 && [ -z $4 ] && file="*"
+
+      cmd="sed -i 's/$src/$dst/g' $file"
+      eval $cmd
+
+      exit 0
+
+
 else
       echo $USAGE
 fi

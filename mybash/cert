@@ -15,7 +15,9 @@ USAGE=$(
 END
 )
 
-source utils/utils.sh
+#### Import utils ##################################
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/utils/utils.sh
 
 #### Global Config. #################################
 # set -x  # Output commands being run.

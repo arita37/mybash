@@ -10,6 +10,10 @@ USAGE=$(
 END
 )
 
+#### Import utils ##################################
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/utils/utils.sh
+
 #### Global Config. #################################
 # set -x  # Output commands being run.
 set -e # Exit on error.å
@@ -18,7 +22,7 @@ FUNAME=$(basename "$0")
 YMD=$(date '+%Y%m%d')
 
 ### Input Params and Defaults ##################################
-[ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
+[ $# -eq 0 ] && print_usage ###  No input print doc
 task=$1
 
 ### Core ###########################################
@@ -39,10 +43,10 @@ if [[ "$task" = uncmp ]]; then
 	esac
 	exit 0
 elif [[ "$task" = cmp ]]; then
-	zipfile=$2 && [ -z $2 ] && echo $USAGE && exit 0
+	zipfile=$2 && [ -z $2 ] && print_usage
 	echo "${@:3}"
 	sourcefiles="${@:3}"
-	sourcefiles="${@:3}" && [ ${#sourcefiles[@]} -eq 0 ] && echo $USAGE && exit 0
+	sourcefiles="${@:3}" && [ ${#sourcefiles[@]} -eq 0 ] && print_usage
 
 	case $zipfile in
 		*.zip)      zip "$zipfile" $sourcefiles                              ;;
