@@ -1,0 +1,40 @@
+#!/bin/bash
+
+USAGE=$(
+      cat <<-END
+     Perform cert management operations
+     ## TODO: Make <Key> and <Clcert> optional
+
+     cert get <Cert.pfx> key <Key> 				#### Get private key in <Key> file from the the pfx certificate
+     cert get <Cert.pfx> clcert <Clcert> 			#### Get client cert in <Clcert> file from the the pfx certificate
+
+END
+)
+
+#### Global Config. #################################
+# set -x  # Output commands being run.
+set -e # Exit on error.å
+
+FUNAME=$(basename "$0")
+YMD=$(date '+%Y%m%d')
+
+### Input Params and Defaults ##################################
+[ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
+task=$1
+
+### Core ###########################################
+if [[ "$task" = get ]]; then
+	certfile=$2 && [ -z $2 ] && echo -e $USAGE && exit 
+	artifacts=$3 && [ -z $3 ] && echo -e $USAGE && exit
+
+	case $artifacts in
+		key)    Key=$4 && [ -z $4 ] && echo -e $USAGE && exit 
+			openssl pkcs12 -in $certfile -nodes -nocerts -nokeys -out $Key           ;;
+		clcert) Clcert=$4 && [ -z $4 ] && echo -e $USAGE && exit
+			openssl pkcs12 -in $certfile -nodes -clcerts -out $Clcert                ;;
+		*)      echo "'$artifacts' not recognized"                                       ;;
+	esac
+	exit 0
+else
+      echo $USAGE
+fi
