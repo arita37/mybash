@@ -3,13 +3,17 @@
 USAGE=$(
       cat <<-END
      Perform cert management operations
-     ## TODO: Make <Key> and <Clcert> optional
+     ## TODO: Make <key> and <clcert> optional
 
-     cert get <Cert.pfx> key <Key> 				#### Get private key in <Key> file from the the pfx certificate
-     cert get <Cert.pfx> clcert <Clcert> 			#### Get client cert in <Clcert> file from the the pfx certificate
+     cert get <cert.pfx> key <key> 				#### Get private key in <key> file from the the pfx certificate
+     cert get <cert.pfx> clcert <clcert> 			#### Get client cert in <clcert> file from the the pfx certificate
+
+     cert gen <cert.pfx> <clcert> [key] [cacert]                #### Generate pfx certificate from client certificate and private key(optional), cacert(optional)
 
 END
 )
+
+source utils/utils.sh
 
 #### Global Config. #################################
 # set -x  # Output commands being run.
@@ -19,22 +23,38 @@ FUNAME=$(basename "$0")
 YMD=$(date '+%Y%m%d')
 
 ### Input Params and Defaults ##################################
-[ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
+[ $# -eq 0 ] && print_usage ###  No input print doc
 task=$1
+certfile=$2 && [ -z $2 ] && print_usage
 
 ### Core ###########################################
 if [[ "$task" = get ]]; then
-	certfile=$2 && [ -z $2 ] && echo -e $USAGE && exit 
-	artifacts=$3 && [ -z $3 ] && echo -e $USAGE && exit
+	artifacts=$3 && [ -z $3 ] && print_usage
 
 	case $artifacts in
-		key)    Key=$4 && [ -z $4 ] && echo -e $USAGE && exit 
-			openssl pkcs12 -in $certfile -nodes -nocerts -nokeys -out $Key           ;;
-		clcert) Clcert=$4 && [ -z $4 ] && echo -e $USAGE && exit
-			openssl pkcs12 -in $certfile -nodes -clcerts -out $Clcert                ;;
+		key)    key=$4 && [ -z $4 ] && print_usage
+			openssl pkcs12 -in $certfile -nodes -nocerts -nokeys -out $key           ;;
+		clcert) clcert=$4 && [ -z $4 ] && print_usage
+			openssl pkcs12 -in $certfile -nodes -clcerts -out $clcert                ;;
 		*)      echo "'$artifacts' not recognized"                                       ;;
 	esac
 	exit 0
+elif [[ "$task" = gen ]]; then
+	clcert=$3 && [ -z $3 ] && print_usage	
+	cmd="openssl pkcs12 -out $certfile -in $clcert -export"
+
+	for arg in "${@:4}"
+	do
+		if [[ -n $arg ]]; then
+			base=${arg%.*} && ext=${arg#$base.}
+			case $ext in
+				key)    cmd+=" -inkey $arg"                                              ;;
+				cer)	cmd+=" -certfile $arg"						 ;;
+				crt)	cmd+=" -certfile $arg"						 ;;
+			esac
+		fi
+	done
+	eval "$cmd"
 else
-      echo $USAGE
+	print_usage
 fi

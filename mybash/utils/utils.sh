@@ -140,6 +140,11 @@ function print_envars(){
   python -c "import os, pprint; pprint.pprint(dict(os.environ))"  
 }
 
+function print_usage() {
+  echo -e "$USAGE"
+  exit
+}
+
 
 alias env_show=print_envars
 
