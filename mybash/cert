@@ -27,6 +27,10 @@ YMD=$(date '+%Y%m%d')
 task=$1
 certfile=$2 && [ -z $2 ] && print_usage
 
+
+
+
+
 ### Core ###########################################
 if [[ "$task" = get ]]; then
 	artifacts=$3 && [ -z $3 ] && print_usage
@@ -39,6 +43,10 @@ if [[ "$task" = get ]]; then
 		*)      echo "'$artifacts' not recognized"                                       ;;
 	esac
 	exit 0
+
+
+
+
 elif [[ "$task" = gen ]]; then
 	clcert=$3 && [ -z $3 ] && print_usage	
 	cmd="openssl pkcs12 -out $certfile -in $clcert -export"
@@ -55,6 +63,9 @@ elif [[ "$task" = gen ]]; then
 		fi
 	done
 	eval "$cmd"
+
+
+
 else
 	print_usage
 fi
