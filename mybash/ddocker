@@ -42,7 +42,9 @@ elif [[ "$task" = getid ]]; then
     ### https://stackoverflow.com/questions/68816329/how-to-get-docker-container-id-from-within-the-container-with-cgroup-v2
 
 
+    grep 'systemd' /proc/self/mountinfo|cut -d/ -f3 
 
+    
 
 
 else
