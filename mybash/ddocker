@@ -1,0 +1,52 @@
+#!/bin/bash
+USAGE=$(
+      cat <<-END
+
+      docker shortcuts/utils
+
+
+END
+)
+
+source utils/utils.sh
+
+#### Global Config. #################################
+# set -x  # Output commands being run.
+set -e # Exit on error.å
+
+FUNAME=$(basename "$0")
+YMD=$(date '+%Y%m%d')
+
+### Input Params and Defaults ##################################
+[ $# -eq 0 ] && print_usage ###  No input print doc
+task=$1
+dockerfile=$2 && [ -z $2 ] && print_usage
+
+
+
+
+
+######  ???   ########################################
+if [[ "$task" = find ]]; then
+  	prefix=$3 && [ -z $3 ] && print_usage
+
+   docker search --filter=NAME=$prefix
+
+
+
+
+
+exit 0
+##### Get docker ID from Inside the docker  ########################################
+elif [[ "$task" = getid ]]; then
+    ### https://stackoverflow.com/questions/68816329/how-to-get-docker-container-id-from-within-the-container-with-cgroup-v2
+
+
+    grep 'systemd' /proc/self/mountinfo|cut -d/ -f3 
+
+    
+
+
+else
+	print_usage
+fi
