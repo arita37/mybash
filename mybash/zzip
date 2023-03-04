@@ -44,20 +44,28 @@ if [[ "$task" = uncmp ]]; then
 	exit 0
 elif [[ "$task" = cmp ]]; then
 	zipfile=$2 && [ -z $2 ] && print_usage
-	echo "${@:3}"
-	sourcefiles="${@:3}"
 	sourcefiles="${@:3}" && [ ${#sourcefiles[@]} -eq 0 ] && print_usage
+	filestocmp=()
+
+	#### If a file is a directory, filter out files less than 1 GB to compress ####
+	for file in $sourcefiles
+	do
+		[ -f $file ] && filestocmp+=$file
+		[ -d $file ] && filestocmp+=$(find $file -type f -size 1G | paste -sd " ")
+	done
+
+	echo "Files to compress: $filestocmp"
 
 	case $zipfile in
-		*.zip)      zip "$zipfile" $sourcefiles                              ;;
-		*.tar)      tar -cvf "$zipfile" $sourcefiles		             ;;
-		*.tgz)      tar -zcvf "$zipfile" $sourcefiles                        ;;
-		*.tar.xz)   tar -Jcvf "$zipfile" $sourcefiles                        ;;
-		*.tar.bz2)  tar -jcvf "$zipfile" $sourcefiles                        ;;
-		*.tar.gz)   tar -zcvf "$zipfile" $sourcefiles                        ;;
-		*.7z)       7z a "$zipfile" $sourcefiles                             ;;
-		*.rar)      rar a "$zipfile" $sourcefiles                            ;;
-		*)          echo "'$zipfile' Format not recognized"                  ;;
+		*.zip)      zip "$zipfile" $filestocmp                              ;;
+		*.tar)      tar -cvf "$zipfile" $filestocmp		            ;;
+		*.tgz)      tar -zcvf "$zipfile" $filestocmp                        ;;
+		*.tar.xz)   tar -Jcvf "$zipfile" $filestocmp                        ;;
+		*.tar.bz2)  tar -jcvf "$zipfile" $filestocmp                        ;;
+		*.tar.gz)   tar -zcvf "$zipfile" $filestocmp                        ;;
+		*.7z)       7z a "$zipfile" $filestocmp                             ;;
+		*.rar)      rar a "$zipfile" $filestocmp                            ;;
+		*)          echo "'$zipfile' Format not recognized"                 ;;
 	esac
 	exit 0
 else
