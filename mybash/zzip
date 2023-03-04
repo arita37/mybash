@@ -23,7 +23,7 @@ task=$1
 
 ### Core ###########################################
 if [[ "$task" = uncmp ]]; then
-	zipfile=$2 && [ -z $2 ] && echo $USAGE && zipfile="invalid"
+	zipfile=$2 && [ -z $2 ] && echo -e $USAGE && zipfile="invalid"
 	targetdir=$3 && [ -z $3 ] && targetdir=$(pwd)
 
 	case $zipfile in
