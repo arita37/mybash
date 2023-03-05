@@ -1,8 +1,7 @@
 #!/bin/bash
-
 USAGE=$(
       cat <<-END
-     Perform cert management operations
+     Perform cert/key management operations
      ## TODO: Make <key> and <clcert> optional
 
      cert get <cert.pfx> key <key> 				#### Get private key in <key> file from the the pfx certificate (ex: cert get cert.pfx key pkey.key)
@@ -15,11 +14,11 @@ USAGE=$(
 END
 )
 
-#### Import utils ##################################
+#### Import utils ###############################################
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/utils/utils.sh
 
-#### Global Config. #################################
+#### Global Config. #############################################
 # set -x  # Output commands being run.
 set -e # Exit on error.å
 
@@ -68,18 +67,28 @@ elif [[ "$task" = set ]]; then
 		fi
 	done
 	eval "$cmd"
-	exit 0
 
 
 
-elif [[ "$task" = gen ]]; then
-        key=$2 && [ -z $2 ] && print_usage
-	ssh-keygen -f $key
-
-	exit 0
 
 
+exit 0
 
+##### Generate ssh key
+elif [[ "$task" = sshkey ]]; then
+  # https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+  key=$2 && [ -z $2 ] && print_usage
+	#ssh-keygen -f $key
+  INFO="ssh-keygen -t rsa -b 4096 -C "your_email@example.com" "
+
+
+  echo $INFO
+   
+
+
+
+
+exit 0
 else
 	print_usage
 fi
