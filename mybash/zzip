@@ -45,14 +45,14 @@ if [[ "$task" = uncmp ]]; then
 elif [[ "$task" = cmp ]]; then
 	zipfile=$2 && [ -z $2 ] && print_usage
 	sourcefiles="${@:3}" && [ ${#sourcefiles[@]} -eq 0 ] && print_usage
-	maxfilesize=$4 && [ -z $4 ] && maxfilesize="1G"	
+	# maxfilesize=$4 && [ -z $4 ] && maxfilesize="1G"	
 	filestocmp=()
 
 	#### If a file is a directory, filter out files less than 1 GB to compress ####
 	for file in $sourcefiles
 	do
 		[ -f $file ] && filestocmp+=$file
-		[ -d $file ] && filestocmp+=$(find $file -type f -size $maxfilesize | paste -sd " ")
+		[ -d $file ] && filestocmp+=$(find $file -type f -size 1G | paste -sd " ")
 	done
 
 	echo "Files to compress: $filestocmp"
