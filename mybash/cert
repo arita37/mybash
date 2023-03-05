@@ -10,7 +10,7 @@ USAGE=$(
 
      cert set <cert.pfx> <clcert> [key] [cacert]                #### Convert pfx certificate from client certificate and private key(optional), cacert(optional) (ex: cert set cert.pfx clcert.pem pkey.key cacert.cer)
 
-     cert gen [key]						#### Create new public cert, private key(default=~/.ssh/ida_rsa, id_rsa.pub) (ex: cert set pkey.key)
+     cert gen [key]						#### Create new public cert, private key(default=~/.ssh/ida_rsa, id_rsa.pub) (ex: cert gen pkey.key)
 
 END
 )
