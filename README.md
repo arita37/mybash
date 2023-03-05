@@ -35,6 +35,23 @@
 ```
 
 
+## TODO
+```
+
+1) AWS S3 backup / unback from S3 bucket to Local filesystem
+   use case: a new EC2 instance where we need to re-build all....
+    aws s3 donwload archive + unzip
+ 
+   
+
+
+
+
+
+
+```
+
+
 
 ## Template of all scripts
 ```bash
