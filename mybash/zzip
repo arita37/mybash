@@ -4,8 +4,8 @@ USAGE=$(
       cat <<-END
      Perform zip operations based on the compression mechanism
 
-     zzip uncmp archive.tar target				#### Uncompress the file to target directory(default=PWD)  
-     zzip cmp archive.tar source1, [source2...]			#### Compress and/or archive the source files. 
+     zzip uncmp archive.tar target				#### Uncompress the file to target directory(default=PWD)  (ex: zzip uncmp archive.tar unarchive/)
+     zzip cmp archive.tar source1, [source2...]			#### Compress and/or archive the source files. (ex: zzip cmp archive.tar file1 dir2) 
 
 END
 )

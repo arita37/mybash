@@ -5,12 +5,12 @@ USAGE=$(
      Perform cert management operations
      ## TODO: Make <key> and <clcert> optional
 
-     cert get <cert.pfx> key <key> 				#### Get private key in <key> file from the the pfx certificate
-     cert get <cert.pfx> clcert <clcert> 			#### Get client cert in <clcert> file from the the pfx certificate
+     cert get <cert.pfx> key <key> 				#### Get private key in <key> file from the the pfx certificate (ex: cert get cert.pfx key pkey.key)
+     cert get <cert.pfx> clcert <clcert> 			#### Get client cert in <clcert> file from the the pfx certificate (ex: cert get cert.pfx clcert clcert.pem)
 
-     cert set <cert.pfx> <clcert> [key] [cacert]                #### Convert pfx certificate from client certificate and private key(optional), cacert(optional)
+     cert set <cert.pfx> <clcert> [key] [cacert]                #### Convert pfx certificate from client certificate and private key(optional), cacert(optional) (ex: cert set cert.pfx clcert.pem pkey.key cacert.cer)
 
-     cert set [key]						#### Create new public cert, private key(default=~/.ssh/ida_rsa, id_rsa.pub)
+     cert gen [key]						#### Create new public cert, private key(default=~/.ssh/ida_rsa, id_rsa.pub) (ex: cert set pkey.key)
 
 END
 )

@@ -5,7 +5,7 @@ USAGE=$(
 
      files find "*/.py"                   
      files findinside   "./*.py"   "*myword*" 
-     files replace <seq1> <seq2> [file]                           #### Replace seq1 with seq2 at all places in <file>(default=* i.e. all files in the directory)
+     files replace <seq1> <seq2> [file]                           #### Replace seq1 with seq2 at all places in <file>(default=* i.e. all files in the directory) (ex: files replace print echo *.bash)
 
 END
 )
