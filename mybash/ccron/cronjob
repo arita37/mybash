@@ -68,6 +68,8 @@ ${HOME}/zscript/zbatch_autoscale_test 2>&1 >> ${HOME}/zlog/cron_autoscale.log
 #### Backup home_ubuntu
 0 2 * * *  ${HOME}/zscript/homepush 2>&1 >> ${HOME}/zlog/cron_homepush.log
 
+#### Backup config files in home directory
+0 5 * * * find ${HOME} -name "\.*" -size 2M | zzip cmp ${HOME}/backup-conf.tar
 
 
 

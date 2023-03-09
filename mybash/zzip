@@ -64,7 +64,7 @@ elif [[ "$task" = cmp ]]; then
 	for file in $sourcefiles
 	do
 		[ -f $file ] && filestocmp+=($file)
-		[ -d $file ] && filestocmp+=$(find $file -type f -size $maxfilesize | paste -sd " ")
+		[ -d $file ] && filestocmp+=$(find $file -type f -size -$maxfilesize | paste -sd " ")
 	done
 
 	echo "Files to compress:" ${filestocmp[@]}
