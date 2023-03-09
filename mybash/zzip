@@ -4,8 +4,8 @@ USAGE=$(
       cat <<-END
      Perform zip operations based on the compression mechanism
 
-     zzip uncmp archive.tar target				#### Uncompress the file to target directory(default=PWD)  (ex: zzip uncmp archive.tar unarchive/)
-     zzip cmp archive.tar source1, [source2...]			#### Compress and/or archive the source files. (ex: zzip cmp archive.tar file1 dir2) 
+     zzip uncmp archive.tar target			         	#### Uncompress the file to target directory(default=PWD)  (ex: zzip uncmp archive.tar unarchive/)
+     zzip cmp archive.tar source1, [source2...]	[maxfilesize=1G]	#### Compress and/or archive the source files with size maxfilesize=size(ex: 1K, 5G, 6M, default=1G). (ex: zzip cmp archive.tar file1 dir2)
 
 END
 )
@@ -44,29 +44,42 @@ if [[ "$task" = uncmp ]]; then
 	exit 0
 elif [[ "$task" = cmp ]]; then
 	zipfile=$2 && [ -z $2 ] && print_usage
-	sourcefiles="${@:3}" && [ ${#sourcefiles[@]} -eq 0 ] && print_usage
-	# maxfilesize=$4 && [ -z $4 ] && maxfilesize="1G"	
+	limit="maxfilesize=[0-9]+[BKMG]"
+	maxfilesize="1G"
+	length=$(($#))
+	last="${!#}"
 	filestocmp=()
+
+	if [[ $last =~ $limit ]]; then
+		maxfilesize=${last#*=}
+		sourcefiles=${@:3:$length-3}
+	else
+		sourcefiles=${@:3:$length-2}
+	fi
+
+
+	[ ${#sourcefiles[@]} -eq 0 ] && print_usage
 
 	#### If a file is a directory, filter out files less than 1 GB to compress ####
 	for file in $sourcefiles
 	do
-		[ -f $file ] && filestocmp+=$file
-		[ -d $file ] && filestocmp+=$(find $file -type f -size 1G | paste -sd " ")
+		[ -f $file ] && filestocmp+=($file)
+		[ -d $file ] && filestocmp+=$(find $file -type f -size $maxfilesize | paste -sd " ")
 	done
 
-	echo "Files to compress: $filestocmp"
+	echo "Files to compress:" ${filestocmp[@]}
+	echo "Max file size:" $maxfilesize
 
 	case $zipfile in
-		*.zip)      zip "$zipfile" $filestocmp                              ;;
-		*.tar)      tar -cvf "$zipfile" $filestocmp		            ;;
-		*.tgz)      tar -zcvf "$zipfile" $filestocmp                        ;;
-		*.tar.xz)   tar -Jcvf "$zipfile" $filestocmp                        ;;
-		*.tar.bz2)  tar -jcvf "$zipfile" $filestocmp                        ;;
-		*.tar.gz)   tar -zcvf "$zipfile" $filestocmp                        ;;
-		*.7z)       7z a "$zipfile" $filestocmp                             ;;
-		*.rar)      rar a "$zipfile" $filestocmp                            ;;
-		*)          echo "'$zipfile' Format not recognized"                 ;;
+		*.zip)      zip "$zipfile" ${filestocmp[@]}                              ;;
+		*.tar)      tar -cvf "$zipfile" "${filestocmp[@]}"		         ;;
+		*.tgz)      tar -zcvf "$zipfile" ${filestocmp[@]}                        ;;
+		*.tar.xz)   tar -Jcvf "$zipfile" ${filestocmp[@]}                        ;;
+		*.tar.bz2)  tar -jcvf "$zipfile" ${filestocmp[@]}                        ;;
+		*.tar.gz)   tar -zcvf "$zipfile" ${filestocmp[@]}                        ;;
+		*.7z)       7z a "$zipfile" ${filestocmp[@]}                             ;;
+		*.rar)      rar a "$zipfile" ${filestocmp[@]}                            ;;
+		*)          echo "'$zipfile' Format not recognized"                      ;;
 	esac
 	exit 0
 else
