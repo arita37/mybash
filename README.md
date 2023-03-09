@@ -22,7 +22,7 @@
 #### Example
      folder size        ./             #### Print folder size in Gb
      folder topfile     ./    20       #### Print 20 biggest size files
-     folder recentifle  ./    10       #### Print recently modified files   
+     folder recentfile  ./    10       #### Print recently modified files   
 
 
      folder backup   mypathXYZ/                           #### copied into default path ~/zarchive/mypath_suffix_20230202/

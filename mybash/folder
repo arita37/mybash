@@ -31,6 +31,7 @@ YMD=$(date '+%Y%m%d')
 
 #### Import utils #################################
 source utils/util_stable.sh
+source logs/logs.sh
 
 ### Input Params and Defaults ##################################
 [ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
@@ -40,7 +41,9 @@ ppath=$2 && [ -z $2 ] && ppath="$PWD"    ###  current path as default
 ### Core ###########################################
 if [[ "$task" = size ]]; then
       ssize=$3 && [ -z $3 ] && ssize=20
-
+      logInfo "task=size"
+      logInfo "ppath=$ppath" 
+      logInfo "ssize=$ssize"
       df -h $ppath
       echo # Newline
       du -h -d 10 $ppath 2>&1 |
@@ -53,7 +56,10 @@ if [[ "$task" = size ]]; then
 elif [[ "$task" = topfile ]]; then
       ssize=$3 && [ -z $3 ] && ssize=20
       for val in $4; do eexcludedirs+="--exclude=$val "; done && [ -z $4 ] && excludedirs="~/zzzzz"
-
+      logInfo "task=topfile"
+      logInfo "ppath=$ppath" 
+      logInfo "eexcludedirs=$eexcludedirs"
+      logInfo "ssize=$ssize"
       df -H $ppath
       echo # Newline
 
@@ -72,7 +78,10 @@ exit 0
 elif [[ "$task" = recentfile ]]; then
       ### recent file modified files + created
       ssize=$3 && [ -z $3 ] && ssize=20
-
+      logInfo "task=recentfile"
+      logInfo "ppath=$ppath" 
+      logInfo "ssize=$ssize"
+      logInfo "OSTYPE=$OSTYPE" 
       if [[ "$OSTYPE" == "darwin"* ]]; then
             ### MacoS
             while read -r str; do echo -e "$(date -r "$str" +'%F %T') \t $str"; done < \
@@ -101,7 +110,10 @@ exit 0
 elif [[ "$task" = backup ]]; then
       ### backup quickly currently folder, skip big files.
       pathbase="backup_$YMD"
-      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase" && mkdir -p $dir_to
+      logInfo "task=backup"
+      logInfo "ppath=$ppath" 
+      logInfo "dir_to=$dir_to" 
 
       rsync -ar $ppath $dir_to
 
@@ -111,9 +123,12 @@ exit 0
 elif [[ "$task" = copysmallfile ]]; then
       ### Copy only small files, exclude big one cplwf
       pathbase="backup_$YMD"
-      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase" && mkdir -p $dir_to
       max_file_size="-$4c" && [ -z $4 ] && max_file_size="-1000c"
-
+      logInfo "task=copysmallfile"
+      logInfo "ppath=$ppath" 
+      logInfo "dir_to=$dir_to" 
+      logInfo "max_file_size=$max_file_size"
       #### Add File filtering
       # echo "find $ppath -mindepth 1 -maxdepth 10 -type f -size $max_file_size -exec cp -t $dir_to"
       cmd=$(find $ppath -mindepth 1 -maxdepth 10 -type f -size $max_file_size -exec cp {} $dir_to \;)
@@ -126,9 +141,12 @@ exit 0
 elif [[ "$task" = copyfolderonly ]]; then
       ### Copy only folder
       pathbase="backup_$YMD"
-      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase"
+      dir_to=$3 && [ -z $3 ] && dir_to="~/zbackup/$pathbase" && mkdir -p $dir_to
       eexclude="-$4c" && [ -z $4 ] && eexclude="*"
 
+      logInfo "task=copyfolderonly"
+      logInfo "ppath=$ppath" 
+      logInfo "dir_to=$dir_to" 
       #### Add File filtering
       #   rsync -a --include '*/' --exclude  $eexclude  $ppath $dir_to
 	  rsync -a -f"+ */" -f"- *" $ppath $dir_to
