@@ -18,6 +18,10 @@
      source $mybashdir/__init/init_all.sh       ##### Init all the alias
 
 
+    source ggit   ## Source all git shorcuts
+    mybashupdate  ## auto update the repo
+
+
 
 #### Example
      folder size        ./             #### Print folder size in Gb

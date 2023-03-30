@@ -13,6 +13,8 @@ END
 )
 
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 
 
 
@@ -78,3 +80,37 @@ function gitpush() {
     cd "$CURRENT_DIR"
 
 }
+
+
+
+function gitstashpull() {  
+    ## $1: commit message, $2: dir of the repo to commit
+    ## gitpush 'ok'  "myrepo gitdev/log_report/"
+
+    # set -e
+
+    local CURRENT_DIR=$(pwd)
+
+    if [[ -z $1 ]]; then 
+      echo ""  ###Not assigned
+    else 
+      cd $1
+      
+    fi 
+    echo $(pwd)
+
+    git stash
+
+    git pull --all
+
+    cd "$CURRENT_DIR"
+
+}
+
+
+function mybashupdate() (
+   gitstashpull "$SCRIPT_DIR/mybash/"
+   chmod -R 777  "$SCRIPT_DIR/mybash/"
+}
+
+
