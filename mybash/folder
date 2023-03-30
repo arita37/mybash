@@ -29,8 +29,10 @@ set -e # Exit on error.å
 FUNAME=$(basename "$0")
 YMD=$(date '+%Y%m%d')
 
-#### Import utils #################################
-source utils/util_stable.sh
+#### Import utils relative path  #################################
+source "$(dirname "$0")/utils/util_stable.sh"
+
+
 
 ### Input Params and Defaults ##################################
 [ $# -eq 0 ] && echo -e "$USAGE" && exit ###  No input print doc
