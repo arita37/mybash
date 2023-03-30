@@ -19,6 +19,7 @@ END
 function gitignore() {
     # Set the maximum file size in bytes
     local MAX_SIZE=10000000
+    echo "adding to gitignore big files"
 
     # Find all files in the current directory and its subdirectories
     find . -type f | while read file; do
@@ -30,6 +31,8 @@ function gitignore() {
             echo "$file" >> .gitignore
         fi
     done
+
+    echo "gitignore done"
 }
 
 
