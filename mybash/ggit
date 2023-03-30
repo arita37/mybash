@@ -1,0 +1,77 @@
+#!/bin/bash
+USAGE=$(
+      cat <<-END
+ 
+       source mybash/ggit
+
+       gitignore              ### big files are excluded.
+       gitpush 'mymsg'        ### current repo
+       gitpush 'mymsg'  myfolderrepo/
+
+
+END
+)
+
+
+
+
+
+function gitignore() {
+    # Set the maximum file size in bytes
+    local MAX_SIZE=10000000
+
+    # Find all files in the current directory and its subdirectories
+    find . -type f | while read file; do
+        # Get the size of the file
+        local size=$(stat -c%s "$file")
+        # Check if the size is above the maximum
+        if [ $size -gt $MAX_SIZE ]; then
+            # Add the file to .gitignore
+            echo "$file" >> .gitignore
+        fi
+    done
+}
+
+
+
+function gitpush() {  
+    ## $1: commit message, $2: dir of the repo to commit
+    ## gitpush 'ok'  "myrepo gitdev/log_report/"
+
+    set -e
+
+    local CURRENT_DIR=$(pwd)
+
+    if [[ -z $2 ]]; then 
+      echo ""  ###Not assigned
+    else 
+      cd $2
+      
+    fi 
+
+    gitignore 
+
+    # Set the maximum file size in bytes
+    MAX_SIZE=9000000
+
+    # Get a list of modified files
+    git diff --name-only HEAD | while read file; do
+        # Check if the file exists
+        if [ -f "$file" ]; then
+            # Get the size of the file
+            size=$(stat -c%s "$file")
+            # Check if the size is below the maximum
+            if [ $size -lt $MAX_SIZE ]; then
+                # Add the file to the git commit
+                git add "$file"
+            fi
+        fi
+    done
+
+    # Commit the changes with a message
+    git commit -m "$1"
+    git push --all
+
+    cd "$CURRENT_DIR"
+
+}
