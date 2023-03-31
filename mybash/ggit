@@ -83,6 +83,12 @@ function gitpush() {
 
 
 
+function copysmall() {
+
+   find "$1" -type f -size -1000k -exec cp --parents \{\}  "$2" \;
+
+}
+
 function gitstashpull() {  
     ## $1: commit message, $2: dir of the repo to commit
     ## gitpush 'ok'  "myrepo gitdev/log_report/"
