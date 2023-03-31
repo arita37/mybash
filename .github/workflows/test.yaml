@@ -1,0 +1,109 @@
+name: test_mybash
+on:
+
+  #### Manual GA Launch
+  workflow_dispatch:
+    inputs:
+
+  push:
+    branches:
+      - prod
+
+
+  pull_request:
+    branches:
+      - adev
+      - main
+
+env:
+  log_verbosity: "5"
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+    timeout-minutes: 25 
+    steps:
+    - uses: actions/checkout@v1
+
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #       aws-region: ap-northeast-1
+
+    - name: Set up Python 3.8.*
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8.*
+      
+    - name: Install pipenv
+      uses: dschep/install-pipenv-action@v1
+               
+    # - name: log_start
+    #   env: 
+    #       REPO_TOKEN:  ${{ secrets.REPO_TOKEN_LOG_REPORT }}
+
+    #   run: |
+    #       cd /home/runner/work/ml/  && git clone https://$REPO_TOKEN:x-oauth-basic@github.com/ok/log_report.git report                  
+    #       cd report
+    #       git checkout ml
+
+    # - name: Setup Test env
+    #   run:  |
+    #       pwd
+    #       mkdir -p  ../report/mlc/test/
+    #       ls ../
+  
+    # - name: Cache pipenv virtualenv
+    #   id: cache-pipenv
+    #   uses: actions/cache@v1
+    #   with:
+    #     path: /opt/hostedtoolcache/Python/
+    #     key: ${{ runner.os }}-pipenv-${{ hashFiles('pip_fat.txt') }}
+
+
+    # - name: Install repo requirements  1
+    #   if: steps.cache-pipenv.outputs.cache-hit != 'true'
+    #   run: |
+    #        pip install -r  mlc/config/common/pip_min.txt
+    #        pip install -r  mlc/config/common/pip_fat.txt
+      
+      
+    # - name: Install dev requirements  
+    #   if: steps.cache-pipenv.outputs.cache-hit != 'true'
+    #   run:  |
+    #     pip install -r  mlc/config/common/pip_dev.txt
+
+
+
+    - name: test_import
+      # continue-on-error: true
+      run: |
+            export PATH="mybash/:$PATH"
+            source ggit
+            source files 
+            source folder 
+        
+    # ########  Expor results
+    # - name: log_end
+    #   continue-on-error: true
+    #   env:
+    #     GIT_TAG: ${{ github.ref_name }}
+    #     GIT_HASH: ${{ github.event.pull_request.head.sha || github.sha }}      
+    #   run: |
+    #        source mlc/scripts/bins/utils.sh   
+    #        cd ../report/mlc/test/
+    #        ls .
+    #        tag="${GIT_TAG}-run_pytest.yaml-${GIT_HASH}"
+    #        git_push_bot "$tag"
+    #        #cat  "../report/log_runtest.py"
+         
+
+
