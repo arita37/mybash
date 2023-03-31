@@ -108,7 +108,7 @@ function gitstashpull() {
 }
 
 
-function mybashupdate() (
+function mybashupdate() {
    gitstashpull "$SCRIPT_DIR/mybash/"
    chmod -R 777  "$SCRIPT_DIR/mybash/"
 }
