@@ -43,7 +43,7 @@ function gitpush() {
     ## $1: commit message, $2: dir of the repo to commit
     ## gitpush 'ok'  "myrepo gitdev/log_report/"
 
-    set -e
+    # set -e
 
     local CURRENT_DIR=$(pwd)
 
