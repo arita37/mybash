@@ -1,0 +1,13 @@
+fire
+utilmy
+python-box
+torch
+segment-anything-py
+opencv-python 
+pycocotools 
+matplotlib 
+onnxruntime; python_version < '3.11'
+onnx
+rasterio
+tqdm
+gdown
