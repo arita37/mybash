@@ -1,6 +1,48 @@
 #!/bin/bash
 info=" Generic Batch launcher
 
+################ TODO
+
+
+1)  Add name arguments for the script
+https://unix.stackexchange.com/questions/129391/passing-named-arguments-to-shell-scripts
+
+while [ $# -gt 0 ]; do
+
+   if [[ $1 == *"--"* ]]; then
+        v="${1/--/}"
+        declare $v="$2"
+   fi
+
+  shift
+done
+pass it like  runner.sh --mmode /some/path --arg_1 5 and then in the script you can use $arg_1 and $p_out.
+
+
+
+
+2) Parse the task with those folders patterns
+
+   latest/
+        YMD-HM_task01/run.sh  :  Only starts > YMD_HM date (in Japan time)
+        YMD_task01/run.sh  :     Only starts > YMD_0000 date (at midnight YMD, in Japan time)
+
+        HM_task01/run.sh  :      Only starts >  H hour M minutes on today's  date ( in Japan time)
+
+       
+        task01/run.sh  :              Starts at any time.
+
+        task01_nodelete/run.sh  :     Starts at any time.
+
+
+
+
+
+
+
+
+
+
      ## Example
      ###### Run all scripts in test/  in debug modee,  1 hour maxttime,  below CPU 20% usage,  below 50% ram usage
      ./runner.sh debug  test/  3600   20   50
