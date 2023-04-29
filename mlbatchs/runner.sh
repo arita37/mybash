@@ -184,7 +184,7 @@ for dirk0 in $subfolders; do
     time_diff=$((tnow - t0_unix))
     echo $time_diff
     if [[ $time_diff -gt $maxtime ]]; then
-       echo2 "#### Max Time Limit, Stop Instance "  
+       echo2 "#### Max Time Limit: $maxtime, Stop Instance in 300s "  
        gitpushforce  "from batch: $(nowjp) - stop instance"
        sleep 300 #### Safety              
        mlinstance_stop   2>&1 | tee -a "${LOGFILE7}"
