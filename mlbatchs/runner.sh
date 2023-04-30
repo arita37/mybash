@@ -5,14 +5,15 @@ info=" Generic Batch launcher
 ask with those folders patterns
 
    latest/
-        YMD-HM_task01/run.sh  :  Only starts > YMD_HM date (in Japan time)
-        YMD_task01/run.sh  :     Only starts > YMD_0000 date (at midnight YMD, in Japan time)
 
+        YMD_task01/run.sh  :     Only starts > YMD_0000 date (at midnight YMD, in Japan time)
+                                 Done
+
+        YMD-HM_task01/run.sh  :  Only starts > YMD_HM date (in Japan time)
         HM_task01/run.sh  :      Only starts >  H hour M minutes on today's  date ( in Japan time)
 
        
         task01/run.sh  :              Starts at any time.
-
         task01_nodelete/run.sh  :     Starts at any time.
 
 

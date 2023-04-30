@@ -114,10 +114,10 @@ for dirk0 in $subfolders; do
    if [ -d "$dirnew" ]; then  continue; fi  
 
    #### Check if script date is below than today's date
-   dtscript=$(date_extract_to_unix $script)
-   dtnow_unix=$(date +d)
+   dtscript_unix=$(date_extract_to_unix $script)
+   dtnow_unix=$(date +%s)
    echo2 "job date: $dtscript"
-   if (( $(echo "$dtscript > $dtnow_unix" | bc -l) )); then  echo "$dirk  skipped"; continue;  fi  
+   if (( $(echo "$dtscript_unix > $dtnow_unix" | bc -l) )); then  echo "$dirk  skipped"; continue;  fi  
 
 
    echo2  "### $dirk  start: $(nowjp)"    
