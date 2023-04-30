@@ -151,7 +151,7 @@ for dirk0 in $subfolders; do
    rm_empty_folder "$dirin/$dirk/"
 
 
-  ### Check if the CPU usage is low. #################################
+  ### Check if MaxTime is reached ####################################
   while true; do
     if [[ time_diff_is_greater_than $t0_unix $maxtime ]]; then
        echo2 "#### Max Time Limit: $maxtime, Stop Instance in 300s "  
