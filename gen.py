@@ -19,36 +19,21 @@ _By using just 3-5 images you can teach new concepts to Stable Diffusion and per
 For a general introduction to the Stable Diffusion model please refer to this [colab](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_diffusion.ipynb).
 
 """
-
-def colab_setup():
-  ss= """
-        #@title Install the required libs
-        !pip install -U -qq git+https://github.com/huggingface/diffusers.git
-        !pip install -qq accelerate transformers ftfy
-
-        #@title [Optional] Install xformers for faster and memory efficient training
-        #@markdown Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
-
-        # !pip install -U --pre triton
-        !pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/T4/xformers-0.0.13.dev0-py3-none-any.whl
-  """
-
-
-#@title Import required libraries
-import argparse,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob
+import argparse,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob, time
 import svgutils.transform as sg
 import numpy as np, torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
 from torch.utils.data import Dataset
 
-import PIL
 from accelerate import Accelerator
 from accelerate.logging import get_logger
 from accelerate.utils import set_seed
 from diffusers import AutoencoderKL, DDPMScheduler, PNDMScheduler, StableDiffusionPipeline, UNet2DConditionModel
 from diffusers.optimization import get_scheduler
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
+
+import PIL
 from PIL import Image
 from torchvision import transforms
 from tqdm.auto import tqdm
@@ -63,7 +48,6 @@ from utilmy import log
 from subprocess import getoutput
 from IPython.display import HTML
 from IPython.display import clear_output
-import time
 
 
 
@@ -119,6 +103,22 @@ def test1():
     """Create noise_scheduler for training"""
     noise_scheduler = DDPMScheduler.from_config(pretrained_model_name_or_path, subfolder="scheduler")
 
+
+
+
+###########################################################################################
+def colab_setup():
+  ss= """
+        #@title Install the required libs
+        !pip install -U -qq git+https://github.com/huggingface/diffusers.git
+        !pip install -qq accelerate transformers ftfy
+
+        #@title [Optional] Install xformers for faster and memory efficient training
+        #@markdown Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
+
+        # !pip install -U --pre triton
+        !pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/T4/xformers-0.0.13.dev0-py3-none-any.whl
+  """
 
 
 
@@ -421,8 +421,6 @@ def model_setup():
         text_encoder.text_model.embeddings.position_embedding.parameters(),
     )
     freeze_params(params_to_freeze)
-
-
 
 
 
