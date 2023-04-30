@@ -3,12 +3,18 @@
    !pip install reqs.txt
    pip install fire
 
-   ### run code
-    python utils.py test10
+   ### Run in local or colab
+   git clone  https://github.com/arita37/mybash.git imgapp
+   cd imgapp
+   git checkout zbiket
+
+   python utils.py test3
+   python utils.py test10
 
 
-    https://github.com/opengeos/segment-geospatial/blob/main/samgeo/samgeo.py#L75-L102
 
+
+   ### SAM
     segment-anything-py
     opencv-python 
     pycocotools 
@@ -18,7 +24,6 @@
     rasterio
     tqdm
     gdown
-
     # https://pypi.org/project/segment-anything-py/1.0/
 
 
@@ -43,7 +48,7 @@ try :
   from google_images_download import google_images_download
 except: pass
 
-from utilmy import log
+from utilmy import (log, os_makedirs)
 
 
 
@@ -109,6 +114,39 @@ def test11():
     plt.show()
 
 
+def test3(imgname="BTgKexLec.png"):
+    """ 
+        python utils.py. test3 --imgname img2.png
+
+    """
+    dirimg= os.environ.get("dirimg", "/content/images/" )
+
+    dirimg1= dirimg + f'/{imgname}'
+    log(dirimg1)
+
+    image = cv2.imread( dirimg1 )
+    # (optional) resize the image if it is too big
+    image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    xr, yr = bike_get_input_points(image, "right-wheel")
+    xl, yl = bike_get_input_points(image, "left-wheel")
+    xb, yb = bike_get_input_points(image, "bike")
+    input_points = np.array([[xr, yr], [xl, yl], [xb, yb]])
+    input_labels = np.array([1, 1, 1])
+
+    masks = img_get_mask_frame(points=input_points, labels=input_labels, 
+                               img_dir= dirimg1, dirout="ztmp/out/", method="one")
+
+    plt.figure(figsize=(10,10))
+    # plt.imshow(image)
+    show_mask(masks, plt.gca())
+    # show_points(input_points, input_labels, plt.gca())
+    plt.axis('off')
+    plt.show() 
+
+
+
 ########################################################################################
 def using_colab():
     import torch
@@ -128,20 +166,6 @@ def using_colab():
     #!wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
 
 
-def show_mask(mask, ax, rgba=[0, 0, 1.0, 1]):
-    color = np.array([rgba]) # default color blue
-    h, w = mask.shape[-2:]
-    mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
-    ax.imshow(mask_image)
-
-
-def show_points(coords, labels, ax, marker_size=375):
-    pos_points = coords[labels==1]
-    neg_points = coords[labels==0]
-    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
-    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
-
-
 def model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda"):
 
     sam_checkpoint = same_checkpoint
@@ -153,6 +177,7 @@ def model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", devic
 
     predictor = SamPredictor(sam)
     return predictor
+
 
 def img_get_mask_wheel(points, labels, img_dir='images/BTgKexLec.png', dirout="", method="sam01"):
     ####. get wheel mask
@@ -195,7 +220,62 @@ def img_get_mask_frame(points, labels, img_dir='images/BTgKexLec.png', dirout=""
     return masks
 
 
+def bike_get_input_points(image, part)->tuple:
+    """ tricks to get pints 
 
+    """
+    h, w = image.shape[:2]
+
+    if part == "right-wheel":
+        y = h - 10
+        x = int(w / 2)
+
+        for i in range(int(w / 2)):
+            # if we find a black pixel, break the loop, otherwise, keep looping until we reach the 
+            # end of the image (image is supposed to have 3 channels with black and white pixels)
+            if image[y, x][0] == 0:
+                break
+            x += int(w / 32)
+
+    elif part == "left-wheel":
+        y = h - 10
+        x = 0
+
+        for i in range(int(w / 2)):
+            if image[y, x][0] == 0:
+                break
+            x += int(w / 32)
+
+    elif part == "bike":
+        y = 0
+        x = int(w / 2)
+
+        for i in range(h):
+            if image[y, x][0] == 0:
+                break
+            y += 1
+
+    elif part == "frame":
+        x, y = 50, 50
+    else:
+        log("part must be one of 'right-wheel', 'left-wheel', 'bike', 'frame'")
+
+    return (x, y)
+
+
+
+def show_mask(mask, ax, rgba=[0, 0, 1.0, 1]):
+    color = np.array([rgba]) # default color blue
+    h, w = mask.shape[-2:]
+    mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
+    ax.imshow(mask_image)
+
+
+def show_points(coords, labels, ax, marker_size=375):
+    pos_points = coords[labels==1]
+    neg_points = coords[labels==0]
+    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
+    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
 
 
 
