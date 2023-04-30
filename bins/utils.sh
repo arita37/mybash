@@ -336,7 +336,7 @@ function log_report_push() {
     local CURRENT_DIR=$(pwd)
     cd  $dirlog_report
 
-    # gitignore 
+    gitignore 
     git pull --all
     git add --all 
     git commit -m "update"
