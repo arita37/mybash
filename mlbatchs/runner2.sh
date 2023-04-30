@@ -95,6 +95,10 @@ nowjp || exit 1
 echo "RAM usage $(ram_get_usage)"
   
 
+function elog() {
+    echo -e "$1" 2>&1 | tee -a "${LOGFILE7}"
+}
+
 
 ######################################################################
 ####### Run Script in each sub-folder. ###############################
@@ -167,8 +171,8 @@ for dirk0 in $subfolders; do
     sleep 20
 
 
-    cpu_get_avg_usage   2>&1 | tee -a "${LOGFILE7}"
-    ram_get_usage       2>&1 | tee -a "${LOGFILE7}"  
+    elog $(cpu_get_avg_usage)   
+    elog $(ram_get_usage)         
     #### Exit the waiting loop if CPU_usage < minCPU AND RAM_usage < minRAM 
     # if (( $(echo "$cpu_total_usage < $mincpu" | bc -l) )); then
     #     if (( $(echo "$ram_total_usage < $minram" | bc -l) )); then
@@ -187,7 +191,7 @@ echo2 "\n#### ALL Tasks done"
 ls -l "done/$ymd/"  2>&1 | tee -a "${LOGFILE7}"
 
 if [[ "$mmode" == *"stop"*  ]]; then
-    echo "Instance Stopped in 300sec" 2>&1 | tee -a "${LOGFILE7}"
+    elog "Instance Stopped in 300sec"
     gitpushforce  "batch_runner: $(nowjp) - stop instance"       
 
     sleep 300  ### Safety , dont lower this level
