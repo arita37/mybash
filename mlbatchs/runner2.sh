@@ -3,24 +3,6 @@ info=" Generic Batch launcher
 
 ################ TODO
 
-
-1)  Add name arguments for the script
-https://unix.stackexchange.com/questions/129391/passing-named-arguments-to-shell-scripts
-
-while [ $# -gt 0 ]; do
-
-   if [[ $1 == *"--"* ]]; then
-        v="${1/--/}"
-        declare $v="$2"
-   fi
-
-  shift
-done
-pass it like  runner.sh --mmode /some/path --arg_1 5 and then in the script you can use $arg_1 and $p_out.
-
-
-
-
 2) Parse the task with those folders patterns
 
    latest/
@@ -35,15 +17,12 @@ pass it like  runner.sh --mmode /some/path --arg_1 5 and then in the script you 
         task01_nodelete/run.sh  :     Starts at any time.
 
 
+####################################################################################################
 
 
 
 
-
-
-
-
-     ## Example
+#### Usage
      ###### Run all scripts in test/  in debug modee,  1 hour maxttime,  below CPU 20% usage,  below 50% ram usage
      ./runner.sh debug  test/  3600   20   50
 
