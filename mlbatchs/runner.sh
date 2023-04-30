@@ -174,6 +174,8 @@ for dirk0 in $subfolders; do
        exit 1
     fi
 
+
+    # bin/bash runner.sh ---> All the (sub-PIDS, cmd_name)
     #### Exit if not more python process running ##################### 
     curr_pid="$(get_current_shell_pid)"
     get_subprocess "$curr_pid" > "./ztmp.txt"
