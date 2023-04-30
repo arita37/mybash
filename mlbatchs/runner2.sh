@@ -99,6 +99,21 @@ function elog() {
     echo -e "$1" 2>&1 | tee -a "${LOGFILE7}"
 }
 
+function task_movefolder() {
+
+      mkdir -p $dirnew
+      if [[  $mmode   == *"debug"* ]]; then
+          cp "$script" "$dirnew" ;    echo2  "COPY $script TO $dirnew"  
+
+      elif [[ $script == *"nodelete"* ]]; then
+          cp $script "$dirnew" ;      echo2  "COPY $script TO $dirnew"  
+
+      else
+          mv $script $dirnew ;        echo2  "MOVE $script TO $dirnew"            
+      fi      
+
+} 
+
 
 ######################################################################
 ####### Run Script in each sub-folder. ###############################
