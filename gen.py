@@ -66,6 +66,62 @@ from IPython.display import clear_output
 import time
 
 
+
+###########################################################################################
+def test1():
+    """### Training
+    Define hyper for our training
+    If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
+    """
+
+    """## Settings for teaching your new concept"""
+    #@markdown `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
+    pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion" #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+
+    """### Get the training images:
+    #### Download the images from the internet and save them locally.
+    You can also upload the images to colab or load from google drive, please check the next section if you want to use that.
+    """
+
+    #@markdown Add here the URLs to the images of the concept you are adding. 3-5 should be fine
+    urls = [
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/2.jpeg",
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/3.jpeg",
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/5.jpeg",
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/6.jpeg",
+          ## You can add additional images here
+    ]
+
+    #@title Settings for your newly created concept
+    #@markdown `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
+    what_to_teach = "object" #@param ["object", "style"]
+    #@markdown `placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
+    placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    #@markdown `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
+    initializer_token = "bicycle" #@param {type:"string"
+
+    hyper = {
+        "learning_rate": 5e-04,
+        "scale_lr": True,
+        "max_train_steps": 5000,
+        "save_steps": 500,
+        "train_batch_size": 4,
+        "gradient_accumulation_steps": 1,
+        "gradient_checkpointing": True,
+        "mixed_precision": "fp16",
+        "seed": 42,
+        "output_dir": "sd-concept-output"
+    }
+    #v!mkdir -p sd-concept-output
+    ########## """Train!"""
+    # logger = get_logger(__name__)
+
+    """Create noise_scheduler for training"""
+    noise_scheduler = DDPMScheduler.from_config(pretrained_model_name_or_path, subfolder="scheduler")
+
+
+
+
 def gpu_check():
     s = getoutput('nvidia-smi')
     # if 'T4' in s:
@@ -119,24 +175,6 @@ def image_grid(imgs, rows, cols):
         grid.paste(img, box=(i%cols*w, i//cols*h))
     return grid
 
-"""## Settings for teaching your new concept"""
-#@markdown `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
-pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion" #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
-
-"""### Get the training images:
-#### Download the images from the internet and save them locally.
-You can also upload the images to colab or load from google drive, please check the next section if you want to use that.
-"""
-
-#@markdown Add here the URLs to the images of the concept you are adding. 3-5 should be fine
-urls = [
-      "https://huggingface.co/datasets/valhalla/images/resolve/main/2.jpeg",
-      "https://huggingface.co/datasets/valhalla/images/resolve/main/3.jpeg",
-      "https://huggingface.co/datasets/valhalla/images/resolve/main/5.jpeg",
-      "https://huggingface.co/datasets/valhalla/images/resolve/main/6.jpeg",
-      ## You can add additional images here
-]
-
 
 def download_image(url):
   try:
@@ -145,13 +183,13 @@ def download_image(url):
     return None
   return Image.open(BytesIO(response.content)).convert("RGB")
 
+
 def down_images():
     images = list(filter(None,[download_image(url) for url in urls]))
     save_path = "./my_concept"
     if not os.path.exists(save_path):
       os.mkdir(save_path)
     [image.save(f"{save_path}/{i}.jpeg") for i, image in enumerate(images)]
-
 
 
 
@@ -186,8 +224,6 @@ def image_setup():
     image_grid(images, 1, len(images))
 
 
-
-
 def prompt_create():
     """## Teach the model a new concept (fine-tuning with textual inversion)
     Execute this this sequence of cells to run the training process. The whole process may take from 1-4 hours. (Open this block if you are interested in how this process works under the hood or if you want to change advanced training settings or hyper)
@@ -220,13 +256,7 @@ def prompt_create():
         "Create a clean and simple SVG illustration of a {} , centered on a clear white background",
     ]
 
-#@title Settings for your newly created concept
-#@markdown `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
-what_to_teach = "object" #@param ["object", "style"]
-#@markdown `placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-placeholder_token = "<bicycle-svg>" #@param {type:"string"}
-#@markdown `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
-initializer_token = "bicycle" #@param {type:"string"}
+
 
 
 ########################################################################################################
@@ -397,52 +427,28 @@ def model_setup():
 
 
 #############################################################################################
-"""Dataset used for fine-tuning. Text, images """
-train_dataset = TextualInversionDataset(
-      data_root=save_path, ### image pathsonly
-      tokenizer=tokenizer,
-      size=vae.sample_size,
-      placeholder_token=placeholder_token,  ### Text data
-      repeats=100,
-      learnable_property=what_to_teach, #Option selected above between object and style
-      center_crop=False,
-      set="train",
-)
+def create_dataset():
+    """Dataset used for fine-tuning. Text, images """
+    train_dataset = TextualInversionDataset(
+          data_root=save_path, ### image pathsonly
+          tokenizer=tokenizer,
+          size=vae.sample_size,
+          placeholder_token=placeholder_token,  ### Text data
+          repeats=100,
+          learnable_property=what_to_teach, #Option selected above between object and style
+          center_crop=False,
+          set="train",
+    )
+
 
 def create_dataloader(train_batch_size=1):
     return torch.utils.data.DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
 
 
-"""Create noise_scheduler for training"""
-noise_scheduler = DDPMScheduler.from_config(pretrained_model_name_or_path, subfolder="scheduler")
-
 
 
 
 ###################################################################################################
-"""### Training
-Define hyper for our training
-If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
-"""
-hyper = {
-    "learning_rate": 5e-04,
-    "scale_lr": True,
-    "max_train_steps": 5000,
-    "save_steps": 500,
-    "train_batch_size": 4,
-    "gradient_accumulation_steps": 1,
-    "gradient_checkpointing": True,
-    "mixed_precision": "fp16",
-    "seed": 42,
-    "output_dir": "sd-concept-output"
-}
-#v!mkdir -p sd-concept-output
-
-
-########## """Train!"""
-#@title Training function
-logger = get_logger(__name__)
-
 def save_progress(text_encoder, placeholder_token_id, accelerator, save_path):
     log("Saving embeddings")
     learned_embeds = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight[placeholder_token_id]
@@ -777,5 +783,13 @@ def run_inference2():
     #     repo_id=repo_id,
     #     token=hf_token
     #   )
+
+
+
+
+###################################################################################################
+if __name__ == "__main__":
+    fire.Fire()
+
 
 
