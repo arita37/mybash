@@ -79,26 +79,12 @@ pass it like  runner.sh --mmode /some/path --arg_1 5 and then in the script you 
 shopt -s expand_aliases
 
 
-########## Name Input ####################################################
-### https://unix.stackexchange.com/questions/129391/passing-named-arguments-to-shell-scripts
-while [ $# -gt 0 ]; do
-
-   if [[ $1 == *"--"* ]]; then
-        v="${1/--/}"
-        declare $v="$2"
-   fi
-
-  shift
-done
-
-
-
 ########## Default value ##############################################
-[ -z $mmode ]   &&  mmode="debug"     ### Prod mean github repo is updated at each time
-[ -z $dirin ]   &&  dirin="latest"
-[ -z $maxtime ] &&  maxtime=60
-[ -z $mincpu ]  &&  mincpu=15 
-[ -z $minram ]  &&  minram=100
+mmode="$1"         && [ -z $1 ] &&  mmode="debug"     ### Prod mean github repo is updated at each time
+dirin="$2"         && [ -z $2 ] &&  dirin="latest"
+maxtime=$3         && [ -z $3 ] &&  maxtime=60
+mincpu=$4          && [ -z $4 ] &&  mincpu=15 
+minram=$5          && [ -z $5 ] &&  minram=100
 
 echo $mmode
 if  [[  "$mmode" == *"debug"* ]]; then
@@ -108,6 +94,7 @@ if  [[  "$mmode" == *"debug"* ]]; then
 fi
 
 instance_mode="$mmode"
+
 
 ########## Dates ######################################################
 ymd=$(TZ='Asia/Tokyo' date +'%Y%m%d')
@@ -129,7 +116,7 @@ nowjp || exit 1
 echo "RAM usage $(ram_get_usage)"
   
 
-star wars
+
 ######################################################################
 ####### Run Script in each sub-folder. ###############################
 subfolders=$(find "$dirin" -maxdepth 1 -mindepth 1 -type d | sort)
@@ -166,8 +153,8 @@ for dirk0 in $subfolders; do
       ### Move Script   #################################################
       dirnew="done/$ymd/$dirk/" 
       task_movefolder $mmode  $script  $dirnew 
-
       if [[  $mmode   == *"debug2"* ]]; then exit;  fi   ### Exit early if debug
+
 
 
       ### Update Remote repo   ########################################
