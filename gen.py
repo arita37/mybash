@@ -22,13 +22,14 @@ For a general introduction to the Stable Diffusion model please refer to this [c
 """
 import fire,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob, time
 from box import Box
+from utilmy import log, os_makedirs, glob_glob
 
 import numpy as np
 from tqdm.auto import tqdm
 from io import BytesIO
 from subprocess import getoutput
 
-
+################################################################
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
@@ -42,15 +43,16 @@ from accelerate.utils import set_seed
 from diffusers import AutoencoderKL, DDPMScheduler, PNDMScheduler, StableDiffusionPipeline, UNet2DConditionModel
 from diffusers.optimization import get_scheduler
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
+from transformers import CLIPFeatureExtractor, CLIPTextModel, CLIPTokenizer
 
 
+#############################
 import PIL
 import svgutils.transform as sg
 from PIL import Image
-from transformers import CLIPFeatureExtractor, CLIPTextModel, CLIPTokenizer
 
-from utilmy import log 
 
+###########################################################
 try :
     from IPython.display import HTML
     from IPython.display import clear_output
@@ -58,39 +60,80 @@ except : pass
 
 
 ###########################################################################################
+def test0():
+    log('Import is ok')
+
+
 def test1():
     """### Training
     Define hyper for our training
     If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
     """
+    global cc
+    cc = Box({})
 
-    """## Settings for teaching your new concept"""
-    #@markdown `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
-    pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion" #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    ##############################################################################################
+    ## Settings for teaching your new concept
+    #　 `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
+    #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    cc.pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion"
 
     """### Get the training images:
     #### Download the images from the internet and save them locally.
     You can also upload the images to colab or load from google drive, please check the next section if you want to use that.
     """
-
-    #@markdown Add here the URLs to the images of the concept you are adding. 3-5 should be fine
-    urls = [
+    #　 Add here the URLs to the images of the concept you are adding. 3-5 should be fine
+    cc.urls = [
           "https://huggingface.co/datasets/valhalla/images/resolve/main/2.jpeg",
-          "https://huggingface.co/datasets/valhalla/images/resolve/main/3.jpeg",
+          "https://huggingface.co/datasets/vrlhalla/images/resolve/main/3.jpeg",
           "https://huggingface.co/datasets/valhalla/images/resolve/main/5.jpeg",
           "https://huggingface.co/datasets/valhalla/images/resolve/main/6.jpeg",
           ## You can add additional images here
     ]
 
     #@title Settings for your newly created concept
-    #@markdown `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
-    what_to_teach = "object" #@param ["object", "style"]
-    #@markdown `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
-    #@markdown `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
-    initializer_token = "bicycle" #@param {type:"string"
+    #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
+    cc.what_to_teach = "object" #@param ["object", "style"]
 
-    hyper = {
+    #　 `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
+    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    #r `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
+
+
+    cc.initializer_token = "bicycle" #@param {type:"string"
+
+    #### Custom Prompt for the images to fine tune.  ######################
+    cc.imagenet_templates_small = [
+        "a svg of a {}",
+        "a rendering of a {}",
+        "the photo of a {}",
+        "flat vector icon of{}",
+        "a dark photo of the {}",
+        "white color clear background{}",
+        "Design a flat vector icon of a {}",
+        "minimalistic image of {}",
+        "transparent background photo of the {}",
+        "Create a clean and simple {}",
+        "simple SVG illustration  {}",
+    ]
+    # prompt = "black color flat vector icon of bicycle, black and white, b&w, white color clear background only"
+    # prmopt = "Design a black and white flat vector icon of a bicycle with a clear background, featuring a minimalist style and solid black color on a transparent background."
+    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
+    cc.imagenet_style_templates_small = [
+        "flat vector icon of  of {}",
+        "reate a clean and simple SVG illustration of a {} , centered on a clear white background.",
+        "Design a  flat vector icon of a {} with a clear background",
+        "featuring a minimalist style {} and solid  color on a clear white background",
+        "Create a clean and simple SVG illustration of a {} , centered on a clear white background",
+    ]
+
+
+
+    ### dataset
+    cc.save_path=""
+
+
+    cc.hyper = {
         "learning_rate": 5e-04,
         "scale_lr": True,
         "max_train_steps": 5000,
@@ -104,10 +147,11 @@ def test1():
     }
     #v!mkdir -p sd-concept-output
     ########## """Train!"""
-    # logger = get_logger(__name__)
 
-    """Create noise_scheduler for training"""
-    noise_scheduler = DDPMScheduler.from_config(pretrained_model_name_or_path, subfolder="scheduler")
+    ###############################################################################
+    log("#### config:\n", cc)
+    model_setup()
+
 
 
 
@@ -123,7 +167,7 @@ def colab_setup():
 
         
         #@title [Optional] Install xformers for faster and memory efficient training
-        #@markdown Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
+        #　 Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
 
         # !pip install -U --pre triton
         !pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/T4/xformers-0.0.13.dev0-py3-none-any.whl
@@ -164,23 +208,22 @@ def gpu_check():
     #   %pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/A100/xformers-0.0.13.dev0-py3-none-any.whl
 
     # #@title [Optional] Login to the Hugging Face Hub
-    # #@markdown Add a token with the "Write Access" role to be able to add your trained concept to the [Library of Concepts](https://huggingface.co/sd-concepts-library)
+    # #　 Add a token with the "Write Access" role to be able to add your trained concept to the [Library of Concepts](https://huggingface.co/sd-concepts-library)
     # # !pip install ipywidgets
     # from huggingface_hub import notebook_login
 
     # notebook_login()
 
 
-global cc,train_dataset
+global cc
 def init_vars():
-    global cc,train_dataset
+    global cc
     cc = Box({})
     cc.urls= ""
     
     ### dataset
     cc.save_path=""
-    cc.tokenizer=""
-    cc.cc.placeholder_token=""
+    cc.placeholder_token=""
     cc.what_to_teach=""
     cc.imagenet_style_templates_small ="style"
 
@@ -192,6 +235,7 @@ def init_vars():
 
 
     #### Hyper params
+    ##     If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
     cc.hyper =  {
         "learning_rate": 5e-04,
         "scale_lr": True,
@@ -204,7 +248,7 @@ def init_vars():
         "seed": 42,
         "output_dir": "sd-concept-output"
     }
-    
+
 
 
 ###########################################################################################
@@ -241,7 +285,7 @@ def image_setup():
     *Make sure that the directory only contains images as the following cells will read all the files from the provided directory.*
     """
 
-    #@markdown `images_path` is a path to directory containing the training images. It could 
+    #　 `images_path` is a path to directory containing the training images. It could 
     images_path = "bicycle" #@param {type:"string"}
     images_path= r"D:\Projects\research_paper_scratch\bicycle"
     while not os.path.exists(str(images_path)):
@@ -275,7 +319,7 @@ def prompt_create():
     """
 
   
-    imagenet_templates_small = [
+    cc.imagenet_templates_small = [
         "a svg of a {}",
         "a rendering of a {}",
         "the photo of a {}",
@@ -291,7 +335,7 @@ def prompt_create():
     # prompt = "black color flat vector icon of bicycle, black and white, b&w, white color clear background only"
     # prmopt = "Design a black and white flat vector icon of a bicycle with a clear background, featuring a minimalist style and solid black color on a transparent background."
     # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
-    imagenet_style_templates_small = [
+    cc.imagenet_style_templates_small = [
         "flat vector icon of  of {}",
         "reate a clean and simple SVG illustration of a {} , centered on a clear white background.",
         "Design a  flat vector icon of a {} with a clear background",
@@ -307,8 +351,7 @@ def prompt_create():
 ########################################################################################################
 class TextualInversionDataset(Dataset):
     def __init__(
-        self,
-        data_root,
+        self,data_root,
         tokenizer,
         learnable_property="object",  # [object, style]
         size=512,
@@ -338,14 +381,14 @@ class TextualInversionDataset(Dataset):
             self._length = self.num_images * repeats
 
         self.interpolation = {
-            "linear": PIL.Image.LINEAR,
+            "linear":   PIL.Image.LINEAR,
             "bilinear": PIL.Image.BILINEAR,
-            "bicubic": PIL.Image.BICUBIC,
-            "lanczos": PIL.Image.LANCZOS,
+            "bicubic":  PIL.Image.BICUBIC,
+            "lanczos":  PIL.Image.LANCZOS,
         }[interpolation]
 
         #### List of Text prompt. 
-        self.templates = cc.imagenet_style_templates_small if learnable_property == "style" else cc.imagenet_templates_small
+        self.templates      = cc.imagenet_style_templates_small if learnable_property == "style" else cc.imagenet_templates_small
         self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
 
     def __len__(self):
@@ -418,14 +461,6 @@ def create_dataset():
 def create_dataloader(train_batch_size=1):
     return torch.utils.data.DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
 
-
-
-
-"""### Training
-
-Define hyperparameters for our training
-If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
-"""
 
 
 
@@ -516,11 +551,8 @@ def training_function(text_encoder, vae, unet):
     gradient_checkpointing      = cc.hyper["gradient_checkpointing"]
 
 
-
-
     train_dataset    = create_dataset()
     train_dataloader = create_dataloader(train_batch_size)
-
 
 
 
@@ -705,8 +737,7 @@ def train_launcher():
 
 
 #########################################################################################
-def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background" #@param {type:"string"}
-
+def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background"
     ,num_samples = 1
     ,num_rows = 50
     ,resolution = 20
@@ -723,7 +754,7 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
     increase inference step
 
     #@title Run the Stable Diffusion pipeline
-    #@markdown Don't forget to use the placeholder token in your prompt
+    #　 Don't forget to use the placeholder token in your prompt
 
 
     # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
@@ -788,7 +819,7 @@ def run_inference2():
     # !pip install python-slugify
     # save_concept_to_public_library = True #@param {type:"boolean"}
     # name_of_your_concept = "Cat toy" #@param {type:"string"}
-    # #@markdown `hf_token_write`: leave blank if you logged in with a token with `write access` in the [Initial Setup](#scrollTo=KbzZ9xe6dWwf). If not, [go to your tokens settings and create a write access token](https://huggingface.co/settings/tokens)
+    # #　 `hf_token_write`: leave blank if you logged in with a token with `write access` in the [Initial Setup](#scrollTo=KbzZ9xe6dWwf). If not, [go to your tokens settings and create a write access token](https://huggingface.co/settings/tokens)
     # hf_token_write = "" #@param {type:"string"}
 
     # if(save_concept_to_public_library):
