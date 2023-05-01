@@ -75,7 +75,7 @@ def test1():
     ##############################################################################################
     ## Settings for teaching your new concept
     #　 `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
-    #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    # ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
     cc.pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion"
 
     """### Get the training images:
@@ -93,14 +93,14 @@ def test1():
 
     #@title Settings for your newly created concept
     #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
-    cc.what_to_teach = "object" #@param ["object", "style"]
+    cc.what_to_teach = "object" # ["object", "style"]
 
     #　 `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    cc.placeholder_token = "<bicycle-svg>" # {type:"string"}
     #r `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
 
 
-    cc.initializer_token = "bicycle" #@param {type:"string"
+    cc.initializer_token = "bicycle" # {type:"string"
 
     #### Custom Prompt for the images to fine tune.  ######################
     cc.imagenet_templates_small = [
@@ -288,7 +288,7 @@ def image_setup():
     """
 
     #　 `images_path` is a path to directory containing the training images. It could 
-    images_path = "bicycle" #@param {type:"string"}
+    images_path = "bicycle" # {type:"string"}
     images_path= r"D:\Projects\research_paper_scratch\bicycle"
     while not os.path.exists(str(images_path)):
       log('The images_path specified does not exist, use the colab file explorer to copy the path :')
@@ -820,10 +820,10 @@ def run_inference2():
     # #@title Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
     # !pip uninstall slugify
     # !pip install python-slugify
-    # save_concept_to_public_library = True #@param {type:"boolean"}
-    # name_of_your_concept = "Cat toy" #@param {type:"string"}
+    # save_concept_to_public_library = True # {type:"boolean"}
+    # name_of_your_concept = "Cat toy" # {type:"string"}
     # #　 `hf_token_write`: leave blank if you logged in with a token with `write access` in the [Initial Setup](#scrollTo=KbzZ9xe6dWwf). If not, [go to your tokens settings and create a write access token](https://huggingface.co/settings/tokens)
-    # hf_token_write = "" #@param {type:"string"}
+    # hf_token_write = "" # {type:"string"}
 
     # if(save_concept_to_public_library):
     #   from slugify import slugify
