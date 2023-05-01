@@ -141,9 +141,10 @@ def test1():
         "train_batch_size": 4,
         "gradient_accumulation_steps": 1,
         "gradient_checkpointing": True,
-        "mixed_precision": "fp16",
+        # "mixed_precision": "fp16",  #### need GPU
+        "mixed_precision": "no",  #### need GPU  ## ['no', 'fp8', 'fp16', 'bf16']
         "seed": 42,
-        "output_dir": "sd-concept-output"
+        "output_dir": "out/"
     }
     #v!mkdir -p sd-concept-output
     ########## """Train!"""
@@ -404,7 +405,7 @@ class TextualInversionDataset(Dataset):
 
         ##### Pick some random Prompt: only one prompt/label at time.
         #### image can receive random prompt
-        placeholder_string = self.cc.placeholder_token
+        placeholder_string = self.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         """
