@@ -171,9 +171,9 @@ def gpu_check():
     # notebook_login()
 
 
-global cc,traindataset
+global cc,train_dataset
 def init_vars():
-    global cc
+    global cc,train_dataset
     cc = Box({})
     cc.urls= ""
     
