@@ -26,7 +26,7 @@ https://www.google.com/search?q=simple+bike+vector+art+black+and+white&tbm=isch&
 
 
 
-""'
+"""
 
 import cv2
 import numpy as np
