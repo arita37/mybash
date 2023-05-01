@@ -130,7 +130,7 @@ def test1():
 
 
     ### dataset
-    cc.save_path=""
+    cc.dir_img="imgs/"
 
 
     cc.hyper = {
@@ -151,6 +151,7 @@ def test1():
     ###############################################################################
     log("#### config:\n", cc)
     model_setup()
+    train_launcher()
 
 
 
@@ -367,7 +368,7 @@ class TextualInversionDataset(Dataset):
         self.tokenizer = tokenizer
         self.learnable_property = learnable_property
         self.size = size
-        self.cc.placeholder_token = cc.placeholder_token
+        self.placeholder_token = cc.placeholder_token
         self.center_crop = center_crop
         self.flip_p = flip_p
 
@@ -445,11 +446,12 @@ class TextualInversionDataset(Dataset):
 
 def create_dataset():
     """Dataset used for fine-tuning. Text, images """
+    global tokenizer
     train_dataset = TextualInversionDataset(
-          data_root=cc.save_path, ### image pathsonly
-          tokenizer=cc.tokenizer,
+          data_root=cc.dir_img, ### image pathsonly
+          tokenizer=tokenizer,
           size=vae.sample_size,
-          placeholder_token=cc.cc.placeholder_token,  ### Text data
+          placeholder_token=cc.placeholder_token,  ### Text data
           repeats=100,
           learnable_property=cc.what_to_teach, #Option selected above between object and style
           center_crop=False,
