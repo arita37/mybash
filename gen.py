@@ -9,7 +9,7 @@
 Original file is located at
     https://colab.research.google.com/drive/1F5IfrlYPfk-DW_xTuTpujEiU5VxeTeRQ
 
-# Textual-inversion fine-tuning for Stable Diffusion using d🧨ffusers 
+# Textual-inversion fine-tuning for Stable Diffusion using diffusers 
 
 This notebook shows how to "teach" Stable Diffusion a new concept via textual-inversion using 🤗 Hugging Face [🧨 Diffusers library](https://github.com/huggingface/diffusers). 
 
@@ -18,14 +18,22 @@ _By using just 3-5 images you can teach new concepts to Stable Diffusion and per
 
 For a general introduction to the Stable Diffusion model please refer to this [colab](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_diffusion.ipynb).
 
+
 """
 import argparse,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob, time
-import svgutils.transform as sg
-import numpy as np, torch
+import numpy as np
+from tqdm.auto import tqdm
+from io import BytesIO
+from subprocess import getoutput
+
+
+import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
 from torch.utils.data import Dataset
+from torchvision import transforms
 
+import accelerate
 from accelerate import Accelerator
 from accelerate.logging import get_logger
 from accelerate.utils import set_seed
@@ -33,19 +41,14 @@ from diffusers import AutoencoderKL, DDPMScheduler, PNDMScheduler, StableDiffusi
 from diffusers.optimization import get_scheduler
 from diffusers.pipelines.stable_diffusion import StableDiffusionSafetyChecker
 
-import PIL
-from PIL import Image
-from torchvision import transforms
-from tqdm.auto import tqdm
-from transformers import CLIPFeatureExtractor, CLIPTextModel, CLIPTokenizer
 
-#@title Download
-from io import BytesIO
+import PIL
+import svgutils.transform as sg
+from PIL import Image
+from transformers import CLIPFeatureExtractor, CLIPTextModel, CLIPTokenizer
 
 from utilmy import log 
 
-
-from subprocess import getoutput
 from IPython.display import HTML
 from IPython.display import clear_output
 
@@ -139,7 +142,7 @@ def gpu_check():
     #         break
     #     except:
     #         pass
-    #     print('[1;31mit seems that your GPU is not supported at the moment')
+    #     log('[1;31mit seems that your GPU is not supported at the moment')
     #     time.sleep(5)
 
     # if (gpu=='T4'):
@@ -176,7 +179,7 @@ def image_grid(imgs, rows, cols):
     return grid
 
 
-def download_image(url):
+def image_download(url):
   try:
     response = requests.get(url)
   except:
@@ -184,13 +187,12 @@ def download_image(url):
   return Image.open(BytesIO(response.content)).convert("RGB")
 
 
-def down_images():
-    images = list(filter(None,[download_image(url) for url in urls]))
+def image_download2():
+    images = list(filter(None,[image_download(url) for url in urls]))
     save_path = "./my_concept"
     if not os.path.exists(save_path):
       os.mkdir(save_path)
     [image.save(f"{save_path}/{i}.jpeg") for i, image in enumerate(images)]
-
 
 
 def image_setup():
@@ -203,7 +205,7 @@ def image_setup():
     images_path = "bicycle" #@param {type:"string"}
     images_path= r"D:\Projects\research_paper_scratch\bicycle"
     while not os.path.exists(str(images_path)):
-      print('The images_path specified does not exist, use the colab file explorer to copy the path :')
+      log('The images_path specified does not exist, use the colab file explorer to copy the path :')
       images_path=input("")
     save_path = images_path
 
@@ -218,12 +220,13 @@ def image_setup():
           new_image.convert('RGB')
           images.append(new_image.resize((512, 512)))
       except:
-        print(f"{image_path} is not a valid image, please make sure to remove this file from the directory otherwise the training could fail.")
+        log(f"{image_path} is not a valid image, please make sure to remove this file from the directory otherwise the training could fail.")
 
 
     image_grid(images, 1, len(images))
 
 
+########################################################################################################
 def prompt_create():
     """## Teach the model a new concept (fine-tuning with textual inversion)
     Execute this this sequence of cells to run the training process. The whole process may take from 1-4 hours. (Open this block if you are interested in how this process works under the hood or if you want to change advanced training settings or hyper)
@@ -255,6 +258,8 @@ def prompt_create():
         "featuring a minimalist style {} and solid  color on a clear white background",
         "Create a clean and simple SVG illustration of a {} , centered on a clear white background",
     ]
+
+
 
 
 
@@ -444,10 +449,8 @@ def create_dataloader(train_batch_size=1):
 
 
 
-
-
 ###################################################################################################
-def save_progress(text_encoder, placeholder_token_id, accelerator, save_path):
+def train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path):
     log("Saving embeddings")
     learned_embeds = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight[placeholder_token_id]
     learned_embeds_dict = {placeholder_token: learned_embeds.detach().cpu()}
@@ -455,12 +458,12 @@ def save_progress(text_encoder, placeholder_token_id, accelerator, save_path):
 
 
 def training_function(text_encoder, vae, unet):
-    train_batch_size = hyper["train_batch_size"]
+    train_batch_size            = hyper["train_batch_size"]
     gradient_accumulation_steps = hyper["gradient_accumulation_steps"]
-    learning_rate = hyper["learning_rate"]
-    max_train_steps = hyper["max_train_steps"]
-    output_dir = hyper["output_dir"]
-    gradient_checkpointing = hyper["gradient_checkpointing"]
+    learning_rate               = hyper["learning_rate"]
+    max_train_steps             = hyper["max_train_steps"]
+    output_dir                  = hyper["output_dir"]
+    gradient_checkpointing      = hyper["gradient_checkpointing"]
 
     accelerator = Accelerator(
         gradient_accumulation_steps=gradient_accumulation_steps,
@@ -517,12 +520,12 @@ def training_function(text_encoder, vae, unet):
     log(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
     log(f"  Gradient Accumulation steps = {gradient_accumulation_steps}")
     log(f"  Total optimization steps = {max_train_steps}")
-    print("***** Running training *****")
-    print(f"  Num examples = {len(train_dataset)}")
-    print(f"  Instantaneous batch size per device = {train_batch_size}")
-    print(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
-    print(f"  Gradient Accumulation steps = {gradient_accumulation_steps}")
-    print(f"  Total optimization steps = {max_train_steps}")
+    log("***** Running training *****")
+    log(f"  Num examples = {len(train_dataset)}")
+    log(f"  Instantaneous batch size per device = {train_batch_size}")
+    log(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
+    log(f"  Gradient Accumulation steps = {gradient_accumulation_steps}")
+    log(f"  Total optimization steps = {max_train_steps}")
     
     # Only show the progress bar once on each machine.
     progress_bar = tqdm(range(max_train_steps), disable=not accelerator.is_local_main_process)
@@ -532,7 +535,7 @@ def training_function(text_encoder, vae, unet):
     for epoch in range(num_train_epochs):
         text_encoder.train()
         for step, batch in enumerate(train_dataloader):
-            # print("step", step)
+            # log("step", step)
             with accelerator.accumulate(text_encoder):
                 # Convert images to latent space
                 latents = vae.encode(batch["pixel_values"].to(dtype=weight_dtype)).latent_dist.sample().detach()
@@ -584,7 +587,7 @@ def training_function(text_encoder, vae, unet):
                 global_step += 1
                 if global_step % hyper["save_steps"] == 0:
                     save_path = os.path.join(output_dir, f"learned_embeds-step-{global_step}.bin")
-                    save_progress(text_encoder, placeholder_token_id, accelerator, save_path)
+                    train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path)
                     #### 3.4 Gb --> loaded in GPU, CPU inference: 10sec per image... 
                     ### cannot reduce image size: not good results, 512x 512,  128 x 128 ????
                     ### PNG format ONLY, svg --> PNG. 
@@ -600,11 +603,11 @@ def training_function(text_encoder, vae, unet):
 
         accelerator.wait_for_everyone()
 
-        print("epoch", epoch)
+        log("epoch", epoch)
 
     # Create the pipeline using using the trained modules and save it.
     if accelerator.is_main_process:
-        print("creating pipeline")
+        log("creating pipeline")
         pipeline = StableDiffusionPipeline.from_pretrained(
             pretrained_model_name_or_path,
             text_encoder=accelerator.unwrap_model(text_encoder),
@@ -612,23 +615,22 @@ def training_function(text_encoder, vae, unet):
             vae=vae,
             unet=unet,
         )
-        print("pipeline", pipeline)
+        log("pipeline", pipeline)
         pipeline.save_pretrained(output_dir)
-        print("pipeline saved")
+        log("pipeline saved")
         # Also save the newly trained embeddings
         save_path = os.path.join(output_dir, f"learned_embeds.bin")
-        save_progress(text_encoder, placeholder_token_id, accelerator, save_path)
-        print("progress saved")
+        train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path)
+        log("progress saved")
 
 
 def train_launcher():
-    import accelerate
-    print(torch.cuda.is_available())
+    log(torch.cuda.is_available())
 
     accelerate.notebook_launcher(training_function, args=(text_encoder, vae, unet),num_processes = 1)
 
     for param in itertools.chain(unet.parameters(), text_encoder.parameters()):
-      print(param.grad) 
+      log(param.grad) 
       if param.grad is not None:
         del param.grad  # free some memory
       torch.cuda.empty_cache()
@@ -636,7 +638,34 @@ def train_launcher():
 
 
 #########################################################################################
-def run_inference():
+def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background" #@param {type:"string"}
+
+    num_samples = 1,
+    num_rows = 50,  
+    resolution = 20
+
+    )):
+    """
+
+    Keep the seed.
+
+    Single bike as prompt
+    Vector Illustration with black  bike and white and clear background.
+
+    prompt lenght: 250 words,  medium, long prompt or short ???
+    increase inference step
+
+    #@title Run the Stable Diffusion pipeline
+    #@markdown Don't forget to use the placeholder token in your prompt
+
+
+    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
+    # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
+    # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
+
+
+    """
+    global hyper
     #@title Set up the pipeline 
     from diffusers import DPMSolverMultistepScheduler
     pipe = StableDiffusionPipeline.from_pretrained(
@@ -645,46 +674,25 @@ def run_inference():
         torch_dtype=torch.float16,
     ).to("cuda")
 
-    #@title Run the Stable Diffusion pipeline
-    #@markdown Don't forget to use the placeholder token in your prompt
-    prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background" #@param {type:"string"}
+
 
     folder = "svgs_house"
-    resolution = 20
-    number_of_images = 10
-    def svg_scale(input,output,resolution):
-      fig = sg.fromfile(input)
+    #number_of_images = 10
+    def svg_scale(input1,output,resolution):
+      fig = sg.fromfile(input1)
       fig.set_size((str(resolution),str(resolution)))
       fig.save(output)
 
-    def svg_scale(input,output,resolution):
-      fig = sg.fromfile(input)
-      fig.set_size((str(resolution),str(resolution)))
-      fig.save(output)
-
-    """
-    Keep the seed.
-
-    Single bike as prompt
-    Vector Illustration with black  bike and white and clear background.
-
-    prompt lenght: 250 words,  medium, long prompt or short ???
-    increase inference step
-    """
-    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
-    # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
-    # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
-    num_samples = 1 #@param {type:"number"}
-    num_rows = 50 #@param {type:"number"}
 
     all_images = [] 
     for _ in range(num_rows):
-        # print(f"Generating row {_}")
+        # log(f"Generating row {_}")
 
         #### num_inference icrease: more details,  decrease: less details.
         #### fine tuning Colab PRO: 100 - 500 images
         images = pipe([prompt] * num_samples,height=512,width=512 ,
                       num_inference_steps=20).images
+
         # display and save images
         for image in images:
             display(image)
