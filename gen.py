@@ -20,7 +20,9 @@ For a general introduction to the Stable Diffusion model please refer to this [c
 
 
 """
-import argparse,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob, time
+import fire,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob, time
+from box import Box
+
 import numpy as np
 from tqdm.auto import tqdm
 from io import BytesIO
@@ -49,9 +51,10 @@ from transformers import CLIPFeatureExtractor, CLIPTextModel, CLIPTokenizer
 
 from utilmy import log 
 
-from IPython.display import HTML
-from IPython.display import clear_output
-
+try :
+    from IPython.display import HTML
+    from IPython.display import clear_output
+except : pass
 
 
 ###########################################################################################
@@ -82,8 +85,8 @@ def test1():
     #@title Settings for your newly created concept
     #@markdown `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
     what_to_teach = "object" #@param ["object", "style"]
-    #@markdown `placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-    placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    #@markdown `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
+    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
     #@markdown `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
     initializer_token = "bicycle" #@param {type:"string"
 
@@ -113,9 +116,12 @@ def test1():
 def colab_setup():
   ss= """
         #@title Install the required libs
-        !pip install -U -qq git+https://github.com/huggingface/diffusers.git
-        !pip install -qq accelerate transformers ftfy
+        pip install -U -qq git+https://github.com/huggingface/diffusers.git
+        pip install -qq accelerate transformers ftfy
+        
+        svgutils
 
+        
         #@title [Optional] Install xformers for faster and memory efficient training
         #@markdown Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
 
@@ -165,6 +171,41 @@ def gpu_check():
     # notebook_login()
 
 
+global cc,traindataset
+def init_vars():
+    global cc
+    cc = Box({})
+    cc.urls= ""
+    
+    ### dataset
+    cc.save_path=""
+    cc.tokenizer=""
+    cc.cc.placeholder_token=""
+    cc.what_to_teach=""
+    cc.imagenet_style_templates_small ="style"
+
+
+    ##### Pre-trained model
+    cc.pretrained_model_name_or_path   =""
+    cc.initializer_token=""
+
+
+
+    #### Hyper params
+    cc.hyper =  {
+        "learning_rate": 5e-04,
+        "scale_lr": True,
+        "max_train_steps": 5000,
+        "save_steps": 500,
+        "train_batch_size": 4,
+        "gradient_accumulation_steps": 1,
+        "gradient_checkpointing": True,
+        "mixed_precision": "fp16",
+        "seed": 42,
+        "output_dir": "sd-concept-output"
+    }
+    
+
 
 ###########################################################################################
 def image_grid(imgs, rows, cols):
@@ -187,9 +228,8 @@ def image_download(url):
   return Image.open(BytesIO(response.content)).convert("RGB")
 
 
-def image_download2():
+def image_download2(urls, save_path="./ztmp/concept/"):
     images = list(filter(None,[image_download(url) for url in urls]))
-    save_path = "./my_concept"
     if not os.path.exists(save_path):
       os.mkdir(save_path)
     [image.save(f"{save_path}/{i}.jpeg") for i, image in enumerate(images)]
@@ -284,7 +324,7 @@ class TextualInversionDataset(Dataset):
         self.tokenizer = tokenizer
         self.learnable_property = learnable_property
         self.size = size
-        self.placeholder_token = placeholder_token
+        self.cc.placeholder_token = cc.placeholder_token
         self.center_crop = center_crop
         self.flip_p = flip_p
 
@@ -305,7 +345,7 @@ class TextualInversionDataset(Dataset):
         }[interpolation]
 
         #### List of Text prompt. 
-        self.templates = imagenet_style_templates_small if learnable_property == "style" else imagenet_templates_small
+        self.templates = cc.imagenet_style_templates_small if learnable_property == "style" else cc.imagenet_templates_small
         self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
 
     def __len__(self):
@@ -320,7 +360,7 @@ class TextualInversionDataset(Dataset):
 
         ##### Pick some random Prompt: only one prompt/label at time.
         #### image can receive random prompt
-        placeholder_string = self.placeholder_token
+        placeholder_string = self.cc.placeholder_token
         text = random.choice(self.templates).format(placeholder_string)
 
         """
@@ -360,55 +400,85 @@ class TextualInversionDataset(Dataset):
         return example
 
 
+def create_dataset():
+    """Dataset used for fine-tuning. Text, images """
+    train_dataset = TextualInversionDataset(
+          data_root=cc.save_path, ### image pathsonly
+          tokenizer=cc.tokenizer,
+          size=vae.sample_size,
+          placeholder_token=cc.cc.placeholder_token,  ### Text data
+          repeats=100,
+          learnable_property=cc.what_to_teach, #Option selected above between object and style
+          center_crop=False,
+          set="train",
+    )
+    return train_dataset
 
+
+def create_dataloader(train_batch_size=1):
+    return torch.utils.data.DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
+
+
+
+
+"""### Training
+
+Define hyperparameters for our training
+If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
+"""
+
+
+
+###################################################################################################
 def model_setup():
     """### Setting up the model"""
+    global text_encoder, vae, unet, tokenizer
 
     #@title Load the tokenizer and add the placeholder token as a additional special token.
     tokenizer = CLIPTokenizer.from_pretrained(
-        pretrained_model_name_or_path,
+        cc.pretrained_model_name_or_path,
         subfolder="tokenizer",
     )
 
     # Add the placeholder token in tokenizer
-    num_added_tokens = tokenizer.add_tokens(placeholder_token)
+    num_added_tokens = tokenizer.add_tokens(cc.placeholder_token)
     if num_added_tokens == 0:
         raise ValueError(
-            f"The tokenizer already contains the token {placeholder_token}. Please pass a different"
-            " `placeholder_token` that is not already in the tokenizer."
+            f"The tokenizer already contains the token {cc.placeholder_token}. Please pass a different"
+            " `cc.placeholder_token` that is not already in the tokenizer."
         )
 
     #@title Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
-    # Convert the initializer_token, placeholder_token to ids
-    token_ids = tokenizer.encode(initializer_token, add_special_tokens=False)
+    # Convert the initializer_token, cc.placeholder_token to ids
+    token_ids = tokenizer.encode(cc.initializer_token, add_special_tokens=False)
     # Check if initializer_token is a single token or a sequence of tokens
     if len(token_ids) > 1:
         raise ValueError("The initializer token must be a single token.")
 
     initializer_token_id = token_ids[0]
-    placeholder_token_id = tokenizer.convert_tokens_to_ids(placeholder_token)
+    cc.placeholder_token_id = tokenizer.convert_tokens_to_ids(cc.placeholder_token)
 
 
     # Load models and create wrapper for stable diffusion
     # pipeline = StableDiffusionPipeline.from_pretrained(pretrained_model_name_or_path)
     # del pipeline
     text_encoder = CLIPTextModel.from_pretrained(
-        pretrained_model_name_or_path, subfolder="text_encoder"
+        cc.pretrained_model_name_or_path, subfolder="text_encoder"
     )
     vae = AutoencoderKL.from_pretrained(
-        pretrained_model_name_or_path, subfolder="vae"
+        cc.pretrained_model_name_or_path, subfolder="vae"
     )
     unet = UNet2DConditionModel.from_pretrained(
-        pretrained_model_name_or_path, subfolder="unet"
+        cc.pretrained_model_name_or_path, subfolder="unet"
     )
 
 
     """Initialise the newly added placeholder token with the embeddings of the initializer token
-    We have added the `placeholder_token` in the `tokenizer` so we resize the token embeddings here, this will a new embedding vector in the token embeddings for our `placeholder_token`
+    We have added the `cc.placeholder_token` in the `tokenizer` so we resize the token embeddings here, this will a new embedding vector in the token embeddings for our `cc.placeholder_token`
     """
     text_encoder.resize_token_embeddings(len(tokenizer))
     token_embeds = text_encoder.get_input_embeddings().weight.data
-    token_embeds[placeholder_token_id] = token_embeds[initializer_token_id]
+    token_embeds[cc.placeholder_token_id] = token_embeds[initializer_token_id]
 
 
     """In Textual-Inversion we only train the newly added embedding vector, so lets freeze rest of the model parameters here"""
@@ -428,58 +498,49 @@ def model_setup():
     freeze_params(params_to_freeze)
 
 
-
-#############################################################################################
-def create_dataset():
-    """Dataset used for fine-tuning. Text, images """
-    train_dataset = TextualInversionDataset(
-          data_root=save_path, ### image pathsonly
-          tokenizer=tokenizer,
-          size=vae.sample_size,
-          placeholder_token=placeholder_token,  ### Text data
-          repeats=100,
-          learnable_property=what_to_teach, #Option selected above between object and style
-          center_crop=False,
-          set="train",
-    )
-
-
-def create_dataloader(train_batch_size=1):
-    return torch.utils.data.DataLoader(train_dataset, batch_size=train_batch_size, shuffle=True)
-
-
-
 ###################################################################################################
 def train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path):
     log("Saving embeddings")
-    learned_embeds = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight[placeholder_token_id]
-    learned_embeds_dict = {placeholder_token: learned_embeds.detach().cpu()}
+    learned_embeds = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight[cc.placeholder_token_id]
+    learned_embeds_dict = {cc.placeholder_token: learned_embeds.detach().cpu()}
     torch.save(learned_embeds_dict, save_path)
 
 
 def training_function(text_encoder, vae, unet):
-    train_batch_size            = hyper["train_batch_size"]
-    gradient_accumulation_steps = hyper["gradient_accumulation_steps"]
-    learning_rate               = hyper["learning_rate"]
-    max_train_steps             = hyper["max_train_steps"]
-    output_dir                  = hyper["output_dir"]
-    gradient_checkpointing      = hyper["gradient_checkpointing"]
+    global train_dataset
+    train_batch_size            = cc.hyper["train_batch_size"]
+    gradient_accumulation_steps = cc.hyper["gradient_accumulation_steps"]
+    learning_rate               = cc.hyper["learning_rate"]
+    max_train_steps             = cc.hyper["max_train_steps"]
+    output_dir                  = cc.hyper["output_dir"]
+    gradient_checkpointing      = cc.hyper["gradient_checkpointing"]
+
+
+
+
+    train_dataset    = create_dataset()
+    train_dataloader = create_dataloader(train_batch_size)
+
+
+
 
     accelerator = Accelerator(
         gradient_accumulation_steps=gradient_accumulation_steps,
-        mixed_precision=hyper["mixed_precision"]
+        mixed_precision= cc.hyper["mixed_precision"]
     )
 
     if gradient_checkpointing:
         text_encoder.gradient_checkpointing_enable()
         unet.enable_gradient_checkpointing()
 
-    train_dataloader = create_dataloader(train_batch_size)
-
-    if hyper["scale_lr"]:
+    if cc.hyper["scale_lr"]:
         learning_rate = (
             learning_rate * gradient_accumulation_steps * train_batch_size * accelerator.num_processes
         )
+
+
+    """Create noise_scheduler for training"""
+    noise_scheduler = DDPMScheduler.from_config(cc.pretrained_model_name_or_path, subfolder="scheduler")
 
     # Initialize the optimizer
     optimizer = torch.optim.AdamW(
@@ -575,7 +636,7 @@ def training_function(text_encoder, vae, unet):
                 else:
                     grads = text_encoder.get_input_embeddings().weight.grad
                 # Get the index for tokens that we want to zero the grads for
-                index_grads_to_zero = torch.arange(len(tokenizer)) != placeholder_token_id
+                index_grads_to_zero = torch.arange(len(tokenizer)) != cc.placeholder_token_id
                 grads.data[index_grads_to_zero, :] = grads.data[index_grads_to_zero, :].fill_(0)
 
                 optimizer.step()
@@ -585,9 +646,9 @@ def training_function(text_encoder, vae, unet):
             if accelerator.sync_gradients:
                 progress_bar.update(1)
                 global_step += 1
-                if global_step % hyper["save_steps"] == 0:
+                if global_step % cc.hyper["save_steps"] == 0:
                     save_path = os.path.join(output_dir, f"learned_embeds-step-{global_step}.bin")
-                    train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path)
+                    train_save_progress(text_encoder, cc.placeholder_token_id, accelerator, save_path)
                     #### 3.4 Gb --> loaded in GPU, CPU inference: 10sec per image... 
                     ### cannot reduce image size: not good results, 512x 512,  128 x 128 ????
                     ### PNG format ONLY, svg --> PNG. 
@@ -609,7 +670,7 @@ def training_function(text_encoder, vae, unet):
     if accelerator.is_main_process:
         log("creating pipeline")
         pipeline = StableDiffusionPipeline.from_pretrained(
-            pretrained_model_name_or_path,
+            cc.pretrained_model_name_or_path,
             text_encoder=accelerator.unwrap_model(text_encoder),
             tokenizer=tokenizer,
             vae=vae,
@@ -620,13 +681,19 @@ def training_function(text_encoder, vae, unet):
         log("pipeline saved")
         # Also save the newly trained embeddings
         save_path = os.path.join(output_dir, f"learned_embeds.bin")
-        train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path)
+        train_save_progress(text_encoder, cc.placeholder_token_id, accelerator, save_path)
         log("progress saved")
 
 
-def train_launcher():
-    log(torch.cuda.is_available())
 
+def train_launcher():
+    """ Launch trainer
+
+    """
+    global text_encoder, vae, unet
+    model_setup()
+
+    log(torch.cuda.is_available())
     accelerate.notebook_launcher(training_function, args=(text_encoder, vae, unet),num_processes = 1)
 
     for param in itertools.chain(unet.parameters(), text_encoder.parameters()):
@@ -640,11 +707,11 @@ def train_launcher():
 #########################################################################################
 def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background" #@param {type:"string"}
 
-    num_samples = 1,
-    num_rows = 50,  
-    resolution = 20
+    ,num_samples = 1
+    ,num_rows = 50
+    ,resolution = 20
 
-    )):
+    ):
     """
 
     Keep the seed.
@@ -665,12 +732,11 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
 
     """
-    global hyper
     #@title Set up the pipeline 
     from diffusers import DPMSolverMultistepScheduler
     pipe = StableDiffusionPipeline.from_pretrained(
-        hyper["output_dir"],
-        scheduler=DPMSolverMultistepScheduler.from_pretrained(hyper["output_dir"], subfolder="scheduler"),
+        cc.hyper["output_dir"],
+        scheduler=DPMSolverMultistepScheduler.from_pretrained(cc.hyper["output_dir"], subfolder="scheduler"),
         torch_dtype=torch.float16,
     ).to("cuda")
 
@@ -695,10 +761,10 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
         # display and save images
         for image in images:
-            display(image)
+            #display(image)
             image_name = folder+"/"+str(datetime.now())+".png"
             image.save(image_name)
-            display(image)
+           # display(image)
             ppm_path=image_name.replace("png","ppm")
             svg_path=ppm_path.replace("ppm","svg")
             svg_scaled =svg_path.replace(".svg","_20.svg")
@@ -741,7 +807,7 @@ def run_inference2():
     #   image_string = ""
     #   repo_id = f"sd-concepts-library/{slugify(name_of_your_concept)}"
     #   for i, image in enumerate(images_upload):
-    #       image_string = f'''{image_string}![{placeholder_token} {i}](https://huggingface.co/{repo_id}/resolve/main/concept_images/{image})
+    #       image_string = f'''{image_string}![{cc.placeholder_token} {i}](https://huggingface.co/{repo_id}/resolve/main/concept_images/{image})
     # '''
     #   if(what_to_teach == "style"):
     #       what_to_teach_article = f"a `{what_to_teach}`"
@@ -752,7 +818,7 @@ def run_inference2():
     # base_model: {pretrained_model_name_or_path}
     # ---
     # ### {name_of_your_concept} on Stable Diffusion
-    # This is the `{placeholder_token}` concept taught to Stable Diffusion via Textual Inversion. You can load this concept into the [Stable Conceptualizer](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_conceptualizer_inference.ipynb) notebook. You can also train your own concepts and load them into the concept libraries using [this notebook](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/sd_textual_inversion_training.ipynb).
+    # This is the `{cc.placeholder_token}` concept taught to Stable Diffusion via Textual Inversion. You can load this concept into the [Stable Conceptualizer](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_conceptualizer_inference.ipynb) notebook. You can also train your own concepts and load them into the concept libraries using [this notebook](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/sd_textual_inversion_training.ipynb).
 
     # Here is the new concept you will be able to use as {what_to_teach_article}:
     # {image_string}
@@ -763,7 +829,7 @@ def run_inference2():
     #   readme_file.close()
     #   #Save the token identifier to a file
     #   text_file = open("token_identifier.txt", "w")
-    #   text_file.write(placeholder_token)
+    #   text_file.write(cc.placeholder_token)
     #   text_file.close()
     #   #Save the type of teached thing to a file
     #   type_file = open("type_of_concept.txt","w")
