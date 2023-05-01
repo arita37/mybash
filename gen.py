@@ -91,7 +91,7 @@ def test1():
           ## You can add additional images here
     ]
 
-    #@title Settings for your newly created concept
+    # Settings for your newly created concept
     #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
     cc.what_to_teach = "object" # ["object", "style"]
 
@@ -161,14 +161,14 @@ def test1():
 ###########################################################################################
 def colab_setup():
   ss= """
-        #@title Install the required libs
+        # Install the required libs
         pip install -U -qq git+https://github.com/huggingface/diffusers.git
         pip install -qq accelerate transformers ftfy
         
         svgutils
 
         
-        #@title [Optional] Install xformers for faster and memory efficient training
+        # [Optional] Install xformers for faster and memory efficient training
         #　 Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
 
         # !pip install -U --pre triton
@@ -209,7 +209,7 @@ def gpu_check():
     # elif (gpu=='A100'):
     #   %pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/A100/xformers-0.0.13.dev0-py3-none-any.whl
 
-    # #@title [Optional] Login to the Hugging Face Hub
+    # # [Optional] Login to the Hugging Face Hub
     # #　 Add a token with the "Write Access" role to be able to add your trained concept to the [Library of Concepts](https://huggingface.co/sd-concepts-library)
     # # !pip install ipywidgets
     # from huggingface_hub import notebook_login
@@ -472,7 +472,7 @@ def model_setup():
     """### Setting up the model"""
     global text_encoder, vae, unet, tokenizer
 
-    #@title Load the tokenizer and add the placeholder token as a additional special token.
+    # Load the tokenizer and add the placeholder token as a additional special token.
     tokenizer = CLIPTokenizer.from_pretrained(
         cc.pretrained_model_name_or_path,
         subfolder="tokenizer",
@@ -486,7 +486,7 @@ def model_setup():
             " `cc.placeholder_token` that is not already in the tokenizer."
         )
 
-    #@title Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
+    # Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
     # Convert the initializer_token, cc.placeholder_token to ids
     token_ids = tokenizer.encode(cc.initializer_token, add_special_tokens=False)
     # Check if initializer_token is a single token or a sequence of tokens
@@ -756,7 +756,7 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
     prompt lenght: 250 words,  medium, long prompt or short ???
     increase inference step
 
-    #@title Run the Stable Diffusion pipeline
+    # Run the Stable Diffusion pipeline
     #　 Don't forget to use the placeholder token in your prompt
 
 
@@ -766,7 +766,7 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
 
     """
-    #@title Set up the pipeline 
+    # Set up the pipeline 
     from diffusers import DPMSolverMultistepScheduler
     pipe = StableDiffusionPipeline.from_pretrained(
         cc.hyper["output_dir"],
@@ -817,7 +817,7 @@ def run_inference2():
     To save this concept for re-using, download the `learned_embeds.bin` file or save it on the library of concepts.
     Use the [Stable Conceptualizer notebook](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_conceptualizer_inference.ipynb) for inference with persistently saved pre-trained concepts
     """
-    # #@title Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
+    # # Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
     # !pip uninstall slugify
     # !pip install python-slugify
     # save_concept_to_public_library = True # {type:"boolean"}
