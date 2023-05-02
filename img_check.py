@@ -13,7 +13,7 @@ from io import BytesIO
 import requests
 from bs4 import BeautifulSoup
 
-from utilmy import glob_glob, os_makedirs, pd_to_file
+from utilmy import log,glob_glob, os_makedirs, pd_to_file, date_now
 from utilmy.images.util_image import image_read
 
 
