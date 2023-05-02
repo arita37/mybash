@@ -1,28 +1,24 @@
 '''
-pip install utilmy fire
-
-python scraper.py  fetch --query "simple bike in black and white"  --dirout ztmp/fetch/bing/simple_bike_black/
+pip install utilmy fire rembg
 
 
+python scraper.py  fetch  --query "simple bike in black and white" --limit 10  --dirout ztmp/fetch/bing/simple_bike_black/
 
 
 '''
-import fire
+import fire, os, sys
 from pathlib import Path
 import urllib.request
 import urllib
 import imghdr
 import posixpath
 
-try:
-    from rembg import remove
-except:
-    os.system("pip install rembg")
-    from rembg import remove
+from rembg import remove
 
 
-def fetch(query, limit=100, dirout='dl', adult_filter_off=True, 
-    force_replace=False, timeout=60, filter="", verbose=True, png_conv=False):
+
+def fetch(query, limit=5, dirout='dl', adult_filter_off=True, 
+          force_replace=False, timeout=60, filter="", verbose=True, png_conv=False):
 
     # engine = 'bing'
     if adult_filter_off:
@@ -169,27 +165,6 @@ class Bing:
 if __name__ == "__main__":
     fire.Fire()
 
-
-
-
-
-
-def zz_notuser():
-        query = input("Enter your query: ")
-        limit = input("Enter number of images: ")
-        try:
-            limit = int(limit)
-        except:
-            print("Limit should be integer value, using 100 as default")
-            limit = 100
-        out_dir = input("Enter OutPut Dir (Default 'dl'): ")
-        if out_dir == "":
-            out_dir = "dl"
-        png_conv = input("AutoConvert to png (Y or N)")
-        if png_conv in ["y", "Y"]:
-            png_conv = True
-        else:
-            png_conv = False
 
 
 
