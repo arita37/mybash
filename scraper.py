@@ -7,16 +7,13 @@ python scraper.py  fetch --query "simple bike in black and white"  --dirout ztmp
 
 
 '''
-
+import fire,re, os, sys, shutil
 from pathlib import Path
 import urllib.request
 import urllib
 import imghdr
 import posixpath
-import re
-import os
-import sys
-import shutil
+
 try:
     from rembg import remove
 except:
