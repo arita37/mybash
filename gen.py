@@ -24,7 +24,7 @@ import fire,itertools,  math, os, random,sys, shutil, subprocess, datetime, requ
 from box import Box
 from utilmy import log, os_makedirs, glob_glob
 
-import numpy as np
+import numpy as np, json
 from tqdm.auto import tqdm
 from io import BytesIO
 from subprocess import getoutput
@@ -255,13 +255,22 @@ def runtrain(cfg="params_test"):
     """### Training
     Define hyper for our training
     If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
+
+    from utilmy import json_save
+    json_save(cc, "ztmp/config/cfg_v1.json")
     """
     global cc
     log(f"#### Start Full train with param_name: {cfg}")
-    try :
-       cc = globals()[cfg]() ### it's a function not a var !
-    except :   
-       cc = globals()[cfg]   ### it's a  var !
+
+    if ".json" in cfg :
+        from utilmy import config_load
+        cc = config_load(cfg)
+        cc = Box(cc)
+    else :
+        try :
+           cc = globals()[cfg]() ### it's a function not a var !
+        except :   
+           cc = globals()[cfg]   ### it's a  var !
 
     log('Params loaded\n', cc)
 
@@ -1075,6 +1084,39 @@ def run_inference2():
     #     token=hf_token
     #   )
 
+
+
+###########################################################################################
+def json_load(path) :
+  """function json_load.
+  Doc::
+          
+  """
+  try :
+    return json.load(open( path, mode='r'))
+  except Exception as e :
+    log(e)
+    return {}
+
+
+def json_save(dd:dict, path:str) :
+  """function json_save
+  Doc::
+          
+  """
+  os_makedirs(path)
+  try :
+    json.dump(dd, open( path, mode='w'))
+    return path
+  except Exception as e :
+    log(e)
+
+
+def pprint(dd,indent=3):
+    if isinstance(dd, dict):
+        log(json.dumps(cc, sort_keys=True, indent=indent,separators=(',', ': ') ))  
+    else :
+        log(dd)
 
 
 
