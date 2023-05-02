@@ -390,19 +390,34 @@ def colab_tips():
     ss= """
 #! cat gen.py 
 
-#### Run in Background mode  Check
-! nohup  2>&1 bash -c 'pip list && python3 gen.py  test1' &
-! mkdir -p "ztmp/zlog"
-! mv nohup.out "ztmp/zlog/nohup_$(date +'%Y%m%d_%H%M%S').out"
-! ls ztmp/zlog
-
-
-
 
 ### Use this to prevent Colab to shut-down
+! pwd && mkdir -p "ztmp/" 
+! rm "ztmp/znohup_sleeper.out"
 ! nohup  2>&1 bash -c 'while true; do  echo "$(date +'%Y%m%d_%H%M%S')"; sleep 60; done' &
-! mv nohup.out "znohup_sleeper.out"   ### Auto re-direct
-! cat znohup_sleeper.out
+! mv nohup.out "ztmp/znohup_sleeper.out"   ### Auto re-direct
+! cat ztmp/znohup_sleeper.out
+
+
+
+#### Run in Background mode
+### Process is Running Long
+#! nohup  2>&1 bash -c 'pip list && python3 gen.py  test1' &
+#! nohup  2>&1 bash -c 'pip list && python3 gen.py  runtrain --cfg "params_test" ' &
+! nohup  2>&1 bash -c 'pip list && python3 gen.py  runtrain --cfg "ztmp/config/cfg_v1.json" ' &
+! mkdir -p "ztmp/zlog"
+! mv nohup.out "ztmp/zlog/nohup_full_$(date +'%Y%m%d_%H%M%S').out"
+! ls ztmp/zlog 
+! echo "" && find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "
+
+
+
+### Most recent log
+!cat  $( find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" " )
+
+
+
+
 
     """
     log(ss)
@@ -747,10 +762,12 @@ def training_function(text_encoder, vae, unet):
     gradient_checkpointing      = cc.hyper["gradient_checkpointing"]
 
 
-    ### Prevent Overlap
+    ### TimeStamp output_dir + Config saved  #####################
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
     output_dir = output_dir + f"/{t0}/"
+    cc.hyper['ouput_dir2'] =  output_dir
     os_makedirs(output_dir)
+    json_save(cc, output_dir + "/cc_config.json")
 
 
     train_dataset    = create_dataset()
