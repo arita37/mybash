@@ -2,49 +2,40 @@
 pip install utilmy fire rembg
 
 
-python scraper.py  fetch  --query "simple bike in black and white" --limit 10  --dirout ztmp/fetch/bing/simple_bike_black/
+python scraper.py  fetch  --query "simple bike in black and white" --limit 1  --dirout ztmp/fetch/bing/
 
 
 '''
-import fire, os, sys
+import fire, os, sys,re
 from pathlib import Path
 import urllib.request
 import urllib
 import imghdr
 import posixpath
-import re
+
 from rembg import remove
+from utilmy import os_makedirs
 
 
 
-def fetch(query, limit=5, dirout='dl', adult_filter_off=True, 
-          force_replace=False, timeout=60, filter="", verbose=True, png_conv=False):
+def fetch(query, limit=1, dirout='dl', adult_filter='on', 
+          force_replace=False, timeout=60, filter="", verbose=1, png_conv=1):
 
     # engine = 'bing'
-    if adult_filter_off:
-        adult = 'off'
-    else:
-        adult = 'on'
-
     
     image_dir = Path(dirout).joinpath(query).absolute()
+    os_makedirs(str(image_dir))
 
-    if force_replace:
-        if Path.is_dir(image_dir):
-            shutil.rmtree(image_dir)
+    png_conv = True if png_conv == 1 else False 
+    verbose  = True if verbose  == 1 else False 
 
-    # check directory and create if necessary
-    try:
-        if not Path.is_dir(image_dir):
-            Path.mkdir(image_dir, parents=True)
-
-    except Exception as e:
-        print('[Error]Failed to create directory.', e)
-        sys.exit(1)
         
     print("[%] Downloading Images to {}".format(str(image_dir.absolute())))
-    bing = Bing(query, limit, image_dir, adult, timeout, filter, verbose, png_conv)
+    bing = Bing(query, limit, image_dir, adult_filter, timeout, filter, verbose, png_conv)
     bing.run()
+
+
+
 
 class Bing:
     def __init__(self, query, limit, dirout="dl", adult="on", timeout=60,  filter='', verbose=True, png_conv=False):
