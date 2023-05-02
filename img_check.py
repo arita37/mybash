@@ -1,9 +1,96 @@
+"""
+pip install utilmy fire
+
+
+python img_check.py run_classifier  --dirin "img_bad/;imgs/"  --dirout "ztmp/classfier/
+
+
+"""
 import cv2
 import numpy as np
 import urllib.request
 from io import BytesIO
 import requests
 from bs4 import BeautifulSoup
+
+from utilmy import glob_glob, os_makedirs, pd_to_file
+from utilmy.images.util_image import image_read
+
+
+
+####################################################################################
+def run_classifier(dirin="", dirout="ztmp/classifier/", mode="v2")
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+    dirout2 = dirout + f"/{t0}/"
+    os_makedirs(dirout2)
+
+    dirin2 = [ fi +"/*.*" for fi in dirin.split(";")  ]
+    flist = glob_glob(dirin2 )
+    log('N images:', len(flist))
+
+    if mode =="v1":
+       image_classifier = classify_image_v1
+    else :
+       image_classifier = classify_image_v2
+
+    res = []
+    for fi in flist :
+       img   = image_read(fi)
+       ypred = image_classifier(img)
+       res.append([fi, ypred, modelname])
+
+    res = pd.DateFrame(res, columns=['img_uri', 'ypred', 'modelname'])
+    res['ytrue'] = res['img_uri'].apply(lambda x : 0 if "bad" in x else 1)
+
+    dfbad = res[res.ytrue == 0 ]
+    log('Accuracy bad', dfbad['ypred' ].sum() / len(dfbad)  )
+
+
+    dfgood = res[res.ytrue == 1 ]
+    log('Accuracy good', dfgood['ypred' ].sum() / len(dfgood)  )
+
+    pd_to_file(res, dirout2 + "/df_img_isok.csv", index=False)
+
+
+####################################################################################
+def classify_image_v1(img):
+    _, binary_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+    black_pixels_count = np.sum(binary_img == 0)
+    black_pixels_threshold = img.shape[0] * img.shape[1] * 0.3
+    if black_pixels_count > black_pixels_threshold:
+        return 0 ### bad
+    else:
+        return 1
+
+
+def classify_image_v2(img):
+    # Apply a Gaussian blur to reduce noise
+    blurred_img = cv2.GaussianBlur(img, (5, 5), 0)
+
+    # Apply Canny edge detection
+    edges = cv2.Canny(blurred_img, 100, 200)
+
+    # Find contours
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Calculate the total contour area
+    total_contour_area = sum([cv2.contourArea(c) for c in contours])
+
+    # Calculate the ratio of the total contour area to the image area
+    image_area = img.shape[0] * img.shape[1]
+    contour_area_ratio = total_contour_area / image_area
+
+    # Set thresholds for the contour area ratio
+    min_contour_area_ratio = 0.01
+    max_contour_area_ratio = 0.15
+
+    if contour_area_ratio >= min_contour_area_ratio and contour_area_ratio <= max_contour_area_ratio:
+        return 1 ### good
+    else:
+        return 0
+  # Default to "good" if no clear decision can be made based on the current rules
+
+
 
 def url_to_image(url):
     with urllib.request.urlopen(url) as response:
@@ -12,14 +99,7 @@ def url_to_image(url):
     img = cv2.imdecode(image_data, cv2.IMREAD_GRAYSCALE)
     return img
 
-def classify_image(img):
-    _, binary_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-    black_pixels_count = np.sum(binary_img == 0)
-    black_pixels_threshold = img.shape[0] * img.shape[1] * 0.3
-    if black_pixels_count > black_pixels_threshold:
-        return "bad"
-    else:
-        return "good"
+
 
 def get_image_urls(repo_url):
     base_url = "https://raw.githubusercontent.com"
@@ -29,8 +109,6 @@ def get_image_urls(repo_url):
     image_urls = [base_url + image["href"].replace("/blob", "") for image in images]
     return image_urls
 
-# Example usage
-# ... (previous code)
 
 
 def test():
@@ -91,3 +169,10 @@ def test():
             print(f"Classification result for {url}: {classification}")
         except Exception as e:
             print(f"Error processing {url}: {e}")
+
+
+if __name__ == "__main__":
+    fire.Fire()
+
+
+
