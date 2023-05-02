@@ -258,7 +258,11 @@ def runtrain(cfg="params_test"):
     """
     global cc
     log(f"#### Start Full train with param_name: {cfg}")
-    cc = globals()[cfg]
+    try :
+       cc = globals()[cfg]() ### it's a function not a var !
+    except :   
+       cc = globals()[cfg]   ### it's a  var !
+
     log('Params loaded\n', cc)
 
     ###############################################################################
