@@ -24,8 +24,11 @@ except:
     from rembg import remove
 
 
+from utilmy import glob_glob, os_makedirs
+
+
 def fetch(query, limit=100, dirout='dl', adult_filter_off=True, 
-force_replace=False, timeout=60, filter="", verbose=True, png_conv=False):
+    force_replace=False, timeout=60, filter="", verbose=True, png_conv=False):
 
     # engine = 'bing'
     if adult_filter_off:
@@ -41,13 +44,7 @@ force_replace=False, timeout=60, filter="", verbose=True, png_conv=False):
             shutil.rmtree(image_dir)
 
     # check directory and create if necessary
-    try:
-        if not Path.is_dir(image_dir):
-            Path.mkdir(image_dir, parents=True)
-
-    except Exception as e:
-        print('[Error]Failed to create directory.', e)
-        sys.exit(1)
+    os_makedirs(image_dir)
         
     print("[%] Downloading Images to {}".format(str(image_dir.absolute())))
     bing = Bing(query, limit, image_dir, adult, timeout, filter, verbose, png_conv)
