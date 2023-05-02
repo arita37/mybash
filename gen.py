@@ -956,6 +956,50 @@ def train_launcher():
 
 
 #########################################################################################
+
+
+def image_png_to_svg1(png_file_path: str, svg_file_path: str):
+    from cairosvg import svg2png
+    from PIL import Image
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path)
+
+    # Convert the PNG image to SVG format
+    svg_image = svg2png(bytestring=png_image.tobytes(), write_to=svg_file_path)
+
+    # Save the SVG image to disk
+    with open(svg_file_path, 'wb') as f:
+        f.write(svg_image)
+
+
+
+def image_png_to_svg2(png_file_path: str, svg_file_path: str, xmax: int, ymax: int):
+
+    from svglib.svglib import svg2rlg
+    from reportlab.graphics import renderPDF, renderPM
+    from PIL import Image
+
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path)
+
+    # Convert the PNG image to SVG format
+    drawing = svg2rlg(png_file_path)
+    scale_x = float(xmax) / drawing.width
+    scale_y = float(ymax) / drawing.height
+    drawing.width, drawing.height = xmax, ymax
+    drawing.scale(scale_x, scale_y)
+    renderPM.drawToFile(drawing, svg_file_path, fmt='SVG')
+
+
+def image_svg_scale(input1,output,resolution):
+  fig = sg.fromfile(input1)
+  fig.set_size((str(resolution),str(resolution)))
+  fig.save(output)
+
+
+
 def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background"
     ,num_samples = 1
     ,num_rows = 50
@@ -982,47 +1026,63 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
 
     """
-    #@title Set up the pipeline 
+    #Set up the pipeline 
+    device   = cc.pred.get('device', 'cpu') ## gpu
+    dirmodel = cc.pred['dirmodel']    ### cc.hyper["output_dir"]
+    xmax = ymax = resolution
+
+
+    #### Model Load  ############################################
     from diffusers import DPMSolverMultistepScheduler
     pipe = StableDiffusionPipeline.from_pretrained(
-        cc.hyper["output_dir"],
-        scheduler=DPMSolverMultistepScheduler.from_pretrained(cc.hyper["output_dir"], subfolder="scheduler"),
+        dirmodel,
+        scheduler=DPMSolverMultistepScheduler.from_pretrained(dirmodel, subfolder="scheduler"),
         torch_dtype=torch.float16,
-    ).to("cuda")
+    ).to(device)
 
 
+    #### Output path #############################################
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+    dirout0 = cc['pred'].get('dirout_img', "ztmp/dirout_img/")
+    dirout  = dirout0 + f"/{t0}/"
+    os_makedirs(dirout)
+    json_save(cc, dirout + "/cc_config.json")
 
-    folder = "svgs_house"
+    dirout2  = dirout + f"/img/"
+    os_makedirs(dirout2 +"/png/")
+    os_makedirs(dirout2 +"/svg/")
+
+
     #number_of_images = 10
-    def svg_scale(input1,output,resolution):
-      fig = sg.fromfile(input1)
-      fig.set_size((str(resolution),str(resolution)))
-      fig.save(output)
-
-
     all_images = [] 
     for _ in range(num_rows):
         # log(f"Generating row {_}")
 
         #### num_inference icrease: more details,  decrease: less details.
         #### fine tuning Colab PRO: 100 - 500 images
-        images = pipe([prompt] * num_samples,height=512,width=512 ,
+        images = pipe([prompt] * num_samples, height=512, width=512 ,
                       num_inference_steps=20).images
 
         # display and save images
         for image in images:
             #display(image)
-            image_name = folder+"/"+str(datetime.now())+".png"
+            image_name = dirout2 + "/png/"+str(int(time.time())) +".png"
             image.save(image_name)
-           # display(image)
-            ppm_path=image_name.replace("png","ppm")
-            svg_path=ppm_path.replace("ppm","svg")
-            svg_scaled =svg_path.replace(".svg","_20.svg")
-            subprocess.call(["convert","-flatten",image_name,ppm_path])
-            subprocess.call(["potrace","-s",ppm_path,"-o",svg_path])
-            svg_scale(svg_path,svg_scaled,resolution)
-            os.remove(svg_path)
-            os.remove(ppm_path)
+            # display(image)
+
+            image_name2 =  image_name.replace("png", "svg")
+            image_png_to_svg2(image_name, svg_file_path=image_name2, xmax= xmax, ymax= ymax)
+
+            # ppm_path=image_name.replace("png","ppm")
+            # svg_path=ppm_path.replace("ppm","svg")
+            # svg_scaled =svg_path.replace(".svg","_20.svg")
+            
+            #subprocess.call(["convert","-flatten",image_name,ppm_path])
+            #subprocess.call(["potrace","-s",ppm_path,"-o",svg_path])
+            #svg_scale(svg_path,svg_scaled,resolution)
+            
+            #os.remove(svg_path)
+            #os.remove(ppm_path)
             # image.show()
 
 
