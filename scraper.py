@@ -18,8 +18,8 @@ from utilmy import os_makedirs
 
 
 
-def fetch(query, limit=1, dirout='dl', adult_filter='on', 
-          force_replace=False, timeout=60, filter="", verbose=1, png_conv=1):
+def fetch(query, limit=1, dirout='ztmp/img/', adult_filter='on', 
+          force_replace=0 timeout=60, filter="", verbose=1, png_conv=1):
 
     # engine = 'bing'
     
