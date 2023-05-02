@@ -52,11 +52,12 @@ import svgutils.transform as sg
 from PIL import Image
 
 
+
 ###########################################################
-try :
-    from IPython.display import HTML
-    from IPython.display import clear_output
-except : pass
+global diroot    ## Root in google drive or local
+global cc        ## Global params dict
+
+
 
 
 ###########################################################################################
@@ -70,12 +71,23 @@ def test1():
     If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
     """
     global cc
+    cc = params_test()
+
+    ###############################################################################
+    model_setup()
+
+
+
+###########################################################################################
+def params_test():
+    ## only for testing code
+    global cc
     cc = Box({})
 
     ##############################################################################################
     ## Settings for teaching your new concept
     #　 `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
-    # ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
     cc.pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion"
 
     """### Get the training images:
@@ -91,16 +103,16 @@ def test1():
           ## You can add additional images here
     ]
 
-    # Settings for your newly created concept
+    #@title Settings for your newly created concept
     #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
-    cc.what_to_teach = "object" # ["object", "style"]
+    cc.what_to_teach = "object" #@param ["object", "style"]
 
     #　 `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-    cc.placeholder_token = "<bicycle-svg>" # {type:"string"}
+    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
     #r `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
 
 
-    cc.initializer_token = "bicycle" # {type:"string"
+    cc.initializer_token = "bicycle" #@param {type:"string"
 
     #### Custom Prompt for the images to fine tune.  ######################
     cc.imagenet_templates_small = [
@@ -136,21 +148,117 @@ def test1():
     cc.hyper = {
         "learning_rate": 5e-04,
         "scale_lr": True,
-        "max_train_steps": 5000,
-        "save_steps": 500,
+        #"max_train_steps": 5000,
+        "max_train_steps": 2,
+        "save_steps": 1,
         "train_batch_size": 4,
         "gradient_accumulation_steps": 1,
         "gradient_checkpointing": True,
         # "mixed_precision": "fp16",  #### need GPU
         "mixed_precision": "no",  #### need GPU  ## ['no', 'fp8', 'fp16', 'bf16']
         "seed": 42,
-        "output_dir": "out/"
+        "output_dir": "ztmp/chkpoints/"
     }
-    #v!mkdir -p sd-concept-output
-    ########## """Train!"""
+
+    os_makedirs( cc.hyper.output_dir  )
+    log("#### config:\n", cc)
+    return cc
+
+
+def params_v1():
+    ## only for testing code
+    global cc
+    cc = Box({})
+
+    ##############################################################################################
+    ## Settings for teaching your new concept
+    #　 `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
+    #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    cc.pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion"
+
+    """### Get the training images:
+    #### Download the images from the internet and save them locally.
+    You can also upload the images to colab or load from google drive, please check the next section if you want to use that.
+    """
+    #　 Add here the URLs to the images of the concept you are adding. 3-5 should be fine
+    cc.urls = [
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/2.jpeg",
+          "https://huggingface.co/datasets/vrlhalla/images/resolve/main/3.jpeg",
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/5.jpeg",
+          "https://huggingface.co/datasets/valhalla/images/resolve/main/6.jpeg",
+          ## You can add additional images here
+    ]
+
+    #@title Settings for your newly created concept
+    #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
+    cc.what_to_teach = "object" #@param ["object", "style"]
+
+    #　 `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
+    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    #r `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
+
+
+    cc.initializer_token = "bicycle" #@param {type:"string"
+
+    #### Custom Prompt for the images to fine tune.  ######################
+    cc.imagenet_templates_small = [
+        "a svg of a {}",
+        "a rendering of a {}",
+        "the photo of a {}",
+        "flat vector icon of{}",
+        "a dark photo of the {}",
+        "white color clear background{}",
+        "Design a flat vector icon of a {}",
+        "minimalistic image of {}",
+        "transparent background photo of the {}",
+        "Create a clean and simple {}",
+        "simple SVG illustration  {}",
+    ]
+    # prompt = "black color flat vector icon of bicycle, black and white, b&w, white color clear background only"
+    # prmopt = "Design a black and white flat vector icon of a bicycle with a clear background, featuring a minimalist style and solid black color on a transparent background."
+    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
+    cc.imagenet_style_templates_small = [
+        "flat vector icon of  of {}",
+        "reate a clean and simple SVG illustration of a {} , centered on a clear white background.",
+        "Design a  flat vector icon of a {} with a clear background",
+        "featuring a minimalist style {} and solid  color on a clear white background",
+        "Create a clean and simple SVG illustration of a {} , centered on a clear white background",
+    ]
+
+
+
+    ### dataset
+    cc.dir_img="imgs/"
+
+
+    cc.hyper = {
+        "learning_rate": 5e-04,
+        "scale_lr": True,
+        #"max_train_steps": 5000,
+        "max_train_steps": 2,
+        "save_steps": 1,
+        "train_batch_size": 4,
+        "gradient_accumulation_steps": 1,
+        "gradient_checkpointing": True,
+        # "mixed_precision": "fp16",  #### need GPU
+        "mixed_precision": "no",  #### need GPU  ## ['no', 'fp8', 'fp16', 'bf16']
+        "seed": 42,
+        "output_dir": "ztmp/chkpoints/"
+    }
+
+    log("#### config:\n", cc)
+    return cc
+
+
+
+def runtrain(param_name="param_test"):
+    """### Training
+    Define hyper for our training
+    If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
+    """
+    cc = globals()[param_name]
 
     ###############################################################################
-    log("#### config:\n", cc)
     model_setup()
     train_launcher()
 
@@ -158,27 +266,36 @@ def test1():
 
 
 
+
 ###########################################################################################
-def colab_setup():
+def setup_colab():
   ss= """
-        # Install the required libs
+        #@title Install the required libs
         pip install -U -qq git+https://github.com/huggingface/diffusers.git
         pip install -qq accelerate transformers ftfy
         
         svgutils
 
         
-        # [Optional] Install xformers for faster and memory efficient training
+        #@title [Optional] Install xformers for faster and memory efficient training
         #　 Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
 
         # !pip install -U --pre triton
         !pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/T4/xformers-0.0.13.dev0-py3-none-any.whl
   """
+  log(s)
 
 
+def setup_jupyter():
+    try :
+        from IPython.display import HTML
+        from IPython.display import clear_output
+    except : pass
 
-def gpu_check():
+
+def setup_gpu():
     s = getoutput('nvidia-smi')
+    log(s)
     # if 'T4' in s:
     #   gpu = 'T4'
     # elif 'P100' in s:
@@ -209,7 +326,7 @@ def gpu_check():
     # elif (gpu=='A100'):
     #   %pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/A100/xformers-0.0.13.dev0-py3-none-any.whl
 
-    # # [Optional] Login to the Hugging Face Hub
+    # #@title [Optional] Login to the Hugging Face Hub
     # #　 Add a token with the "Write Access" role to be able to add your trained concept to the [Library of Concepts](https://huggingface.co/sd-concepts-library)
     # # !pip install ipywidgets
     # from huggingface_hub import notebook_login
@@ -217,7 +334,64 @@ def gpu_check():
     # notebook_login()
 
 
-global cc
+def setup_path():
+    ###### Check Root Folder #################################
+    if sys.platform.startswith("linux"):  # could be "linux", "linux2", "linux3", ...
+         diroot = "/content/drive/My Drive/Colab Notebooks/abike/"
+
+    elif sys.platform == "darwin":  ## macos
+         diroot = "./"
+
+    elif os.name == "nt": ### windows
+         diroot = "./"
+
+
+def setup_gdrive(gfolder="Colab Notebooks/abike/"):
+    """ Create a shortcut of the share folder on your google drive
+
+
+    """
+    global diroot
+    try :
+        from google.colab import drive
+        drive.mount('/content/drive')        
+
+        ### Replace with your folder shortcut
+        dirroot = "/content/drive/MyDrive/"+ gfolder
+
+        import os, sys
+        print("Prev:", os.getcwd())
+        os.chdir(diroot)
+        print("New Current:", os.getcwd())
+        os.system("ls .")
+        os.system(" which python3")
+    except Exception as e:
+        log(e)
+
+
+def colab_tips():
+    ss= """
+#! cat gen.py 
+
+#### Run in Background mode  Check
+! nohup  2>&1 bash -c 'pip list && python3 gen.py  test1' &
+! mkdir -p "ztmp/zlog"
+! mv nohup.out "ztmp/zlog/nohup_$(date +'%Y%m%d_%H%M%S').out"
+! ls ztmp/zlog
+
+
+
+
+### Use this to prevent Colab to shut-down
+! nohup  2>&1 bash -c 'while true; do  echo "$(date +'%Y%m%d_%H%M%S')"; sleep 60; done' &
+! mv nohup.out "znohup_sleeper.out"   ### Auto re-direct
+! cat znohup_sleeper.out
+
+    """
+    log(ss)
+
+
+###########################################################################################
 def init_vars():
     global cc
     cc = Box({})
@@ -250,6 +424,7 @@ def init_vars():
         "seed": 42,
         "output_dir": "sd-concept-output"
     }
+
 
 
 
@@ -288,7 +463,7 @@ def image_setup():
     """
 
     #　 `images_path` is a path to directory containing the training images. It could 
-    images_path = "bicycle" # {type:"string"}
+    images_path = "bicycle" #@param {type:"string"}
     images_path= r"D:\Projects\research_paper_scratch\bicycle"
     while not os.path.exists(str(images_path)):
       log('The images_path specified does not exist, use the colab file explorer to copy the path :')
@@ -310,6 +485,7 @@ def image_setup():
 
 
     image_grid(images, 1, len(images))
+
 
 
 ########################################################################################################
@@ -344,8 +520,6 @@ def prompt_create():
         "featuring a minimalist style {} and solid  color on a clear white background",
         "Create a clean and simple SVG illustration of a {} , centered on a clear white background",
     ]
-
-
 
 
 
@@ -472,7 +646,7 @@ def model_setup():
     """### Setting up the model"""
     global text_encoder, vae, unet, tokenizer
 
-    # Load the tokenizer and add the placeholder token as a additional special token.
+    #@title Load the tokenizer and add the placeholder token as a additional special token.
     tokenizer = CLIPTokenizer.from_pretrained(
         cc.pretrained_model_name_or_path,
         subfolder="tokenizer",
@@ -486,7 +660,7 @@ def model_setup():
             " `cc.placeholder_token` that is not already in the tokenizer."
         )
 
-    # Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
+    #@title Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
     # Convert the initializer_token, cc.placeholder_token to ids
     token_ids = tokenizer.encode(cc.initializer_token, add_special_tokens=False)
     # Check if initializer_token is a single token or a sequence of tokens
@@ -539,8 +713,10 @@ def model_setup():
 ###################################################################################################
 def train_save_progress(text_encoder, placeholder_token_id, accelerator, save_path):
     log("Saving embeddings")
+    os_makedirs(save_path)
     learned_embeds = accelerator.unwrap_model(text_encoder).get_input_embeddings().weight[cc.placeholder_token_id]
     learned_embeds_dict = {cc.placeholder_token: learned_embeds.detach().cpu()}
+    os_makedirs(save_path)
     torch.save(learned_embeds_dict, save_path)
 
 
@@ -552,6 +728,8 @@ def training_function(text_encoder, vae, unet):
     max_train_steps             = cc.hyper["max_train_steps"]
     output_dir                  = cc.hyper["output_dir"]
     gradient_checkpointing      = cc.hyper["gradient_checkpointing"]
+
+    os_makedirs(output_dir)
 
 
     train_dataset    = create_dataset()
@@ -682,7 +860,7 @@ def training_function(text_encoder, vae, unet):
                 progress_bar.update(1)
                 global_step += 1
                 if global_step % cc.hyper["save_steps"] == 0:
-                    save_path = os.path.join(output_dir, f"learned_embeds-step-{global_step}.bin")
+                    save_path = output_dir + f"/learned_embeds-step-{global_step}.bin"
                     train_save_progress(text_encoder, cc.placeholder_token_id, accelerator, save_path)
                     #### 3.4 Gb --> loaded in GPU, CPU inference: 10sec per image... 
                     ### cannot reduce image size: not good results, 512x 512,  128 x 128 ????
@@ -756,7 +934,7 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
     prompt lenght: 250 words,  medium, long prompt or short ???
     increase inference step
 
-    # Run the Stable Diffusion pipeline
+    #@title Run the Stable Diffusion pipeline
     #　 Don't forget to use the placeholder token in your prompt
 
 
@@ -766,7 +944,7 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
 
     """
-    # Set up the pipeline 
+    #@title Set up the pipeline 
     from diffusers import DPMSolverMultistepScheduler
     pipe = StableDiffusionPipeline.from_pretrained(
         cc.hyper["output_dir"],
@@ -817,13 +995,13 @@ def run_inference2():
     To save this concept for re-using, download the `learned_embeds.bin` file or save it on the library of concepts.
     Use the [Stable Conceptualizer notebook](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_conceptualizer_inference.ipynb) for inference with persistently saved pre-trained concepts
     """
-    # # Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
+    # #@title Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
     # !pip uninstall slugify
     # !pip install python-slugify
-    # save_concept_to_public_library = True # {type:"boolean"}
-    # name_of_your_concept = "Cat toy" # {type:"string"}
+    # save_concept_to_public_library = True #@param {type:"boolean"}
+    # name_of_your_concept = "Cat toy" #@param {type:"string"}
     # #　 `hf_token_write`: leave blank if you logged in with a token with `write access` in the [Initial Setup](#scrollTo=KbzZ9xe6dWwf). If not, [go to your tokens settings and create a write access token](https://huggingface.co/settings/tokens)
-    # hf_token_write = "" # {type:"string"}
+    # hf_token_write = "" #@param {type:"string"}
 
     # if(save_concept_to_public_library):
     #   from slugify import slugify
