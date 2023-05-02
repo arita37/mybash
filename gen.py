@@ -251,12 +251,15 @@ def params_v1():
 
 
 
-def runtrain(param_name="param_test"):
+def runtrain(cfg="params_test"):
     """### Training
     Define hyper for our training
     If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
     """
-    cc = globals()[param_name]
+    global cc
+    log(f"#### Start Full train with param_name: {cfg}")
+    cc = globals()[cfg]
+    log('Params loaded\n', cc)
 
     ###############################################################################
     model_setup()
