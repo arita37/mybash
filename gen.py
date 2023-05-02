@@ -22,7 +22,8 @@ For a general introduction to the Stable Diffusion model please refer to this [c
 """
 import fire,itertools,  math, os, random,sys, shutil, subprocess, datetime, requests, glob, time
 from box import Box
-from utilmy import log, os_makedirs, glob_glob
+from utilmy import (log, os_makedirs, glob_glob, json_save, json_load, pprint, date_now )
+
 
 import numpy as np, json
 from tqdm.auto import tqdm
@@ -745,6 +746,10 @@ def training_function(text_encoder, vae, unet):
     output_dir                  = cc.hyper["output_dir"]
     gradient_checkpointing      = cc.hyper["gradient_checkpointing"]
 
+
+    ### Prevent Overlap
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+    output_dir = output_dir + f"/{t0}/"
     os_makedirs(output_dir)
 
 
