@@ -303,14 +303,14 @@ def img_change_color_bikeframe(img, colorname='navy'):
     return img2
 
 
-def img_set_color_bikewheelleft(img, colorname='navy',:
+def img_set_color_bikewheelleft(img, colorname='navy'):
     img0 = image_read(img) ## nd array or filestring 
     
 
     return img2
 
 
-def img_set_color_bikewheelright(img, colorname='navy',:
+def img_set_color_bikewheelright(img, colorname='navy'):
     img0 = image_read(img) ## nd array or filestring 
     
 
