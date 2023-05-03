@@ -472,9 +472,8 @@ def img_add_background_color(img, colorname='navy', bordersize=5):
 
     img0 = image_read(img) ## nd array or filestring 
 
-    colborder  = webcolors.name_to_rgb(colorname)
-    image = cv2.copyMakeBorder(img0, bordersize, bordersize, bordersize, bordersize, 
-                               cv2.BORDER_CONSTANT, None, colborder)
+    col0  = webcolors.name_to_rgb(colorname)
+
     image = image[:, :, ::-1]
     img_arr = np.array(image)
     img12 = Image.fromarray(img_arr)
