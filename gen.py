@@ -122,17 +122,19 @@ def params_test():
 
     #### Custom Prompt for the images to fine tune.  ######################
     cc.imagenet_templates_small = [
-        "a svg of a {}",
-        "a rendering of a {}",
-        "the photo of a {}",
-        "flat vector icon of{}",
-        "a dark photo of the {}",
-        "white color clear background{}",
-        "Design a flat vector icon of a {}",
-        "minimalistic image of {}",
-        "transparent background photo of the {}",
+        "a svg of a single {}",
+        "a rendering of a single {}",
+        "the photo of a single {}",
+        "flat vector icon of a single {}",
+        # "a dark photo of the {}",
+        "white color clear background of a single {}",
+        "Design a flat vector icon of a single {}",
+        "minimalistic image of a single {}",
+        "transparent background photo of a single {}",
         "Create a clean and simple {}",
-        "simple SVG illustration  {}",
+        "simple SVG illustration of a single  {}",
+        "simple SVG illustration of a  {}  with white background",
+
     ]
     # prompt = "black color flat vector icon of bicycle, black and white, b&w, white color clear background only"
     # prmopt = "Design a black and white flat vector icon of a bicycle with a clear background, featuring a minimalist style and solid black color on a transparent background."
@@ -1247,43 +1249,9 @@ def run_inference2():
 
 
 
-###########################################################################################
-def json_load(path) :
-  """function json_load.
-  Doc::
-          
-  """
-  try :
-    return json.load(open( path, mode='r'))
-  except Exception as e :
-    log(e)
-    return {}
-
-
-def json_save(dd:dict, path:str) :
-  """function json_save
-  Doc::
-          
-  """
-  os_makedirs(path)
-  try :
-    json.dump(dd, open( path, mode='w'))
-    return path
-  except Exception as e :
-    log(e)
-
-
-def pprint(dd,indent=3):
-    if isinstance(dd, dict):
-        log(json.dumps(cc, sort_keys=True, indent=indent,separators=(',', ': ') ))  
-    else :
-        log(dd)
-
-
-
 ###################################################################################################
 if __name__ == "__main__":
     fire.Fire()
 
 
-
+log('loaded')
