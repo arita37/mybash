@@ -1,15 +1,16 @@
 """
+#### How to start:
 
+    git clone https://github.com/arita37/mybash.git
+    cd mybash
+    git checkout zbike
+    ls.
 
-git clone https://github.com/arita37/mybash.git
-cd mybash
-git checkout zbike
-ls.
+    pip install utilmy fire opencv-python  python-box matplotlib 
 
-pip install utilmy fire opencv-python  python-box matplotlib 
+    ### CMD line
+    python img_check.py run_classifier  --dirin "img_bad/;imgs/"  --dirout "ztmp/classfier/
 
-
-python img_check.py run_classifier  --dirin "img_bad/;imgs/"  --dirout "ztmp/classfier/
 
 
 """
