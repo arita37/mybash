@@ -43,13 +43,10 @@ from box import Box
 import numpy as np, webcolors
 import matplotlib.pyplot as plt
 from PIL import Image
-import torch
-from segment_anything import sam_model_registry, SamPredictor
-
 
 
 from utilmy import (log, os_makedirs)
-
+from util_image import image_read 
 
 
 ####################################################################################
@@ -169,7 +166,8 @@ def setup_colab():
 
 
 def model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda"):
-
+    import torch 
+    from segment_anything import sam_model_registry, SamPredictor
     sam_checkpoint = same_checkpoint
     model_type = model_type
     device = device
