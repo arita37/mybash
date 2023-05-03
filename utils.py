@@ -40,7 +40,7 @@
 """
 import fire, os, sys, cv2
 from box import Box
-import numpy as np
+import numpy as np, webcolors
 import matplotlib.pyplot as plt
 from PIL import Image
 import torch
@@ -424,6 +424,55 @@ def img_get_mask_wheel_v2(img_path='sample_data/images.png', verbose=1):
 
 
 
+
+def img_add_border(img, colorname='navy'):
+
+    img0 = image_read(img) ## nd array or filestring 
+
+    colborder  = webcolors.name_to_rgb(colorname)
+    image = cv2.copyMakeBorder(img0, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, colborder)
+    image = image[:, :, ::-1]
+    img_arr = np.array(image)
+    img_arr[10: 50, 300 :370] = (255, 255, 255)
+    img_arr[10: 50, 10 :60] = (255, 255, 255)
+    img12 = Image.fromarray(img_arr)
+
+    if os.environ.get('img_show', '0') = '1' :
+       plt.imshow(img12)
+       plt.axis('off')
+       plt.show()
+
+    return img12
+
+
+
+#####################################################################################################
+def test_color():
+   requested_colour = (119, 172, 152)
+   actual_name, closest_name = get_colour_name(requested_colour)
+   print("Actual colour name:", actual_name, ", closest colour name:", closest_name)
+
+
+def color_closest_color(requested_colour):
+    import webcolors    
+    min_colours = {}
+    for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
+        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+        rd = (r_c - requested_colour[0]) ** 2
+        gd = (g_c - requested_colour[1]) ** 2
+        bd = (b_c - requested_colour[2]) ** 2
+        min_colours[(rd + gd + bd)] = name
+    return min_colours[min(min_colours.keys())]
+
+
+def color_getname(requested_colour=(255,0,0)):
+    import webcolors    
+    try:
+        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
+    except ValueError:
+        closest_name = color_closest_color(requested_colour)
+        actual_name = None
+    return actual_name, closest_name
 
 
 
