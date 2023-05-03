@@ -6,6 +6,11 @@
 !pip install svgutils
 
 
+    from cairosvg import svg2png
+
+        from cairosvg import svg2png
+        pip install reportlab
+
 Original file is located at
     https://colab.research.google.com/drive/1F5IfrlYPfk-DW_xTuTpujEiU5VxeTeRQ
 
@@ -161,7 +166,21 @@ def params_test():
         "output_dir": "ztmp/chkpoints/"
     }
 
-    os_makedirs( cc.hyper.output_dir  )
+
+    ##### Inference ############################################
+    cc.pred ={
+       "dirmodel":   "ztmp/chkpoints/"
+      ,"device":     "cpu"
+      ,'resolution': 20
+
+      ,'num_inference_steps': 1 ##20
+      ,'height': 512
+      ,'width': 512 
+      ,'torch_dtype0': 'fp32'      
+
+    }
+
+
     log("#### config:\n", cc)
     return cc
 
@@ -247,6 +266,23 @@ def params_v1():
         "output_dir": "ztmp/chkpoints/"
     }
 
+
+    ##### Inference ############################################
+    cc.pred ={
+       "dirmodel":   "ztmp/chkpoints/"
+      ,"device":     "cpu"
+      ,'resolution': 20
+
+      ,'num_inference_steps': 20 ##20
+      ,'height': 512
+      ,'width': 512 
+      ,'torch_dtype0': 'fp32'   
+ 
+
+
+    }
+
+
     log("#### config:\n", cc)
     return cc
 
@@ -280,6 +316,32 @@ def runtrain(cfg="params_test"):
     train_launcher()
 
 
+def runpred(cfg="params_test"):
+    """### 
+
+
+    python gen.py runpred   --cfg params_test
+
+    python gen.py runpred   --cfg params_v1
+
+    """
+    global cc
+    log(f"#### Start Inference with param_name: {cfg}")
+
+    if ".json" in cfg :
+        from utilmy import config_load
+        cc = config_load(cfg)
+        cc = Box(cc)
+    else :
+        try :
+           cc = globals()[cfg]() ### it's a function not a var !
+        except :   
+           cc = globals()[cfg]   ### it's a  var !
+
+    log('Params loaded\n', cc)
+
+    ###############################################################################
+    run_inference()
 
 
 
@@ -388,32 +450,32 @@ def setup_gdrive(gfolder="Colab Notebooks/abike/"):
 
 def colab_tips():
     ss= """
-#! cat gen.py 
+        #! cat gen.py 
 
 
-### Use this to prevent Colab to shut-down
-! pwd && mkdir -p "ztmp/" 
-! rm "ztmp/znohup_sleeper.out"
-! nohup  2>&1 bash -c 'while true; do  echo "$(date +'%Y%m%d_%H%M%S')"; sleep 60; done' &
-! mv nohup.out "ztmp/znohup_sleeper.out"   ### Auto re-direct
-! cat ztmp/znohup_sleeper.out
-
-
-
-#### Run in Background mode
-### Process is Running Long
-#! nohup  2>&1 bash -c 'pip list && python3 gen.py  test1' &
-#! nohup  2>&1 bash -c 'pip list && python3 gen.py  runtrain --cfg "params_test" ' &
-! nohup  2>&1 bash -c 'pip list && python3 gen.py  runtrain --cfg "ztmp/config/cfg_v1.json" ' &
-! mkdir -p "ztmp/zlog"
-! mv nohup.out "ztmp/zlog/nohup_full_$(date +'%Y%m%d_%H%M%S').out"
-! ls ztmp/zlog 
-! echo "" && find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "
+        ### Use this to prevent Colab to shut-down
+        ! pwd && mkdir -p "ztmp/" 
+        ! rm "ztmp/znohup_sleeper.out"
+        ! nohup  2>&1 bash -c 'while true; do  echo "$(date +'%Y%m%d_%H%M%S')"; sleep 60; done' &
+        ! mv nohup.out "ztmp/znohup_sleeper.out"   ### Auto re-direct
+        ! cat ztmp/znohup_sleeper.out
 
 
 
-### Most recent log
-!cat  $( find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" " )
+        #### Run in Background mode
+        ### Process is Running Long
+        #! nohup  2>&1 bash -c 'pip list && python3 gen.py  test1' &
+        #! nohup  2>&1 bash -c 'pip list && python3 gen.py  runtrain --cfg "params_test" ' &
+        ! nohup  2>&1 bash -c 'pip list && python3 gen.py  runtrain --cfg "ztmp/config/cfg_v1.json" ' &
+        ! mkdir -p "ztmp/zlog"
+        ! mv nohup.out "ztmp/zlog/nohup_full_$(date +'%Y%m%d_%H%M%S').out"
+        ! ls ztmp/zlog 
+        ! echo "" && find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "
+
+
+
+        ### Most recent log
+        !cat  $( find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" " )
 
 
 
@@ -956,6 +1018,106 @@ def train_launcher():
 
 
 #########################################################################################
+def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background"
+    ,num_samples = 1
+    ,num_rows   = 1
+    ,max_image  = None
+
+    ):
+    """
+    Keep the seed.
+
+    Single bike as prompt
+    Vector Illustration with black  bike and white and clear background.
+
+    prompt lenght: 250 words,  medium, long prompt or short ???
+    increase inference step
+
+    #@title Run the Stable Diffusion pipeline
+    #　 Don't forget to use the placeholder token in your prompt
+
+    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
+    # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
+    # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
+
+
+    """
+    #Set up the pipeline 
+    device              = cc.pred.get('device', 'cpu') ## gpu
+    dirmodel            = cc.pred['dirmodel']    ### cc.hyper["output_dir"]
+    resolution          = cc.pred.get('resolution', 20 )
+
+    num_inference_steps = cc.pred.get('num_inference_steps', 1 )
+    height              = cc.pred.get('height', 512 )
+    width               = cc.pred.get('width',  512 )
+    torch_dtype0        = cc.pred.get('torch_dtype0', 'fp32' )
+    max_image           = cc.pred.get('max_image', 1) if max_image is None else max_image
+
+    torch_dtype = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
+    xmax = ymax = resolution
+
+
+    #### Model Load  ############################################
+    from diffusers import DPMSolverMultistepScheduler
+    pipe = StableDiffusionPipeline.from_pretrained(
+        dirmodel,
+        scheduler=DPMSolverMultistepScheduler.from_pretrained(dirmodel, subfolder="scheduler"),
+        torch_dtype=torch_dtype,
+    ).to(device)
+    log(pipe)
+
+
+    #### Output path #############################################
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+    dirout0 = cc['pred'].get('dirout_img', "ztmp/dirout_img/")
+    dirout  = dirout0 + f"/{t0}/"
+    os_makedirs(dirout)
+    json_save(cc, dirout + "/cc_config.json")
+
+    dirout2  = dirout + f"/img/"
+    os_makedirs(dirout2 +"/png/")
+    os_makedirs(dirout2 +"/svg/")
+
+
+    ii = 0
+    for _ in range(num_rows):
+        # log(f"Generating row {_}")
+        #### num_inference icrease: more details,  decrease: less details.
+        #### fine tuning Colab PRO: 100 - 500 images
+        images = pipe([prompt] * num_samples, height=height, width=width ,
+                      num_inference_steps=num_inference_steps).images
+
+        # display and save images
+        for image in images:
+            #display(image)
+            image_name = dirout2 + "/png/"+str(int(time.time())) +".png"
+            image.save(image_name)
+            log(image_name)
+            ii = ii +1
+
+            if ii > max_image : return
+
+
+###################################################################################
+def img_rescale(dirimg, scale=1):
+    #image_name2 =   dirout2 + "/svg/"+str(int(time.time())) +".png"
+    #image_png_to_svg3(image_name, svg_file_path=image_name2, scale_factor= resolution)
+
+
+    # ppm_path=image_name.replace("png","ppm")
+    # svg_path=ppm_path.replace("ppm","svg")
+    # svg_scaled =svg_path.replace(".svg","_20.svg")
+    
+    #subprocess.call(["convert","-flatten",image_name,ppm_path])
+    #subprocess.call(["potrace","-s",ppm_path,"-o",svg_path])
+    #svg_scale(svg_path,svg_scaled,resolution)
+    
+    #os.remove(svg_path)
+    #os.remove(ppm_path)
+    # image.show()
+    pass
+
+
 
 
 def image_png_to_svg1(png_file_path: str, svg_file_path: str):
@@ -968,9 +1130,34 @@ def image_png_to_svg1(png_file_path: str, svg_file_path: str):
     # Convert the PNG image to SVG format
     svg_image = svg2png(bytestring=png_image.tobytes(), write_to=svg_file_path)
 
+
     # Save the SVG image to disk
     with open(svg_file_path, 'wb') as f:
         f.write(svg_image)
+
+
+def image_png_to_svg3(png_file_path: str, svg_file_path: str, scale_factor=0.25):
+    """
+
+     brew install cairo
+     brew install py3cairo
+     pip install pycairo
+
+     conda install -c conda-forge pygobject
+     png_file_path="imgs/img-black_bike_white_background/bik5.png"
+     svg_file_path="ztmp/bik.png"
+     scale_factor=10
+
+     image_png_to_svg3(png_file_path, svg_file_path, scale_factor=0.25)
+
+    """
+    import cairo
+
+    surface = cairo.ImageSurface.create_from_png(png_file_path)
+    ctx = cairo.Context(surface)
+
+    ctx.scale(scale_factor, scale_factor)
+    surface.write_to_png(svg_file_path)
 
 
 
@@ -997,94 +1184,6 @@ def image_svg_scale(input1,output,resolution):
   fig = sg.fromfile(input1)
   fig.set_size((str(resolution),str(resolution)))
   fig.save(output)
-
-
-
-def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background"
-    ,num_samples = 1
-    ,num_rows = 50
-    ,resolution = 20
-
-    ):
-    """
-
-    Keep the seed.
-
-    Single bike as prompt
-    Vector Illustration with black  bike and white and clear background.
-
-    prompt lenght: 250 words,  medium, long prompt or short ???
-    increase inference step
-
-    #@title Run the Stable Diffusion pipeline
-    #　 Don't forget to use the placeholder token in your prompt
-
-
-    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
-    # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
-    # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
-
-
-    """
-    #Set up the pipeline 
-    device   = cc.pred.get('device', 'cpu') ## gpu
-    dirmodel = cc.pred['dirmodel']    ### cc.hyper["output_dir"]
-    xmax = ymax = resolution
-
-
-    #### Model Load  ############################################
-    from diffusers import DPMSolverMultistepScheduler
-    pipe = StableDiffusionPipeline.from_pretrained(
-        dirmodel,
-        scheduler=DPMSolverMultistepScheduler.from_pretrained(dirmodel, subfolder="scheduler"),
-        torch_dtype=torch.float16,
-    ).to(device)
-
-
-    #### Output path #############################################
-    t0 = date_now(fmt="%Y%m%d_%H%M%S")
-    dirout0 = cc['pred'].get('dirout_img', "ztmp/dirout_img/")
-    dirout  = dirout0 + f"/{t0}/"
-    os_makedirs(dirout)
-    json_save(cc, dirout + "/cc_config.json")
-
-    dirout2  = dirout + f"/img/"
-    os_makedirs(dirout2 +"/png/")
-    os_makedirs(dirout2 +"/svg/")
-
-
-    #number_of_images = 10
-    all_images = [] 
-    for _ in range(num_rows):
-        # log(f"Generating row {_}")
-
-        #### num_inference icrease: more details,  decrease: less details.
-        #### fine tuning Colab PRO: 100 - 500 images
-        images = pipe([prompt] * num_samples, height=512, width=512 ,
-                      num_inference_steps=20).images
-
-        # display and save images
-        for image in images:
-            #display(image)
-            image_name = dirout2 + "/png/"+str(int(time.time())) +".png"
-            image.save(image_name)
-            # display(image)
-
-            image_name2 =  image_name.replace("png", "svg")
-            image_png_to_svg2(image_name, svg_file_path=image_name2, xmax= xmax, ymax= ymax)
-
-            # ppm_path=image_name.replace("png","ppm")
-            # svg_path=ppm_path.replace("ppm","svg")
-            # svg_scaled =svg_path.replace(".svg","_20.svg")
-            
-            #subprocess.call(["convert","-flatten",image_name,ppm_path])
-            #subprocess.call(["potrace","-s",ppm_path,"-o",svg_path])
-            #svg_scale(svg_path,svg_scaled,resolution)
-            
-            #os.remove(svg_path)
-            #os.remove(ppm_path)
-            # image.show()
-
 
 
 def run_inference2():
