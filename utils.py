@@ -209,8 +209,6 @@ def img_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None,  dirout
 
 
 
-
-
 def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict:
     """ tricks to get pints 
 
@@ -442,6 +440,22 @@ def img_add_border(img, colorname='navy', bordersize=5):
        plt.show()
 
     return img12
+
+
+def img_update_color_bikeframe(img, colorname='navy'):
+
+    img0 = image_read(img) ## nd array or filestring 
+    
+
+    return img2
+
+
+def img_update_color_bikewheel(img, colorname='navy', bordersize=5):
+    img0 = image_read(img) ## nd array or filestring 
+    
+
+    return img2
+
 
 
 
