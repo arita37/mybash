@@ -468,7 +468,31 @@ def img_add_border(img, colorname='navy', bordersize=5):
     return img12
 
 
+def img_add_background_color(img, colorname='navy', bordersize=5):
 
+    img0 = image_read(img) ## nd array or filestring 
+
+    colborder  = webcolors.name_to_rgb(colorname)
+    image = cv2.copyMakeBorder(img0, bordersize, bordersize, bordersize, bordersize, 
+                               cv2.BORDER_CONSTANT, None, colborder)
+    image = image[:, :, ::-1]
+    img_arr = np.array(image)
+    img12 = Image.fromarray(img_arr)
+
+
+    if os.environ.get('img_show', '0') = '1' :
+       plt.imshow(img12)
+       plt.axis('off')
+       plt.show()
+
+    return img12
+
+
+def image_remove_background(img):
+    import rembg
+    img1 = image_read(img) ### String or NDarray
+    img1 = rembg.remove(img1)
+    return img1
 
 
 
