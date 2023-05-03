@@ -32,7 +32,7 @@ def run_classifier(dirin="", dirout="ztmp/classifier/", mode="v2")
     dirout2 = dirout + f"/{t0}/"
     os_makedirs(dirout2)
 
-    dirin2 = [ fi +"/*.*" for fi in dirin.split(";")  ]
+    dirin2 = [ fi +"/**/.*" for fi in dirin.split(";")  ]
     flist = glob_glob(dirin2 )
     log('N images:', len(flist))
 
