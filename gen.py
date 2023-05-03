@@ -87,6 +87,9 @@ def test1():
 ###########################################################################################
 def params_test():
     ## only for testing code
+    from box import Box
+    from utilmy import log
+
     global cc
     cc = Box({})
 
@@ -190,6 +193,9 @@ def params_test():
 def params_v1():
     ## only for testing code
     global cc
+    from box import Box
+    from utilmy import log
+
     cc = Box({})
 
     ##############################################################################################
