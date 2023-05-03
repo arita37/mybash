@@ -424,17 +424,17 @@ def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
 
 
-def img_add_border(img, colorname='navy'):
+def img_add_border(img, colorname='navy', bordersize=5):
 
     img0 = image_read(img) ## nd array or filestring 
 
     colborder  = webcolors.name_to_rgb(colorname)
-    image = cv2.copyMakeBorder(img0, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, colborder)
+    image = cv2.copyMakeBorder(img0, bordersize, bordersize, bordersize, bordersize, 
+                               cv2.BORDER_CONSTANT, None, colborder)
     image = image[:, :, ::-1]
     img_arr = np.array(image)
-    img_arr[10: 50, 300 :370] = (255, 255, 255)
-    img_arr[10: 50, 10 :60] = (255, 255, 255)
     img12 = Image.fromarray(img_arr)
+
 
     if os.environ.get('img_show', '0') = '1' :
        plt.imshow(img12)
