@@ -1072,7 +1072,7 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
         # display and save images
         for image in images:
             #display(image)
-            image_name = dirout2 + "/png/"+str(int(time.time())) +".png"
+            image_name = dirout2 + "/png/"+str(int(time.time())) +f"_{ii}.png"
             image.save(image_name)
             log(image_name)
             ii = ii +1
