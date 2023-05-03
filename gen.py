@@ -222,17 +222,19 @@ def params_v1():
 
     #### Custom Prompt for the images to fine tune.  ######################
     cc.imagenet_templates_small = [
-        "a svg of a {}",
-        "a rendering of a {}",
-        "the photo of a {}",
-        "flat vector icon of{}",
-        "a dark photo of the {}",
-        "white color clear background{}",
-        "Design a flat vector icon of a {}",
-        "minimalistic image of {}",
-        "transparent background photo of the {}",
+        "a svg of a single {}",
+        "a rendering of a single {}",
+        "the photo of a single {}",
+        "flat vector icon of a single {}",
+        # "a dark photo of the {}",
+        "white color clear background of a single {}",
+        "Design a flat vector icon of a single {}",
+        "minimalistic image of a single {}",
+        "transparent background photo of a single {}",
         "Create a clean and simple {}",
-        "simple SVG illustration  {}",
+        "simple SVG illustration of a single  {}",
+        "simple SVG illustration of a  {}  with white background",
+
     ]
     # prompt = "black color flat vector icon of bicycle, black and white, b&w, white color clear background only"
     # prmopt = "Design a black and white flat vector icon of a bicycle with a clear background, featuring a minimalist style and solid black color on a transparent background."
@@ -278,23 +280,13 @@ def params_v1():
       ,'width': 512 
       ,'torch_dtype0': 'fp32'   
  
-
-
     }
-
-
     log("#### config:\n", cc)
     return cc
 
 
-
-def runtrain(cfg="params_test"):
-    """### Training
-    Define hyper for our training
-    If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
-
-    from utilmy import json_save
-    json_save(cc, "ztmp/config/cfg_v1.json")
+def config_load2(cfg="param_test"):
+    """ function Name or config json file on json
     """
     global cc
     log(f"#### Start Full train with param_name: {cfg}")
@@ -308,42 +300,25 @@ def runtrain(cfg="params_test"):
            cc = globals()[cfg]() ### it's a function not a var !
         except :   
            cc = globals()[cfg]   ### it's a  var !
+    
+    log('Params loaded in cc: \n', cc) 
+    return cc
+   
 
-    log('Params loaded\n', cc)
+def runtrain(cfg="params_test"):
+    """### Training
+    Define hyper for our training
+    If you are not happy with your results, you can tune the `learning_rate` and the `max_train_steps`
+
+    from utilmy import json_save
+    json_save(cc, "ztmp/config/cfg_v1.json")
+    """
+    global cc
+    cc = config_load2(cfg=cfg)
 
     ###############################################################################
     model_setup()
     train_launcher()
-
-
-def runpred(cfg="params_test"):
-    """### 
-
-
-    python gen.py runpred   --cfg params_test
-
-    python gen.py runpred   --cfg params_v1
-
-    """
-    global cc
-    log(f"#### Start Inference with param_name: {cfg}")
-
-    if ".json" in cfg :
-        from utilmy import config_load
-        cc = config_load(cfg)
-        cc = Box(cc)
-    else :
-        try :
-           cc = globals()[cfg]() ### it's a function not a var !
-        except :   
-           cc = globals()[cfg]   ### it's a  var !
-
-    log('Params loaded\n', cc)
-
-    ###############################################################################
-    run_inference()
-
-
 
 
 ###########################################################################################
@@ -1018,13 +993,13 @@ def train_launcher():
 
 
 #########################################################################################
-def run_inference(prompt = " Design a black and white simple flat vector icon of a svg bicycle with plain white background"
-    ,num_samples = 1
-    ,num_rows   = 1
-    ,max_image  = None
-
-    ):
+def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
     """
+    python gen.py runpred   --cfg params_test
+
+    python gen.py runpred   --cfg params_v1
+
+
     Keep the seed.
 
     Single bike as prompt
@@ -1042,17 +1017,24 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
 
     """
-    #Set up the pipeline 
+    global cc
+    cc = config_load2(cfg=cfg)
+
     device              = cc.pred.get('device', 'cpu') ## gpu
-    dirmodel            = cc.pred['dirmodel']    ### cc.hyper["output_dir"]
+    dirmodel            = cc.pred['dirmodel']   if dirmodel is None else dirmodel  ### cc.hyper["output_dir"]
     resolution          = cc.pred.get('resolution', 20 )
 
     num_inference_steps = cc.pred.get('num_inference_steps', 1 )
     height              = cc.pred.get('height', 512 )
     width               = cc.pred.get('width',  512 )
-    torch_dtype0        = cc.pred.get('torch_dtype0', 'fp32' )
     max_image           = cc.pred.get('max_image', 1) if max_image is None else max_image
 
+    prompt = cc.pred.get("prompt", " Design a black and white simple flat vector icon of a svg bicycle with plain white background")
+    num_samples_per_prompt = cc.pred.get("num_samples_per_prompt", 1)
+    max_loop               = cc.pred.get("max_loop", 1)
+
+
+    torch_dtype0        = cc.pred.get('torch_dtype0', 'fp32' )
     torch_dtype = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
     xmax = ymax = resolution
 
@@ -1076,15 +1058,13 @@ def run_inference(prompt = " Design a black and white simple flat vector icon of
 
     dirout2  = dirout + f"/img/"
     os_makedirs(dirout2 +"/png/")
-    os_makedirs(dirout2 +"/svg/")
-
 
     ii = 0
-    for _ in range(num_rows):
+    for _ in range(max_loop):
         # log(f"Generating row {_}")
         #### num_inference icrease: more details,  decrease: less details.
         #### fine tuning Colab PRO: 100 - 500 images
-        images = pipe([prompt] * num_samples, height=height, width=width ,
+        images = pipe([prompt] * num_samples_per_prompt, height=height, width=width ,
                       num_inference_steps=num_inference_steps).images
 
         # display and save images
