@@ -295,6 +295,31 @@ def show_all(image, masks, ddict):
 
 
 
+def img_change_color_bikeframe(img, colorname='navy'):
+
+    img0 = image_read(img) ## nd array or filestring 
+    
+
+    return img2
+
+
+def img_set_color_bikewheelleft(img, colorname='navy',:
+    img0 = image_read(img) ## nd array or filestring 
+    
+
+    return img2
+
+
+def img_set_color_bikewheelright(img, colorname='navy',:
+    img0 = image_read(img) ## nd array or filestring 
+    
+
+    return img2
+
+
+
+
+
 
 ####################################################################################
 def img_files_badfile(img_paths):
@@ -442,19 +467,6 @@ def img_add_border(img, colorname='navy', bordersize=5):
     return img12
 
 
-def img_update_color_bikeframe(img, colorname='navy'):
-
-    img0 = image_read(img) ## nd array or filestring 
-    
-
-    return img2
-
-
-def img_update_color_bikewheel(img, colorname='navy', bordersize=5):
-    img0 = image_read(img) ## nd array or filestring 
-    
-
-    return img2
 
 
 
