@@ -120,7 +120,7 @@ export_allenv() {
   # export_allenv "env2.txt"
   while IFS='=' read -r name value; do
 
-    if [[ $string1 == *"image_tag"* ]]; then
+    if [[ $string1 == "image_tag" ]]; then
       printf 'export %s="%q"\n' "$name" "${value}"
     else
       echo ""
@@ -207,6 +207,57 @@ function date_extract() {
 
 }
 
+function date_ymdhm_extract() {
+  input_string="$1"
+  date_regex='[0-9]{4}[0-9]{2}[0-9]{2}-[0-2][0-9][0-5][0-9]'
+
+  if [[ $input_string =~ $date_regex ]]; then
+    extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    echo $extracted_date
+  else
+    echo "-1"
+  fi
+
+}
+
+function date_today_extract() {
+  input_string="$1"
+  date_regex='[0-2][0-9][0-5][0-9]'
+
+  if [[ $input_string =~ $date_regex ]]; then
+    extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    echo "$(date +'%Y%m%d')-$extracted_date"
+  else
+    echo "-1"
+  fi
+}
+
+function get_folder_pattern() {
+  input="$1"
+  if [[ $input =~ [0-9]{4}[0-9]{2}[0-9]{2}-[0-2][0-9][0-5][0-9] ]]; then
+    echo "YMD-HM"
+  elif [[ $input =~ [0-9]{4}[0-9]{2}[0-9]{2} ]]; then
+    echo "YMD"
+  elif [[ $input =~ [0-2][0-9][0-5][0-9] ]]; then
+    echo "HM"
+  else
+    echo "-1"
+  fi
+}
+
+function date_extract_from_foldername() {
+  folder_name="$1"
+  folder_pattern=$(get_folder_pattern "$folder_name")
+  if [[ $folder_pattern == "YMD" ]]; then
+    dtscript=$(date_extract "$folder_name")
+  elif [[ $folder_pattern == "YMD-HM" ]]; then
+    dtscript=$(date_ymdhm_extract "$folder_name")
+  elif [[ $folder_pattern == "HM" ]]; then
+    dtscript=$(date_today_extract "$folder_name")
+  fi
+  echo $dtscript
+}
+
 function is_smaller_float {
   if (($(echo "$1 <= $2" | bc -l))); then
     echo "$1 is less than or equal to $2"
@@ -220,7 +271,7 @@ function is_smaller_float {
 function mlinstance_stop() {
   echo "stop instance"
 
-  if [[ $instance_mode == *"stop"* ]]; then
+  if [[ $instance_mode == "stop" ]]; then
     sleep 300 ### safety
 
     sudo shutdown -h now
