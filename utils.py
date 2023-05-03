@@ -351,7 +351,7 @@ def test2():
     min(gray.shape)
 
 
-def img_get_mask_wheel_v1(img_dir='/content/drive/MyDrive/image_bicycle.png'):
+def img_get_mask_wheel_v1(img_dir='imgs/bik5.png'):
     image = cv2.imread(img_dir, cv2.IMREAD_COLOR)    
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -373,7 +373,7 @@ def img_get_mask_wheel_v1(img_dir='/content/drive/MyDrive/image_bicycle.png'):
 
 
 
-def img_get_mask_wheel_v2(img_path='sample_data/images.png', verbose=1):
+def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
     # Load input image
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
