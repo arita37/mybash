@@ -10,11 +10,12 @@
        pip install reqs.txt
 
    ### Example:
+       good images are in imgs/
+       bad  images are in img_bad/
+
        python utils.py test3  --dirimg imgs/    --name ""
 
        python utils.py test10
-
-
 
 
    ### SAM
