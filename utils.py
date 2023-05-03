@@ -129,32 +129,22 @@ def test3(dirimg="imgs/", name=""):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 
-   log("### All   ")
+    log("### All   ")
     ddict = bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')
     # ddict['input_points']  ddict['input_labels_id']  ddict['input_labels']
     masks = img_get_mask(points=ddict['input_points'], labels=ddict['input_labels_id'], 
-                         img_dir= dirimg1,    dirout="ztmp/out/", method="one")
+                         img_dir= dirimg1,    dirout="ztmp/out/", method="sam01")
 
-    plt.figure(figsize=(5,5))
-    plt.imshow(image)
-    show_mask(masks, plt.gca())
-    show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
-    plt.axis('off')
-    plt.show() 
+    show_all(image, masks, ddict)
 
 
 
     log("### Left Wheel   ")
     ddict = bike_get_input_points(image, part='right-wheel')
     masks = img_get_mask(points=ddict['input_points'], labels=ddict['input_labels_id'], 
-                         img_dir= dirimg1,    dirout="ztmp/out/", method="one")
+                         img_dir= dirimg1,    dirout="ztmp/out/", method="sam01")
  
-    plt.figure(figsize=(5,5))
-    plt.imshow(image)
-    show_mask(masks, plt.gca())
-    show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
-    plt.axis('off')
-    plt.show() 
+    show_all(image, masks, ddict)
 
 
 
@@ -297,6 +287,15 @@ def show_points(coords, labels, ax, marker_size=375):
     neg_points = coords[labels==0]
     ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
     ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white', linewidth=1.25)
+
+
+def show_all(image, masks, ddict):
+    plt.figure(figsize=(5,5))
+    plt.imshow(image)
+    show_mask(masks, plt.gca())
+    show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
+    plt.axis('off')
+    plt.show() 
 
 
 
