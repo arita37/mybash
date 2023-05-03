@@ -101,6 +101,49 @@ def classify_image_v2(img):
   # Default to "good" if no clear decision can be made based on the current rules
 
 
+def classify_image_v3(img):
+    IMG_SIZE = (300, 300)
+    imgs_bad = []
+    imgs_good= []
+
+    for img_name in imgs_bad_names:
+        img_path = os.path.join(imgs_bad_Path, img_name)
+        img = cv2.imread(img_path)
+        img = cv2.resize(img, IMG_SIZE)
+        imgGray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        imgs_bad.append(imgGray)
+
+    for img_name in imgs_good_names:
+        img_path = os.path.join(imgs_good_Path, img_name)
+        img = cv2.imread(img_path)
+        img = cv2.resize(img, IMG_SIZE)
+        imgGray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        imgs_good.append(imgGray)
+
+    # create a mask of all good images
+    mask=cv2.bitwise_and(imgs_good[0],imgs_good[1])
+    for i in range (2,22):
+        mask = cv2.bitwise_and(mask, imgs_good[i])
+
+    # Count number of black pixels in the mask
+    check=np.count_nonzero(mask == 0)
+
+    # merge all images in one list
+    all_imgs=np.vstack((imgs_bad,imgs_good))
+    all_imgs_names=np.hstack((imgs_bad_names,imgs_good_names))
+
+    # create a new picture using bitwise function between any image and the mask
+    # the compare the number of black pixels in the new picture to the number of black pixels in the mask
+    for i, pic in enumerate(all_imgs):
+        mask_2 = cv2.bitwise_and(mask, pic)
+        check_2 = np.count_nonzero(mask_2 == 0)
+        if check_2>check:
+            print(i+1,all_imgs_names[i],'=====>','bad')
+        else:
+            print(i+1,all_imgs_names[i],'=====>','good')
+
+
+
 
 def url_to_image(url):
     with urllib.request.urlopen(url) as response:
