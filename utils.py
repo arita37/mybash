@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-   !pip install reqs.txt
-   pip install fire
-
    ### Run in local or colab
-   git clone  https://github.com/arita37/mybash.git imgapp
-   cd imgapp
-   git checkout zbiket
+      git clone  https://github.com/arita37/mybash.git imgapp
+      cd imgapp
+      git checkout zbike
 
-   python utils.py test3
-   python utils.py test10
+   ## Install
+       pip install fire utilmy python-box
+       pip install reqs.txt
+
+   ### Example:
+       python utils.py test3  --dirimg imgs/    --name ""
+
+       python utils.py test10
 
 
 
@@ -27,7 +30,6 @@
     # https://pypi.org/project/segment-anything-py/1.0/
 
 
-
    Image of bicket
    https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.shutterstock.com%2Fimage-vector%2Fblue-mountain-bike-simple-flat-600w-779290111.jpg&tbnid=GYBAUwP0Mspp7M&vet=10CAoQMyhsahcKEwjAzMWyxcH-AhUAAAAAHQAAAAAQAw..i&imgrefurl=https%3A%2F%2Fwww.shutterstock.com%2Fimage-vector%2Fblue-mountain-bike-simple-flat-design-779290111&docid=hyaAJpgQQ8Xd1M&w=600&h=474&itg=1&q=simple%20bike%20vector%20art&ved=0CAoQMyhsahcKEwjAzMWyxcH-AhUAAAAAHQAAAAAQAw
 
@@ -37,28 +39,21 @@
 
 """
 import fire, os, sys, cv2
+from box import Box
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import torch
-sys.path.append("..")
 from segment_anything import sam_model_registry, SamPredictor
 
-try :
-  from google_images_download import google_images_download
-except: pass
+
 
 from utilmy import (log, os_makedirs)
 
 
 
-
 ####################################################################################
-"""# 03) Facebook Masking
-# 04) Segmentation using SegmentAnything Model (SAM) from FaceBook
-### Install the required packages
-"""
-
+###""" # 04) Segmentation using SegmentAnything Model (SAM) 
 def test10():
     log("""### Display the points and labels of the wheels""")
     input_points = np.array([[117, 771], [879, 738], [473, 320]])
@@ -114,41 +109,58 @@ def test11():
     plt.show()
 
 
-def test3(imgname="BTgKexLec.png"):
+def test3(dirimg="imgs/", name=""):
     """ 
-        python utils.py. test3 --imgname img2.png
+
 
     """
-    dirimg= os.environ.get("dirimg", "/content/images/" )
 
-    dirimg1= dirimg + f'/{imgname}'
-    log(dirimg1)
+    #### Find one image
+    from utilmy import glob_glob
+    flist = glob_glob(dirimg + "/**/*")
+    flist = [fi.replace("\\", "/") for fir in flist]
+    flist = [ fi for fi in flist if name in fi.split("/")[-1] ]
+    dirimg1 = flist[0]
+
 
     image = cv2.imread( dirimg1 )
     # (optional) resize the image if it is too big
     image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    xr, yr = bike_get_input_points(image, "right-wheel")
-    xl, yl = bike_get_input_points(image, "left-wheel")
-    xb, yb = bike_get_input_points(image, "bike")
-    input_points = np.array([[xr, yr], [xl, yl], [xb, yb]])
-    input_labels = np.array([1, 1, 1])
 
-    masks = img_get_mask_frame(points=input_points, labels=input_labels, 
-                               img_dir= dirimg1, dirout="ztmp/out/", method="one")
+   log("### All   ")
+    ddict = bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')
+    # ddict['input_points']  ddict['input_labels_id']  ddict['input_labels']
+    masks = img_get_mask(points=ddict['input_points'], labels=ddict['input_labels_id'], 
+                         img_dir= dirimg1,    dirout="ztmp/out/", method="one")
 
-    plt.figure(figsize=(10,10))
-    # plt.imshow(image)
+    plt.figure(figsize=(5,5))
+    plt.imshow(image)
     show_mask(masks, plt.gca())
-    # show_points(input_points, input_labels, plt.gca())
+    show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
     plt.axis('off')
     plt.show() 
 
 
 
+    log("### Left Wheel   ")
+    ddict = bike_get_input_points(image, part='right-wheel')
+    masks = img_get_mask(points=ddict['input_points'], labels=ddict['input_labels_id'], 
+                         img_dir= dirimg1,    dirout="ztmp/out/", method="one")
+ 
+    plt.figure(figsize=(5,5))
+    plt.imshow(image)
+    show_mask(masks, plt.gca())
+    show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
+    plt.axis('off')
+    plt.show() 
+
+
+
+
 ########################################################################################
-def using_colab():
+def setup_colab():
     import torch
     import torchvision
     print("PyTorch version:", torch.__version__)
@@ -179,7 +191,7 @@ def model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", devic
     return predictor
 
 
-def img_get_mask_wheel(points, labels, img_dir='images/BTgKexLec.png', dirout="", method="sam01"):
+def img_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None,  dirout="", method="sam01", multimask_output=False):
     ####. get wheel mask
 
     image = cv2.imread(img_dir)
@@ -187,80 +199,89 @@ def img_get_mask_wheel(points, labels, img_dir='images/BTgKexLec.png', dirout=""
     image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+    if points is None:
+        ddict = bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')
+        points  = ddict['input_points']
+        labels  = ddict['input_labels_id']
+
+
     if method == "sam01":
-        predictor = model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda")
+        global predictor ### 1 Single Global model
+        if "predictor" not in globals() :  #### Not yet initialized
+            predictor = model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda")
         predictor.set_image(image)
 
         masks, scores, logits = predictor.predict(
             point_coords=points,
             point_labels=labels,
-            multimask_output=False, # default True which returns 3 masks with scores
+            multimask_output=multimask_output, # default True which returns 3 masks with scores
         )
 
     return masks
 
 
-def img_get_mask_frame(points, labels, img_dir='images/BTgKexLec.png', dirout="", method="one"):
-    #### get bike frame mask only
-
-    image = cv2.imread(img_dir)
-    # (optional) resize the image if it is too big
-    image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    predictor = model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda")
-    predictor.set_image(image)
-
-    masks, scores, logits = predictor.predict(
-        point_coords=points,
-        point_labels=labels,
-        multimask_output=False, # default True which returns 3 masks with scores
-    )
-
-    return masks
 
 
-def bike_get_input_points(image, part)->tuple:
+
+def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict:
     """ tricks to get pints 
 
     """
     h, w = image.shape[:2]
 
-    if part == "right-wheel":
-        y = h - 10
-        x = int(w / 2)
+    partlist = part.split(",")
+    ddict = {}
+    for part in partlist :
+        if part == "right-wheel":
+            y = h - 10
+            x = int(w / 2)
 
-        for i in range(int(w / 2)):
-            # if we find a black pixel, break the loop, otherwise, keep looping until we reach the 
-            # end of the image (image is supposed to have 3 channels with black and white pixels)
-            if image[y, x][0] == 0:
-                break
-            x += int(w / 32)
+            for i in range(int(w / 2)):
+                # if we find a black pixel, break the loop, otherwise, keep looping until we reach the 
+                # end of the image (image is supposed to have 3 channels with black and white pixels)
+                if image[y, x][0] == 0:
+                    break
+                x += int(w / 32)
 
-    elif part == "left-wheel":
-        y = h - 10
-        x = 0
+        elif part == "left-wheel":
+            y = h - 10
+            x = 0
 
-        for i in range(int(w / 2)):
-            if image[y, x][0] == 0:
-                break
-            x += int(w / 32)
+            for i in range(int(w / 2)):
+                if image[y, x][0] == 0:
+                    break
+                x += int(w / 32)
 
-    elif part == "bike":
-        y = 0
-        x = int(w / 2)
+        elif part == "bike":
+            y = 0
+            x = int(w / 2)
 
-        for i in range(h):
-            if image[y, x][0] == 0:
-                break
-            y += 1
+            for i in range(h):
+                if image[y, x][0] == 0:
+                    break
+                y += 1
 
-    elif part == "frame":
-        x, y = 50, 50
-    else:
-        log("part must be one of 'right-wheel', 'left-wheel', 'bike', 'frame'")
+        elif part == "frame":
+            x, y = 50, 50
 
-    return (x, y)
+        else:
+            log("part must be one of 'right-wheel', 'left-wheel', 'bike', 'frame'")
+            x=-1; y=-1
+
+        if x>0:
+            ddict[part] = (x,y) 
+
+    dd= Box({ 'input_points':   [],
+              'input_label_id': [], 
+              'input_labels':   [],
+    })
+    for ii, label, xy in enumerate(ddict.items()):
+       dd['input_points'].append( xy ) #= np.array([[xr, yr], [xl, yl], [xb, yb]])
+       dd['input_labels_id'].append( ii ) #= np.array([1, 1, 1])
+       dd['input_labels'].append( label ) #= np.array([1, 1, 1])
+       log(ii, label, xy)            
+    
+    return dd
 
 
 
@@ -281,7 +302,7 @@ def show_points(coords, labels, ax, marker_size=375):
 
 
 ####################################################################################
-def img_clean_files(img_paths):
+def img_files_badfile(img_paths):
   import os 
   from PIL import Image
   for filename in img_paths:
@@ -291,57 +312,6 @@ def img_clean_files(img_paths):
     except :
         print("img corrupted, del ", filename)
         os.remove(filename)
-
-
-def google_get_images2(keywords="black and white bicyle vector art ", nmax=10):
-   gimage = google_images_download.googleimagesdownload()
-   arguments = {"keywords": keywords, "limit": nmax, "print_urls": True}
-   img_paths = gimage.download(arguments)
-   img_clean_files(img_paths)
-   return img_paths
-
-
-def google_get_images(keywords="black and white bicyle vector art ", nmax=10, prefix="bicycle_vector_art",
-                      google_api_key="",
-                      google_search_id=""                      
-                      ):
-    from google_images_search import GoogleImagesSearch
-    import requests
-
-    # Replace 'your_api_key' and 'your_cx_id' with your actual API key and search engine ID
-    api_key  = os.environ.get("google_api_key", google_api_key) 
-    search_id= os.environ.get("google_search_id", google_search_id)
-    
-    gis = GoogleImagesSearch(api_key, search_id)
-
-    # Define search parameters
-    _search_params = {
-        'q': keyword,
-        'imgSize': 'medium',
-        'num': nmax
-    }
-
-    gis.search(search_params=_search_params)
-    results = gis.results()
-
-    # Download the images
-    flist = []
-    for i, image in enumerate(results):
-        response = requests.get(image.url)
-        fi = f'{prefix}_{i + 1}.jpg'
-        with open(fi, 'wb') as f:
-            f.write(response.content)
-            flist.append( fi) 
-
-    img_clean_files(img_paths=flist):]
-
-
-def test_google():
-   os.environ.get["google_api_key"]   = ""
-   os.environ.get["google_search_id"] = ""
-   google_get_images(keywords="black and white bicyle vector art ", nmax=10)
-
-
 
 
 
@@ -406,13 +376,6 @@ def img_get_mask_wheel_v1(img_dir='/content/drive/MyDrive/image_bicycle.png'):
 
 
 
-
-
-
-
-
-#########################################################################################
-# 02) OpenCV - Segmentation 2
 def img_get_mask_wheel_v2(img_path='sample_data/images.png', verbose=1):
 
     # Load input image

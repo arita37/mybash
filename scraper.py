@@ -15,6 +15,10 @@ import posixpath
 from rembg import remove
 from utilmy import log, os_makedirs, glob_glob
 
+try :
+  from google_images_download import google_images_download
+except: pass
+
 
 
 def fetch(query, limit=1, dirout='dl', adult_filter='on', 
@@ -35,7 +39,7 @@ def fetch(query, limit=1, dirout='dl', adult_filter='on',
 
 
 
-
+################################################################################################
 class Bing:
     def __init__(self, query, limit, dirout="dl", adult="on", timeout=60,  filter='', verbose=True, png_conv=False):
         self.download_count = 0
@@ -159,7 +163,59 @@ class Bing:
 
 
 
+################################################################################################
+def google_get_images2(keywords="black and white bicyle vector art ", nmax=10):
+   gimage = google_images_download.googleimagesdownload()
+   arguments = {"keywords": keywords, "limit": nmax, "print_urls": True}
+   img_paths = gimage.download(arguments)
+   img_clean_files(img_paths)
+   return img_paths
 
+
+def google_get_images(keywords="black and white bicyle vector art ", nmax=10, prefix="bicycle_vector_art",
+                      google_api_key="",
+                      google_search_id=""                      
+                      ):
+    from google_images_search import GoogleImagesSearch
+    import requests
+
+    # Replace 'your_api_key' and 'your_cx_id' with your actual API key and search engine ID
+    api_key  = os.environ.get("google_api_key", google_api_key) 
+    search_id= os.environ.get("google_search_id", google_search_id)
+    
+    gis = GoogleImagesSearch(api_key, search_id)
+
+    # Define search parameters
+    _search_params = {
+        'q': keyword,
+        'imgSize': 'medium',
+        'num': nmax
+    }
+
+    gis.search(search_params=_search_params)
+    results = gis.results()
+
+    # Download the images
+    flist = []
+    for i, image in enumerate(results):
+        response = requests.get(image.url)
+        fi = f'{prefix}_{i + 1}.jpg'
+        with open(fi, 'wb') as f:
+            f.write(response.content)
+            flist.append( fi) 
+
+    img_clean_files(img_paths=flist):]
+
+
+def test_google():
+   os.environ.get["google_api_key"]   = ""
+   os.environ.get["google_search_id"] = ""
+   google_get_images(keywords="black and white bicyle vector art ", nmax=10)
+
+
+
+
+################################################################################################
 if __name__ == "__main__":
     fire.Fire()
 
