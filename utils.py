@@ -474,29 +474,37 @@ def img_add_border(img, colorname='navy', bordersize=5):
 
 #####################################################################################################
 def test_color():
-   requested_colour = (119, 172, 152)
-   actual_name, closest_name = get_colour_name(requested_colour)
+   rgb_color = (119, 172, 152)
+   actual_name, closest_name = get_colour_name(rgb_color)
    print("Actual colour name:", actual_name, ", closest colour name:", closest_name)
 
 
-def color_closest_color(requested_colour):
+def color_get_rgb(colorname='blue'):
+  try :
+    return webcolors.name_to_rgb(colorname)
+  except Exception as e:
+    log(e)
+    return None
+
+
+def color_get_colorname(rgb_color):
     import webcolors    
     min_colours = {}
     for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-        rd = (r_c - requested_colour[0]) ** 2
-        gd = (g_c - requested_colour[1]) ** 2
-        bd = (b_c - requested_colour[2]) ** 2
+        rd = (r_c - rgb_color[0]) ** 2
+        gd = (g_c - rgb_color[1]) ** 2
+        bd = (b_c - rgb_color[2]) ** 2
         min_colours[(rd + gd + bd)] = name
     return min_colours[min(min_colours.keys())]
 
 
-def color_getname(requested_colour=(255,0,0)):
+def color_getname(rgb_color=(255,0,0)):
     import webcolors    
     try:
-        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
+        closest_name = actual_name = webcolors.rgb_to_name(rgb_color)
     except ValueError:
-        closest_name = color_closest_color(requested_colour)
+        closest_name = color_get_colorname(rgb_color)
         actual_name = None
     return actual_name, closest_name
 
