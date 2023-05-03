@@ -2,24 +2,23 @@
 pip install utilmy fire rembg
 
 
-python scraper.py  fetch  --query "simple bike in black and white" --limit 1  --dirout ztmp/fetch/bing/
+python scraper.py  fetch  --query "simple logo bicycle in black and white" --limit 1  --dirout ztmp/fetch/bing/
 
 
 '''
-import fire, os, sys,re
+import fire, os, sys,re, urllib
 from pathlib import Path
 import urllib.request
-import urllib
 import imghdr
 import posixpath
 
 from rembg import remove
-from utilmy import os_makedirs
+from utilmy import log, os_makedirs, glob_glob
 
 
 
-def fetch(query, limit=1, dirout='ztmp/img/', adult_filter='on', 
-          force_replace=0 timeout=60, filter="", verbose=1, png_conv=1):
+def fetch(query, limit=1, dirout='dl', adult_filter='on', 
+          force_replace=False, timeout=60, filter="", verbose=0, png_conv=1):
 
     # engine = 'bing'
     
@@ -79,12 +78,21 @@ class Bing:
                 return ""
 
 
+
+
     def save_image(self, link, file_path, conv=False):
+
+        if os.path.isfile(file_path):
+            log('file exist skipping')
+            return 
+
         request = urllib.request.Request(link, None, self.headers)
-        image = urllib.request.urlopen(request, timeout=self.timeout).read()
+        image   = urllib.request.urlopen(request, timeout=self.timeout).read()
+        
         if not imghdr.what(None, image):
             print('[Error]Invalid image, not saving {}\n'.format(link))
-            raise ValueError('Invalid image, not saving {}\n'.format(link))
+            # raise ValueError('Invalid image, not saving {}\n'.format(link))
+
         if conv:
             image = remove(image)
         with open(str(file_path), 'wb') as f:
@@ -95,25 +103,24 @@ class Bing:
         self.download_count += 1
         # Get the image link
         try:
-            path = urllib.parse.urlsplit(link).path
-            filename = posixpath.basename(path).split('?')[0]
+            path      = urllib.parse.urlsplit(link).path
+            filename  = posixpath.basename(path).split('?')[0]
             file_type = filename.split(".")[-1]
+            
             if file_type.lower() not in ["jpe", "jpeg", "jfif", "exif", "tiff", "gif", "bmp", "png", "webp", "jpg"]:
                 file_type = "jpg"
+            
+            conv = False
             if self.png_conv:
                 if file_type != "png":
                     conv = True
                     file_type = "png"
-            else:
-                conv = False
+            
             if self.verbose:
-                # Download the image
                 print("[%] Downloading Image #{} from {}".format(self.download_count, link))
                 
-            self.save_image(link, self.dirout.joinpath("Image_{}.{}".format(
-                str(self.download_count), file_type)), conv)
-            if self.verbose:
-                print("[%] File Downloaded !\n")
+            self.save_image(link, self.dirout.joinpath(f"img_{self.download_count}.{file_type}"), conv)
+
 
         except Exception as e:
             self.download_count -= 1
@@ -130,7 +137,7 @@ class Bing:
                           + '&adlt=' + self.adult + '&qft=' + ('' if self.filter is None else self.get_filter(self.filter)) \
                           + "&sc=10-35" + "&cvid=95DD13A3E5D043939BBC3117C416C74B&cc=US&setlang=en-US&form=QBIR"
             #request_url = f"https://www.bing.com/images/search?q={urllib.parse.quote_plus(self.query)}&qs=n&form=QBIR&sp=-1&lq=0&pq=logo%20bicycle%20in%20svg%20black%20and%20white&sc=10-35&cvid=95DD13A3E5D043939BBC3117C416C74B&ghsh=0&ghacc=0&first=1&cw=1349&ch=661"
-            request = urllib.request.Request(request_url, None, headers=self.headers)
+            request  = urllib.request.Request(request_url, None, headers=self.headers)
             response = urllib.request.urlopen(request)
             html = response.read().decode('utf8')
             if html ==  "":
@@ -139,7 +146,7 @@ class Bing:
             links = re.findall('murl&quot;:&quot;(.*?)&quot;', html)
             if self.verbose:
                 print("[%] Indexed {} Images on Page {}.".format(len(links), self.page_counter + 1))
-                print("\n===============================================\n")
+
 
             for link in links:
                 if self.download_count < self.limit and link not in self.seen:
