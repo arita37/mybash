@@ -296,26 +296,21 @@ def show_all(image, masks, ddict):
 
 
 
-def img_change_color_bikeframe(img, colorname='navy'):
+def img_update_color_bike(img, color_leftwheel="red", color_rightwheel="blue", color_frame="pink")
 
     img0 = image_read(img) ## nd array or filestring 
-    
+
+
+    rgb1= color_get_rgb(colorname= color_leftwheel)
+
+
+
+    rgb1= color_get_rgb(colorname= color_rightwheel)
+
 
     return img2
 
 
-def img_set_color_bikewheelleft(img, colorname='navy'):
-    img0 = image_read(img) ## nd array or filestring 
-    
-
-    return img2
-
-
-def img_set_color_bikewheelright(img, colorname='navy'):
-    img0 = image_read(img) ## nd array or filestring 
-    
-
-    return img2
 
 
 
