@@ -18,12 +18,7 @@ from utilmy import log, os_makedirs, glob_glob
 try :
   from google_images_download import google_images_download
 except: pass
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
+
 
 #import helper libraries
 import time
@@ -212,7 +207,16 @@ class GoogleImageScraper():
         print("[INFO] Downloads completed. Please note that some photos were not downloaded as they were not in the correct format (e.g. jpg, jpeg, png)")
 
 
-def gImage(query, image_path="downloads", limit=10, headless=True, min_resolution=(0, 0), max_resolution=(1920, 1080), max_missed=10):
+def fetch_google(query, image_path="downloads", limit=10, headless=True, min_resolution=(0, 0), 
+                 max_resolution=(512, 512), max_missed=10):
+
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.common.exceptions import NoSuchElementException 
+
     googleI = GoogleImageScraper(query, image_path, limit, headless, min_resolution, max_resolution, max_missed)
     googleI.download()
     del googleI
