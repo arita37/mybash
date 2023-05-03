@@ -468,7 +468,7 @@ def img_add_border(img, colorname='navy', bordersize=5):
     return img12
 
 
-def img_add_background_color(img, colorname='navy', bordersize=5):
+def img_add_background_color(img, colorname='navy', alpha=0.9):
 
     img0 = image_read(img) ## nd array or filestring 
 
