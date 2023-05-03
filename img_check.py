@@ -33,7 +33,9 @@ def run_classifier(dirin="", dirout="ztmp/classifier/", mode="v2")
     os_makedirs(dirout2)
 
     dirin2 = [ fi +"/**/.*" for fi in dirin.split(";")  ]
-    flist = glob_glob(dirin2 )
+    flist = []
+    for dirink in dirin2 :
+       flist = flist + glob_glob(dirink )
     log('N images:', len(flist))
 
     if mode =="v1":
