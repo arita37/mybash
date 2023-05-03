@@ -326,7 +326,8 @@ def test1():
 
 
 def test2():
-    img = cv2.imread('/content/drive/MyDrive/image_bicycle.png', cv2.IMREAD_COLOR)
+    dirimg1 = 'imgs/bik5.png'
+    img = cv2.imread(dirimg1, cv2.IMREAD_COLOR)
 
     ret, img2 = cv2.threshold(img, 150, 255, cv2.THRESH_BINARY_INV)
     cv2.imwrite('Image1.jpg', img2)
