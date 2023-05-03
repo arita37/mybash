@@ -1118,6 +1118,7 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
 
 
     """
+    import torch
     global cc
     cc = config_load2(cfg=cfg)
 
