@@ -1,5 +1,12 @@
 """
-pip install utilmy fire
+
+
+git clone https://github.com/arita37/mybash.git
+cd mybash
+git checkout zbike
+ls.
+
+pip install utilmy fire opencv-python  python-box matplotlib 
 
 
 python img_check.py run_classifier  --dirin "img_bad/;imgs/"  --dirout "ztmp/classfier/
