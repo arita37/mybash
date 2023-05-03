@@ -11,3 +11,4 @@ onnx
 rasterio
 tqdm
 gdown
+webcolors
