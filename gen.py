@@ -1177,7 +1177,7 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
 
 
     ii = 0
-    for _ in range(num_rows):
+    for _ in range(max_loop):
         # log(f"Generating row {_}")
         #### num_inference icrease: more details,  decrease: less details.
         #### fine tuning Colab PRO: 100 - 500 images
