@@ -93,7 +93,7 @@ def params_test():
     ##############################################################################################
     ## Settings for teaching your new concept
     #　 `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
-    #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    #param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
     cc.pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion"
 
     """### Get the training images:
@@ -109,16 +109,16 @@ def params_test():
           ## You can add additional images here
     ]
 
-    #@title Settings for your newly created concept
+    #title Settings for your newly created concept
     #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
-    cc.what_to_teach = "object" #@param ["object", "style"]
+    cc.what_to_teach = "object" #param ["object", "style"]
 
     #　 `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    cc.placeholder_token = "<bicycle-svg>" #param {type:"string"}
     #r `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
 
 
-    cc.initializer_token = "bicycle" #@param {type:"string"
+    cc.initializer_token = "bicycle" #param {type:"string"
 
     #### Custom Prompt for the images to fine tune.  ######################
     cc.imagenet_templates_small = [
@@ -195,7 +195,7 @@ def params_v1():
     ##############################################################################################
     ## Settings for teaching your new concept
     #　 `pretrained_model_name_or_path` which Stable Diffusion checkpoint you want to use
-    #@param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
+    #param ["stabilityai/stable-diffusion-2", "stabilityai/stable-diffusion-2-base", "CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"] {allow-input: true}
     cc.pretrained_model_name_or_path = "coder119/Vectorartz_Diffusion"
 
     """### Get the training images:
@@ -211,16 +211,16 @@ def params_v1():
           ## You can add additional images here
     ]
 
-    #@title Settings for your newly created concept
+    #title Settings for your newly created concept
     #　 `what_to_teach`: what is it that you are teaching? `object` enables you to teach the model a new object to be used, `style` allows you to teach the model a new style one can use.
-    cc.what_to_teach = "object" #@param ["object", "style"]
+    cc.what_to_teach = "object" #param ["object", "style"]
 
     #　 `cc.placeholder_token` is the token you are going to use to represent your new concept (so when you prompt the model, you will say "A `<my-placeholder-token>` in an amusement park"). We use angle brackets to differentiate a token from other words/tokens, to avoid collision.
-    cc.placeholder_token = "<bicycle-svg>" #@param {type:"string"}
+    cc.placeholder_token = "<bicycle-svg>" #param {type:"string"}
     #r `initializer_token` is a word that can summarise what your new concept is, to be used as a starting point
 
 
-    cc.initializer_token = "bicycle" #@param {type:"string"
+    cc.initializer_token = "bicycle" #param {type:"string"
 
     #### Custom Prompt for the images to fine tune.  ######################
     cc.imagenet_templates_small = [
@@ -326,14 +326,14 @@ def runtrain(cfg="params_test"):
 ###########################################################################################
 def setup_colab():
   ss= """
-        #@title Install the required libs
+        #title Install the required libs
         pip install -U -qq git+https://github.com/huggingface/diffusers.git
         pip install -qq accelerate transformers ftfy
         
         svgutils
 
         
-        #@title [Optional] Install xformers for faster and memory efficient training
+        #title [Optional] Install xformers for faster and memory efficient training
         #　 Acknowledgement: The xformers wheel are taken from [TheLastBen/fast-stable-diffusion](https://github.com/TheLastBen/fast-stable-diffusion). Thanks a lot for building these wheels!
 
         # !pip install -U --pre triton
@@ -382,7 +382,7 @@ def setup_gpu():
     # elif (gpu=='A100'):
     #   %pip install -q https://github.com/TheLastBen/fast-stable-diffusion/raw/main/precompiled/A100/xformers-0.0.13.dev0-py3-none-any.whl
 
-    # #@title [Optional] Login to the Hugging Face Hub
+    # #title [Optional] Login to the Hugging Face Hub
     # #　 Add a token with the "Write Access" role to be able to add your trained concept to the [Library of Concepts](https://huggingface.co/sd-concepts-library)
     # # !pip install ipywidgets
     # from huggingface_hub import notebook_login
@@ -447,12 +447,12 @@ def colab_tips():
         ! mkdir -p "ztmp/zlog"
         ! mv nohup.out "ztmp/zlog/nohup_full_$(date +'%Y%m%d_%H%M%S').out"
         ! ls ztmp/zlog 
-        ! echo "" && find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" "
+        ! echo "" && find  ztmp/zlog/ -type f -name "*full*" -printf '%T %p\n' | sort -n | tail -1 | cut -f2- -d" "
 
 
 
         ### Most recent log
-        !cat  $( find  ztmp/zlog/ -type f -name "*full*" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" " )
+        !cat  $( find  ztmp/zlog/ -type f -name "*full*" -printf '%T %p\n' | sort -n | tail -1 | cut -f2- -d" " )
 
 
 
@@ -534,7 +534,7 @@ def image_setup():
     """
 
     #　 `images_path` is a path to directory containing the training images. It could 
-    images_path = "bicycle" #@param {type:"string"}
+    images_path = "bicycle" #param {type:"string"}
     images_path= r"D:\Projects\research_paper_scratch\bicycle"
     while not os.path.exists(str(images_path)):
       log('The images_path specified does not exist, use the colab file explorer to copy the path :')
@@ -717,7 +717,7 @@ def model_setup():
     """### Setting up the model"""
     global text_encoder, vae, unet, tokenizer
 
-    #@title Load the tokenizer and add the placeholder token as a additional special token.
+    #title Load the tokenizer and add the placeholder token as a additional special token.
     tokenizer = CLIPTokenizer.from_pretrained(
         cc.pretrained_model_name_or_path,
         subfolder="tokenizer",
@@ -731,7 +731,7 @@ def model_setup():
             " `cc.placeholder_token` that is not already in the tokenizer."
         )
 
-    #@title Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
+    #title Get token ids for our placeholder and initializer token. This code block will complain if initializer string is not a single token
     # Convert the initializer_token, cc.placeholder_token to ids
     token_ids = tokenizer.encode(cc.initializer_token, add_special_tokens=False)
     # Check if initializer_token is a single token or a sequence of tokens
@@ -1010,7 +1010,7 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
     prompt lenght: 250 words,  medium, long prompt or short ???
     increase inference step
 
-    #@title Run the Stable Diffusion pipeline
+    #title Run the Stable Diffusion pipeline
     #　 Don't forget to use the placeholder token in your prompt
 
     # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
@@ -1042,6 +1042,7 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
 
 
     #### Model Load  ############################################
+    modeltag="sd-vectorart"
     from diffusers import DPMSolverMultistepScheduler
     pipe = StableDiffusionPipeline.from_pretrained(
         dirmodel,
@@ -1054,7 +1055,7 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
     #### Output path #############################################
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
     dirout0 = cc['pred'].get('dirout_img', "ztmp/dirout_img/")
-    dirout  = dirout0 + f"/{t0}/"
+    dirout  = dirout0 + f"/{t0}_{modeltag}/"
     os_makedirs(dirout)
     json_save(cc, dirout + "/cc_config.json")
 
@@ -1072,13 +1073,136 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
         # display and save images
         for image in images:
             #display(image)
-            p1 = prompt[:25].replace(" ", "_").replace(",", "-").replace(".", "-")
-            image_name = dirout2 + f"/png/{p1}--{ii}.png"
+            prefix = prompt[:25].replace(" ", "_").replace(",", "-").replace(".", "-")
+            image_name = dirout2 + f"/png/{prefix}--{ii}.png"
             image.save(image_name)
             log(image_name)
             ii = ii +1
 
             if ii > max_image : return
+
+
+
+
+
+
+def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_image  = None):
+    """
+
+    #install library for stability ai deepfloyd
+    !pip install xformers==0.0.16
+    !pip install git+https://github.com/openai/CLIP.git --no-deps
+    !pip install deepfloyd-if==1.0.1
+    from huggingface_hub import login
+    #if you want to use your login key feel free to replace my key with your key
+    login("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")
+
+    Keep the seed.
+    Single bike as prompt
+    Vector Illustration with black  bike and white and clear background.
+
+    prompt lenght: 250 words,  medium, long prompt or short ???
+    increase inference step
+
+    #　 Don't forget to use the placeholder token in your prompt
+
+    # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
+    # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
+    # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
+
+
+    """
+    global cc
+    cc = config_load2(cfg=cfg)
+
+    device              = cc.pred.get('device', 'cpu') ## gpu
+    dirmodel            = cc.pred['dirmodel']   if dirmodel is None else dirmodel  ### cc.hyper["output_dir"]
+    resolution          = cc.pred.get('resolution', 20 )
+
+    num_inference_steps = cc.pred.get('num_inference_steps', 1 )
+    height              = cc.pred.get('height', 512 )
+    width               = cc.pred.get('width',  512 )
+    max_image           = cc.pred.get('max_image', 1) if max_image is None else max_image
+    max_loop               = cc.pred.get("max_loop", 1)
+
+    if prompt is None :
+       prompt          = cc.pred.get("prompt", " Design a black and white simple flat vector icon of a svg bicycle with 2 wheels with plain white background")
+    prompt_negative = cc.pred.get('prompt_negative', " multiple bicyle with unclear background")
+    num_samples_per_prompt = cc.pred.get("num_samples_per_prompt", 1)
+
+
+    torch_dtype0        = cc.pred.get('torch_dtype0', 'fp32' )
+    torch_dtype = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
+    xmax = ymax = resolution
+
+
+
+    #### Model Load  ############################################
+    from diffusers import DiffusionPipeline
+    from diffusers.utils import pt_to_pil
+    import torch
+    log("STAGE 1")
+    modeltag="dfloyd10"
+    # stage 1
+    stage_1 = DiffusionPipeline.from_pretrained("DeepFloyd/IF-I-M-v1.0", variant=torch_dtype0 , torch_dtype=torch_dtype  )
+    # stage_1.enable_xformers_memory_efficient_attention()  # remove line if torch.__version__ >= 2.0.0
+    stage_1.enable_model_cpu_offload()
+    prompt_embeds, negative_embeds = stage_1.encode_prompt(prompt, negative_prompt=prompt_negative)
+
+    # print("STAGE 2")
+    # stage 2
+    # stage_2 = DiffusionPipeline.from_pretrained(
+    #     "DeepFloyd/IF-II-M-v1.0", text_encoder=None, variant="fp16", torch_dtype=torch.float16
+    # )
+    # # # stage_2.enable_xformers_memory_efficient_attention()  # remove line if torch.__version__ >= 2.0.0
+    # stage_2.enable_model_cpu_offload()
+    # # print("STAGE 3")
+    # # stage 3
+    # safety_modules = {"feature_extractor": stage_1.feature_extractor, "safety_checker": stage_1.safety_checker, "watermarker": stage_1.watermarker}
+    # stage_3 = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-x4-upscaler", **safety_modules, torch_dtype=torch.float16)
+    # # stage_3.enable_xformers_memory_efficient_attention(y
+    # # # remove line if torch.__version__ >= 2.0.0
+    # stage_3.enable_model_cpu_offload()
+
+
+
+    #### Output path #############################################
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+    dirout0 = cc['pred'].get('dirout_img', "ztmp/dirout_img/")
+    dirout  = dirout0 + f"/{t0}_{modeltag}/"
+    os_makedirs(dirout)
+    json_save(cc, dirout + "/cc_config.json")
+    dirout2  = dirout + f"/img/"
+    os_makedirs(dirout2 +"/png/")
+
+
+    ii = 0
+    for _ in range(num_rows):
+        # log(f"Generating row {_}")
+        #### num_inference icrease: more details,  decrease: less details.
+        #### fine tuning Colab PRO: 100 - 500 images
+        # images = pipe([prompt] * num_samples, height=height, width=width ,
+        #               num_inference_steps=num_inference_steps).images
+        image = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
+                        guidance_scale=6,  num_inference_steps=num_inference_steps).images
+        image=image[0]
+
+        # display and save images
+        for image in images:
+            prefix = prompt[:25].replace(" ", "_").replace(",", "-").replace(".", "-")
+            image_name = dirout2 + f"/png/{prefix}--{ii}.png"
+            log(image_name)
+            ii = ii +1
+
+            if ii > max_image : return
+
+
+
+
+
+
+
+
 
 
 ###################################################################################
@@ -1175,13 +1299,13 @@ def run_inference2():
     To save this concept for re-using, download the `learned_embeds.bin` file or save it on the library of concepts.
     Use the [Stable Conceptualizer notebook](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_conceptualizer_inference.ipynb) for inference with persistently saved pre-trained concepts
     """
-    # #@title Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
+    # #title Save your newly created concept to the [library of concepts](https://huggingface.co/sd-concepts-library)?
     # !pip uninstall slugify
     # !pip install python-slugify
-    # save_concept_to_public_library = True #@param {type:"boolean"}
-    # name_of_your_concept = "Cat toy" #@param {type:"string"}
+    # save_concept_to_public_library = True #param {type:"boolean"}
+    # name_of_your_concept = "Cat toy" #param {type:"string"}
     # #　 `hf_token_write`: leave blank if you logged in with a token with `write access` in the [Initial Setup](#scrollTo=KbzZ9xe6dWwf). If not, [go to your tokens settings and create a write access token](https://huggingface.co/settings/tokens)
-    # hf_token_write = "" #@param {type:"string"}
+    # hf_token_write = "" #param {type:"string"}
 
     # if(save_concept_to_public_library):
     #   from slugify import slugify
