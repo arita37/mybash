@@ -468,11 +468,14 @@ def img_add_border(img, colorname='navy', bordersize=5):
     return img12
 
 
-def img_add_background_color(img, colorname='navy', alpha=0.9):
+def img_add_background_color(img, colorname='navy', alpha=0.9, remove_bg=0):
 
     img0 = image_read(img) ## nd array or filestring 
 
     col0  = webcolors.name_to_rgb(colorname)
+
+    if remove_bg>0:
+        img0 = image_remove_background(img0)
 
     image = image[:, :, ::-1]
     img_arr = np.array(image)
