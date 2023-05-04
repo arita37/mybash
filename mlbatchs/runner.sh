@@ -71,7 +71,7 @@ mincpu=$4 && [ -z $4 ] && mincpu=15
 minram=$5 && [ -z $5 ] && minram=100
 
 echo $mmode
-if [[ "$mmode" == "debug" ]]; then
+if [[ "$mmode" == *"debug"* ]]; then
     mincpu=60
     minram=100
     maxtime=30
@@ -84,7 +84,7 @@ export LOGDIR="zlog/$ymd/"
 mkdir -p "$LOGDIR"
 export LOGFILE7="${LOGDIR}/log_${ymdhs}.py"
 echo -e "###Start ${ymdhs} \n" 2>&1 | tee "${LOGFILE7}"
-echo ">>>>>> START ${ymdhs}"
+
 ########## Source ####################################################
 source ../bins/utils.sh
 nowjp || exit 1
@@ -101,17 +101,15 @@ for dirk0 in $subfolders; do
     dirk="${dirk##*/}" # print everything after the final "
     echo2 "## $dirk"
 
-    if [[ $dirk == "readme" ]]; then continue; fi
+    if [[ $dirk == *"readme"* ]]; then continue; fi
 
     dirnew="done/$ymd/$dirk/" #### If dir exist prevent 2nd runs for _nodelete
     if [ -d "$dirnew" ]; then continue; fi
 
     #### Check if script date is below than today's date
-    dtscript=$(date_extract_from_foldername "$dirk")
-    echo ">>>>>> DTSCRIPT: $dtscript"
-    current_date=$(TZ='Asia/Tokyo' date +'%Y%m%d-%H%M')
-    ymd1=$(date_to_unix_timestamp "$current_date")
-    echo ">>>>>> YMD1: $ymd1"
+    dtscript=$(date_extract "$dirk")
+    ymd1=$(TZ='Asia/Tokyo' date +'%Y%m%d')
+    echo2 "job date: $dtscript"
     if (($(echo "$dtscript > $ymd1" | bc -l))); then
         echo "$dirk  skipped"
         continue
@@ -135,11 +133,11 @@ for dirk0 in $subfolders; do
         # echo $dirnew
 
         mkdir -p $dirnew
-        if [[ $mmode == "debug" ]]; then
+        if [[ $mmode == *"debug"* ]]; then
             cp "$script" "$dirnew"
             echo2 "COPY $script TO $dirnew"
 
-        elif [[ $script == "nodelete" ]]; then
+        elif [[ $script == *"nodelete"* ]]; then
             cp $script "$dirnew"
             echo2 "COPY $script TO $dirnew"
 
@@ -148,10 +146,10 @@ for dirk0 in $subfolders; do
             echo2 "MOVE $script TO $dirnew"
         fi
 
-        if [[ $mmode == "debug2" ]]; then exit; fi
+        if [[ $mmode == *"debug2"* ]]; then exit; fi
 
         ### Update Remote repo   ########################################
-        if [[ "$mmode" == "prod" ]]; then
+        if [[ "$mmode" == *"prod"* ]]; then
             echo2 "update repo"
             gitpushforce "from batch: $(nowjp)"
         fi
@@ -181,7 +179,7 @@ for dirk0 in $subfolders; do
         cmd_list=$(cat "./ztmp.txt")
         echo "##cmd: $cmd_list"
 
-        if [[ "$cmd_list" != "python" && "$cmd_list" != "latest" ]]; then
+        if [[ "$cmd_list" != *"python"* && "$cmd_list" != *"latest"* ]]; then
             echo2 "No more python, latest/run.sh process running"
             break
         fi
@@ -204,14 +202,14 @@ done
 echo2 "\n#### ALL Tasks done"
 ls -l "done/$ymd/" 2>&1 | tee -a "${LOGFILE7}"
 
-# if [[ "$mmode" == "stop"  ]]; then
-#     echo "Instance Stopped in 300sec" 2>&1 | tee -a "${LOGFILE7}"
-#     gitpushforce  "batch_runner: $(nowjp) - stop instance"
+if [[ "$mmode" == *"stop"* ]]; then
+    echo "Instance Stopped in 300sec" 2>&1 | tee -a "${LOGFILE7}"
+    gitpushforce "batch_runner: $(nowjp) - stop instance"
 
-#     sleep 300  ### Safety , dont lower this level
-#     mlinstance_stop
+    sleep 300 ### Safety , dont lower this level
+    mlinstance_stop
 
-# else
-#     gitpushforce  "batch_runner: $(nowjp) "
+else
+    gitpushforce "batch_runner: $(nowjp) "
 
-# fi
+fi
