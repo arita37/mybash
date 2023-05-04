@@ -1143,10 +1143,14 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     import torch
     log("STAGE 1")
     modeltag="dfloyd10"
+    stage_1 = DiffusionPipeline.from_pretrained(dirmodel)
+    print("LOADED")
+    stage_1.to(device)
+    
     # stage 1
-    stage_1 = DiffusionPipeline.from_pretrained("DeepFloyd/IF-I-M-v1.0", variant=torch_dtype0 , torch_dtype=torch_dtype  )
-    # stage_1.enable_xformers_memory_efficient_attention()  # remove line if torch.__version__ >= 2.0.0
-    stage_1.enable_model_cpu_offload()
+    # stage_1 = DiffusionPipeline.from_pretrained("DeepFloyd/IF-I-M-v1.0", variant=torch_dtype0 , torch_dtype=torch_dtype  )
+    # # stage_1.enable_xformers_memory_efficient_attention()  # remove line if torch.__version__ >= 2.0.0
+    # stage_1.enable_model_cpu_offload()
     prompt_embeds, negative_embeds = stage_1.encode_prompt(prompt, negative_prompt=prompt_negative)
 
     # print("STAGE 2")
