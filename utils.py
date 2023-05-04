@@ -10,12 +10,11 @@
        pip install reqs.txt
 
    ### Example:
-       good images are in imgs/
-       bad  images are in img_bad/
-
        python utils.py test3  --dirimg imgs/    --name ""
 
        python utils.py test10
+
+
 
 
    ### SAM
@@ -210,6 +209,8 @@ def img_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None,  dirout
 
 
 
+
+
 def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict:
     """ tricks to get pints 
 
@@ -293,26 +294,6 @@ def show_all(image, masks, ddict):
     show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
     plt.axis('off')
     plt.show() 
-
-
-
-def img_update_color_bike(img, color_leftwheel="red", color_rightwheel="blue", color_frame="pink")
-
-    img0 = image_read(img) ## nd array or filestring 
-
-
-    rgb1= color_get_rgb(colorname= color_leftwheel)
-
-
-
-    rgb1= color_get_rgb(colorname= color_rightwheel)
-
-
-    return img2
-
-
-
-
 
 
 
@@ -439,21 +420,98 @@ def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
     return seg_wheels
 
+#####################################################################################################
+
+
+
+def img_pipe_v1(dirimg, nmax=5):
+    """ 
+
+    git clone 
+    pip install -r py38img.txt
+
+
+    python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
+
+
+
+    """
+    from utilmy import (glob_glob, os_makedirs, date_now)
+    from util_image import image_read,  image_resize_ratio
+
+     imgfiles = glob_glob(dirimg)
+
+    for ii, imgfilek in enuemrate(imgfiles :
+        try :
+            img = image_read(imgfilek)
+
+            img = image_remove_background(img)
+
+            img = image_add_border(img, colorname=color_random(), bordersize=1)
+
+            img = image_add_bike_color(img, color_wheels= "black", color_frame= color_random(), )
+
+            img = image_resize_ratio(img, width=64, height= 64)
+
+
+            t0 = date_now(fmt="%Y%m%d_%H%M%S")
+
+            imgfile2 = imgfilek.replace("/imgs/", f"/imgs/{t0}")
+            image_save(img, dirfile=imgfile2)
+            log(imgfile2)
+
+        except Exception as e :
+            log(e)
+            log(imgfilek)
+
+
+def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
+    """
+
+    'right-wheel,left-wheel,bike,frame')
+
+    """
+    img = image_read(img)
+    maskdict = img_get_mask_bike(img_dir= img,     method="sam01")
+
+    for labeli, maski in maskdict.items()
+
+         if labeli == 'bike' :
+            img2 = cv2.bitxor(maski, img)
+            ## set color to img2 to red
+            img  =cv2.merge(img, img2)
+
+
+
+         if 'wheel' in label :
+            img2 = cv2.bitxor(maski, img)
+            ## set color to img2 to black
+            img  =cv2.merge(img, img2)
 
 
 
 
-def img_add_border(img, colorname='navy', bordersize=5):
+
+
+def image_remove_background(img= "", level:int=1):
+    import removebg 
+    img = image_read(img)
+    img= removebg.remove(img)
+    return img
+
+
+
+def img_add_border(img, colorname='navy'):
 
     img0 = image_read(img) ## nd array or filestring 
 
     colborder  = webcolors.name_to_rgb(colorname)
-    image = cv2.copyMakeBorder(img0, bordersize, bordersize, bordersize, bordersize, 
-                               cv2.BORDER_CONSTANT, None, colborder)
+    image = cv2.copyMakeBorder(img0, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, colborder)
     image = image[:, :, ::-1]
     img_arr = np.array(image)
+    img_arr[10: 50, 300 :370] = (255, 255, 255)
+    img_arr[10: 50, 10 :60] = (255, 255, 255)
     img12 = Image.fromarray(img_arr)
-
 
     if os.environ.get('img_show', '0') = '1' :
        plt.imshow(img12)
@@ -461,71 +519,34 @@ def img_add_border(img, colorname='navy', bordersize=5):
        plt.show()
 
     return img12
-
-
-def img_add_background_color(img, colorname='navy', alpha=0.9, remove_bg=0):
-
-    img0 = image_read(img) ## nd array or filestring 
-
-    col0  = webcolors.name_to_rgb(colorname)
-
-    if remove_bg>0:
-        img0 = image_remove_background(img0)
-
-    image = image[:, :, ::-1]
-    img_arr = np.array(image)
-    img12 = Image.fromarray(img_arr)
-
-
-    if os.environ.get('img_show', '0') = '1' :
-       plt.imshow(img12)
-       plt.axis('off')
-       plt.show()
-
-    return img12
-
-
-def image_remove_background(img):
-    import rembg
-    img1 = image_read(img) ### String or NDarray
-    img1 = rembg.remove(img1)
-    return img1
 
 
 
 #####################################################################################################
 def test_color():
-   rgb_color = (119, 172, 152)
-   actual_name, closest_name = get_colour_name(rgb_color)
+   requested_colour = (119, 172, 152)
+   actual_name, closest_name = get_colour_name(requested_colour)
    print("Actual colour name:", actual_name, ", closest colour name:", closest_name)
 
 
-def color_get_rgb(colorname='blue'):
-  try :
-    return webcolors.name_to_rgb(colorname)
-  except Exception as e:
-    log(e)
-    return None
-
-
-def color_get_colorname(rgb_color):
+def color_closest_color(requested_colour):
     import webcolors    
     min_colours = {}
     for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-        rd = (r_c - rgb_color[0]) ** 2
-        gd = (g_c - rgb_color[1]) ** 2
-        bd = (b_c - rgb_color[2]) ** 2
+        rd = (r_c - requested_colour[0]) ** 2
+        gd = (g_c - requested_colour[1]) ** 2
+        bd = (b_c - requested_colour[2]) ** 2
         min_colours[(rd + gd + bd)] = name
     return min_colours[min(min_colours.keys())]
 
 
-def color_getname(rgb_color=(255,0,0)):
+def color_getname(requested_colour=(255,0,0)):
     import webcolors    
     try:
-        closest_name = actual_name = webcolors.rgb_to_name(rgb_color)
+        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
     except ValueError:
-        closest_name = color_get_colorname(rgb_color)
+        closest_name = color_closest_color(requested_colour)
         actual_name = None
     return actual_name, closest_name
 
