@@ -434,6 +434,9 @@ def img_pipe_v1(dirimg, nmax=5):
     python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
 
 
+    iamge are locatd in
+          imgs/img-black_bike_white_background/*.*  
+
 
     """
     from utilmy import (glob_glob, os_makedirs, date_now)
