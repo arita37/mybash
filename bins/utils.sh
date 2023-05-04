@@ -264,7 +264,7 @@ function get_folder_pattern() {
 
 }
 
-function date_extract_from_foldername() {
+function date_extract_foldername_unix() {
   folder_name="$1"
   folder_pattern=$(get_folder_pattern "$dirk")
   if [[ $folder_pattern == "YMD" ]]; then
@@ -278,11 +278,18 @@ function date_extract_from_foldername() {
 
 }
 
+function date_now_unix() {
+   echo $(TZ='Asia/Tokyo' date  +%s )
+}
+
+
 function date_to_unix_timestamp() {
   local date_str="$1"
   local format="%Y%m%d-%H%M"
   date -u -d "$date_str" +"%s" 2>/dev/null || date -u -j -f "$format" "$date_str" +"%s" 2>/dev/null || echo "-1"
 }
+
+
 
 function is_smaller_float {
   if (($(echo "$1 <= $2" | bc -l))); then
