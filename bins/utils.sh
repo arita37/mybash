@@ -200,11 +200,12 @@ function date_extract() {
 
   if [[ $input_string =~ $date_regex ]]; then
     extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
-    echo $extracted_date
+    date="${extracted_date}-0000"
+    folder_date=$(date_to_unix_timestamp "$date")
+    echo $folder_date
   else
     echo "-1"
   fi
-
 }
 
 function date_ymdhm_extract() {
@@ -213,7 +214,9 @@ function date_ymdhm_extract() {
 
   if [[ $input_string =~ $date_regex ]]; then
     extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
-    echo $extracted_date
+    date="${extracted_date}"
+    folder_date=$(date_to_unix_timestamp "$date")
+    echo $folder_date
   else
     echo "-1"
   fi
@@ -225,8 +228,10 @@ function date_today_extract() {
   date_regex='[0-2][0-9][0-5][0-9]'
 
   if [[ $input_string =~ $date_regex ]]; then
-    extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
-    echo "$(date +'%Y%m%d')-$extracted_date"
+    extracted_time=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    date="$(TZ='Asia/Tokyo' date +'%Y%m%d')-${extracted_time}"
+    folder_date=$(date_to_unix_timestamp "$date")
+    echo $folder_date
   else
     echo "-1"
   fi
@@ -243,19 +248,27 @@ function get_folder_pattern() {
   else
     echo "-1"
   fi
+
 }
 
 function date_extract_from_foldername() {
   folder_name="$1"
-  folder_pattern=$(get_folder_pattern "$folder_name")
+  folder_pattern=$(get_folder_pattern "$dirk")
   if [[ $folder_pattern == "YMD" ]]; then
-    dtscript=$(date_extract "$folder_name")
+    dtscript=$(date_extract "$dirk")
   elif [[ $folder_pattern == "YMD-HM" ]]; then
-    dtscript=$(date_ymdhm_extract "$folder_name")
+    dtscript=$(date_ymdhm_extract "$dirk")
   elif [[ $folder_pattern == "HM" ]]; then
-    dtscript=$(date_today_extract "$folder_name")
+    dtscript=$(date_today_extract "$dirk")
   fi
   echo $dtscript
+
+}
+
+function date_to_unix_timestamp() {
+  local date_str="$1"
+  local format="%Y%m%d-%H%M"
+  date -u -d "$date_str" +"%s" 2>/dev/null || date -u -j -f "$format" "$date_str" +"%s" 2>/dev/null || echo "-1"
 }
 
 function is_smaller_float {
