@@ -1063,6 +1063,7 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
     dirout2  = dirout + f"/img/"
     os_makedirs(dirout2 +"/png/")
 
+    log("Start generating img")
     ii = 0
     for _ in range(max_loop):
         # log(f"Generating row {_}")
