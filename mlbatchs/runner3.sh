@@ -108,7 +108,9 @@ for dirk0 in $subfolders; do
 
     #### Check if script date is below than today's date
     tscript_unix=$(date_extract_foldername_unix "$dirk")
-    tnow_unix=$(date_now_unix )
+    tnow_unix=$(date_now_unix)
+    echo "TSCRIPT $tscript_unix"
+    echo "TNOW $tnow_unix"
     if (($(echo "$tscript_unix > $tnow_unix" | bc -l))); then
         echo "$dirk  skipped"
         continue
@@ -119,7 +121,7 @@ for dirk0 in $subfolders; do
     for script in $subfolders2; do
         #for script in $dirin/$dirk/*.sh;  do
 
-        if [[ $script == ""* ]]; then continue; fi
+        if [[ $script == *"*"* ]]; then continue; fi
 
         ### Run the task   #################################################
         echo2 "\n###### $script: start"
@@ -201,14 +203,14 @@ done
 echo2 "\n#### ALL Tasks done"
 ls -l "done/$ymd/" 2>&1 | tee -a "${LOGFILE7}"
 
-if [[ "$mmode" == "stop" ]]; then
-    echo "Instance Stopped in 300sec" 2>&1 | tee -a "${LOGFILE7}"
-    gitpushforce "batch_runner: $(nowjp) - stop instance"
+# if [[ "$mmode" == "stop" ]]; then
+#     echo "Instance Stopped in 300sec" 2>&1 | tee -a "${LOGFILE7}"
+#     gitpushforce "batch_runner: $(nowjp) - stop instance"
 
-    sleep 300 ### Safety , dont lower this level
-    mlinstance_stop
+#     sleep 300 ### Safety , dont lower this level
+#     mlinstance_stop
 
-else
-    gitpushforce "batch_runner: $(nowjp) "
+# else
+#     gitpushforce "batch_runner: $(nowjp) "
 
-fi
+# fi

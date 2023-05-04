@@ -279,17 +279,16 @@ function date_extract_foldername_unix() {
 }
 
 function date_now_unix() {
-   echo $(TZ='Asia/Tokyo' date  +%s )
+  current_date=$(TZ='Asia/Tokyo' date +'%Y%m%d-%H%M')
+  current_date_unix=$(date_to_unix_timestamp "$current_date")
+  echo $current_date_unix
 }
-
 
 function date_to_unix_timestamp() {
   local date_str="$1"
   local format="%Y%m%d-%H%M"
   date -u -d "$date_str" +"%s" 2>/dev/null || date -u -j -f "$format" "$date_str" +"%s" 2>/dev/null || echo "-1"
 }
-
-
 
 function is_smaller_float {
   if (($(echo "$1 <= $2" | bc -l))); then
