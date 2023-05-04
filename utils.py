@@ -558,6 +558,94 @@ def color_getname(requested_colour=(255,0,0)):
 
 
 
+##########################################################################################
+def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
+  """ Ok, good to use for images
+  
+
+  """  
+  from utilmy import glob_glob, save, load, log
+  from util_image import image_read, image_save    
+  from rembg import remove
+
+
+  global list_invertcolor
+  global_index_create(name="list_invertcolor")
+
+  ii = 0
+  flist = glob_glob( dirin  )
+  flist = flist[:nmax]
+  # log(flist)
+  for  fi in flist:
+      if ii > nmax : return
+      if fi in list_invertcolor: continue
+  
+      img = image_invert_colors(fi)
+      if img is None : continue
+
+      ii = ii +1
+      if dry ==0 :
+         image_save(img, fi)
+         log(fi)
+         list_invertcolor.add(fi)
+      else :
+         log("dry: ", fi)
+  
+  save(list_invertcolor, "ztmp/list_invertcolor")       
+ 
+
+def global_index_create(name="list_invertcolor"):    
+  try :
+      # len(removebg_list)
+      globals()[name] = load( f"ztmp/{name}")
+      if globals()[name] is None :
+         globals()[name] = set()    
+
+  except :
+      globals()[name] = set() 
+
+
+
+def image_invert_colors(image_path):
+    ### Dark background --> white background  
+    from PIL import Image
+    import cv2
+    import numpy as np
+ 
+    image = Image.open(image_path).convert('RGBA')
+    image = np.array(image)
+
+    # Split the image into its 4 channels (R, G, B, and A)
+    b, g, r, a = cv2.split(image)
+
+    # Merge the B, G, and R channels into a BGR image
+    bgr = cv2.merge((b, g, r))
+
+    # Create a white background image with the same size as the BGR image
+    white_bg = np.ones_like(bgr) * 255
+
+    # Mask the white background image using the alpha channel
+    masked_white_bg = cv2.bitwise_and(white_bg, white_bg, mask=cv2.bitwise_not(a))
+
+    # Combine the masked white background with the BGR image
+    bgr_with_white_bg = cv2.bitwise_or(bgr, masked_white_bg)
+
+    # Convert the BGR image to grayscale
+    gray = cv2.cvtColor(bgr_with_white_bg, cv2.COLOR_BGR2GRAY)
+
+    mean = np.mean(gray)
+    if mean < 127:  ### dark
+        inverted_bgr = cv2.bitwise_not(bgr)         # Invert the colors of the BGR image
+
+        # Merge the inverted BGR image with the alpha channel
+        inverted_image = cv2.merge((inverted_bgr, a))
+
+        return inverted_image
+    else:
+        return None
+
+
+
 
 ###################################################################################################
 if __name__ == "__main__":
