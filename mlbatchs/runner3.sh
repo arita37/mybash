@@ -109,7 +109,7 @@ for dirk0 in $subfolders; do
     #### Check if script date is below than today's date
     tscript_unix=$(date_extract_foldername_unix "$dirk")
     tnow_unix=$(date_now_unix )
-    if (($(echo "$dtscript > $tnow_unix" | bc -l))); then
+    if (($(echo "$tscript_unix > $tnow_unix" | bc -l))); then
         echo "$dirk  skipped"
         continue
     fi
