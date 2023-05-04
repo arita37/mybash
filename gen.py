@@ -1025,7 +1025,7 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
 
     device              = cc.pred.get('device', 'cpu') ## gpu
     dirmodel            = cc.pred['dirmodel']   if dirmodel is None else dirmodel  ### cc.hyper["output_dir"]
-    resolution          = cc.pred.get('resolution', 20 )
+    #resolution          = cc.pred.get('resolution', 20 )
 
     num_inference_steps = cc.pred.get('num_inference_steps', 1 )
     height              = cc.pred.get('height', 512 )
@@ -1037,9 +1037,9 @@ def run_inference(cfg="params_test",dirmodel=None,max_image  = None):
     max_loop               = cc.pred.get("max_loop", 1)
 
 
-    torch_dtype0        = cc.pred.get('torch_dtype0', 'fp32' )
-    torch_dtype = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
-    xmax = ymax = resolution
+    torch_dtype0 = cc.pred.get('torch_dtype0', 'fp32' )
+    torch_dtype  = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
+    #xmax = ymax = resolution
 
 
     #### Model Load  ############################################
@@ -1118,7 +1118,7 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
 
     device              = cc.pred.get('device', 'cpu') ## gpu
     dirmodel            = cc.pred['dirmodel']   if dirmodel is None else dirmodel  ### cc.hyper["output_dir"]
-    resolution          = cc.pred.get('resolution', 20 )
+    # resolution          = cc.pred.get('resolution', 20 )
 
     num_inference_steps = cc.pred.get('num_inference_steps', 1 )
     height              = cc.pred.get('height', 512 )
@@ -1127,15 +1127,13 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     max_loop               = cc.pred.get("max_loop", 1)
 
     if prompt is None :
-       prompt          = cc.pred.get("prompt", " Design a black and white simple flat vector icon of a svg bicycle with 2 wheels with plain white background")
+       prompt       = cc.pred.get("prompt", " Design a black and white simple flat vector icon of a svg bicycle with 2 wheels with plain white background")
     prompt_negative = cc.pred.get('prompt_negative', " multiple bicyle with unclear background")
     num_samples_per_prompt = cc.pred.get("num_samples_per_prompt", 1)
 
 
-    torch_dtype0        = cc.pred.get('torch_dtype0', 'fp32' )
-    torch_dtype = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
-    xmax = ymax = resolution
-
+    torch_dtype0  = cc.pred.get('torch_dtype0', 'fp32' )
+    torch_dtype   = {'fp16': torch.float16, 'fp32': torch.float32 }[torch_dtype0]
 
 
     #### Model Load  ############################################
