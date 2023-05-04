@@ -15,13 +15,8 @@ Original file is located at
     https://colab.research.google.com/drive/1F5IfrlYPfk-DW_xTuTpujEiU5VxeTeRQ
 
 # Textual-inversion fine-tuning for Stable Diffusion using diffusers 
-
 This notebook shows how to "teach" Stable Diffusion a new concept via textual-inversion using 🤗 Hugging Face [🧨 Diffusers library](https://github.com/huggingface/diffusers). 
-
-![Textual Inversion example](https://textual-inversion.github.io/static/images/editing/colorful_teapot.JPG)
 _By using just 3-5 images you can teach new concepts to Stable Diffusion and personalize the model on your own images_ 
-
-For a general introduction to the Stable Diffusion model please refer to this [colab](https://colab.research.google.com/github/huggingface/notebooks/blob/main/diffusers/stable_diffusion.ipynb).
 
 
 """
@@ -1104,14 +1099,13 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     login("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")
 
     Keep the seed.
-    Single bike as prompt
-    Vector Illustration with black  bike and white and clear background.
 
     prompt lenght: 250 words,  medium, long prompt or short ???
     increase inference step
 
     #　 Don't forget to use the placeholder token in your prompt
 
+    Vector Illustration with black  bike and white and clear background.
     # prompt = "Create a clean and simple SVG illustration of a bicycle in black, centered on a transparent background."
     # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
     # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
