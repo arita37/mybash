@@ -6,66 +6,61 @@ LINE_SEP3="###########################"
 
 LINE_END="\n\n\n#######################################################################"
 
+function echo2() {
+  if [[ $2 == '' ]]; then
+    echo -e $1 2>&1 | tee -a "${LOGFILE7}"
 
-function echo2 () {   
-  if [[  $2 == ''  ]]; then
-    echo -e $1  2>&1 | tee -a "${LOGFILE7}"
-
-  else :  ### Not append
-    echo -e $1  2>&1 | tee   "${LOGFILE7}"
-  fi;
-
-}
-
-
-function echo3 () {   
-  echo -e  $LINE_END  2>&1 | tee -a "${LOGFILE7}"
-  if [[  $2 == ''  ]]; then
-    echo -e $1  2>&1 | tee -a "${LOGFILE7}"
-
-  else :  ### Not append
-    echo -e $1  2>&1 | tee   "${LOGFILE7}"
-  fi;
+  else
+    : ### Not append
+    echo -e $1 2>&1 | tee "${LOGFILE7}"
+  fi
 
 }
 
-function echo4 () {   
-  if [[  $2 == ''  ]]; then
-    echo -e "$(nowjp): $1"  2>&1 | tee -a "${LOGFILE7}"
+function echo3() {
+  echo -e $LINE_END 2>&1 | tee -a "${LOGFILE7}"
+  if [[ $2 == '' ]]; then
+    echo -e $1 2>&1 | tee -a "${LOGFILE7}"
 
-  else :  ### Not append
-    echo -e "$(nowjp): $1"  2>&1 | tee -a "${LOGFILE7}"
-  fi;
+  else
+    : ### Not append
+    echo -e $1 2>&1 | tee "${LOGFILE7}"
+  fi
 
 }
 
+function echo4() {
+  if [[ $2 == '' ]]; then
+    echo -e "$(nowjp): $1" 2>&1 | tee -a "${LOGFILE7}"
 
+  else
+    : ### Not append
+    echo -e "$(nowjp): $1" 2>&1 | tee -a "${LOGFILE7}"
+  fi
 
+}
 
 function list_error() {
-   ### Find Error msg in log file
-   ## list_error ztmp/log//_log1.py    
-   echo -e  "\n\n$LINE_END"  
-   echo -e  "###### List of err-ors: ############" 
-   echo -e  $1
-   grep -Ehnr "error|Error" "$1"  | grep -ve "from_error"
-   #grep -Ehnr "error|Error" "$1"  
+  ### Find Error msg in log file
+  ## list_error ztmp/log//_log1.py
+  echo -e "\n\n$LINE_END"
+  echo -e "###### List of err-ors: ############"
+  echo -e $1
+  grep -Ehnr "error|Error" "$1" | grep -ve "from_error"
+  #grep -Ehnr "error|Error" "$1"
 
 }
-
 
 function list_warning() {
-   ### Find Error msg in log file
-   ## list_error ztmp/log//_log1.py    
-   echo -e  "\n\n$LINE_END"  
-   echo -e  "###### List of warni-nings: ############" 
-   echo -e  $1
-   grep -Ehnr "warning|Warning" "$1"  | grep -ve "from_error"
-   #grep -Ehnr "error|Error" "$1"  
+  ### Find Error msg in log file
+  ## list_error ztmp/log//_log1.py
+  echo -e "\n\n$LINE_END"
+  echo -e "###### List of warni-nings: ############"
+  echo -e $1
+  grep -Ehnr "warning|Warning" "$1" | grep -ve "from_error"
+  #grep -Ehnr "error|Error" "$1"
 
 }
-
-
 
 function path_abs() {
   # $1 : relative filename
@@ -74,81 +69,70 @@ function path_abs() {
   fi
 }
 
-
 function git_push_bot() {
-    git config user.name github-actions[bot]
-    git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-    git add --all &&  git commit -m "${1}" 
-    git pull --all     
-    git push --all -f  
+  git config user.name github-actions[bot]
+  git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+  git add --all && git commit -m "${1}"
+  git pull --all
+  git push --all -f
 }
-
-
 
 function timeout2() {
-    # First argument: PID
-    # Second argument: Timeout
-    # Get process start time (Field 22) to check for PID recycling
-    start_time="$(cut -d ' ' -f 22 /proc/$1/stat)"
+  # First argument: PID
+  # Second argument: Timeout
+  # Get process start time (Field 22) to check for PID recycling
+  start_time="$(cut -d ' ' -f 22 /proc/$1/stat)"
 
-    sleep "$2"
+  sleep "$2"
 
-    # Make sure that the PID was not reused by another process
-    # that started at a later time
-    if [ "$(cut -d ' ' -f 22 /proc/$1/stat)" = "$start_time" ]; then
-        # Kill process with SIGTERM
-        kill -9 "$1"
-    fi
+  # Make sure that the PID was not reused by another process
+  # that started at a later time
+  if [ "$(cut -d ' ' -f 22 /proc/$1/stat)" = "$start_time" ]; then
+    # Kill process with SIGTERM
+    kill -9 "$1"
+  fi
 }
-
 
 function kill_sub_process() {
-    local pid="$1"
-    local and_self="${2:-false}"
-    if children="$(pgrep -P "$pid")"; then
-        for child in $children; do
-            kill_sub_process "$child" true
-        done
-    fi
-    if [[ "$and_self" == true ]]; then
-        kill -9 "$pid"
-    fi
+  local pid="$1"
+  local and_self="${2:-false}"
+  if children="$(pgrep -P "$pid")"; then
+    for child in $children; do
+      kill_sub_process "$child" true
+    done
+  fi
+  if [[ "$and_self" == true ]]; then
+    kill -9 "$pid"
+  fi
 }
-
 
 eexport() {
-    ### Export variable to disk for later reload
-    # my_var="Hello, World!"
-    # export_var my_var  file.sh
-    # source file.sh
-    eval "echo export $1=$2 " > $3
-    #source $2
+  ### Export variable to disk for later reload
+  # my_var="Hello, World!"
+  # export_var my_var  file.sh
+  # source file.sh
+  eval "echo export $1=$2 " >$3
+  #source $2
 }
-
 
 export_allenv() {
   # Export all environment variables to a file in a format that can be sourced
   # export_allenv "env2.txt"
   while IFS='=' read -r name value; do
 
-      if [[ $string1 == *"image_tag"* ]]; then
-         printf 'export %s="%q"\n' "$name" "${value}"
-      else
-        echo ""
-      fi
-
+    if [[ $string1 == "image_tag" ]]; then
       printf 'export %s="%q"\n' "$name" "${value}"
-  done < <(printenv) > $1
+    else
+      echo ""
+    fi
+
+    printf 'export %s="%q"\n' "$name" "${value}"
+  done < <(printenv) >$1
 }
 
-
-
-
-
-function print_envars(){ 
-  python -c "import os, pprint; pprint.pprint(dict(os.environ))"  
+function print_envars() {
+  python -c "import os, pprint; pprint.pprint(dict(os.environ))"
 }
-
 
 ####################################################################################
 function cpu_get_num_cores() {
@@ -165,25 +149,21 @@ function cpu_get_num_cores() {
   echo "$num_cores"
 }
 
-
-
 function cpu_get_avg_usage() {
-    # Get the total CPU usage from the ps command
-    cpu_total_usage=$(ps -A -o %cpu | awk '{s+=$1} END {print s}')
-    num_cores=$(cpu_get_num_cores)
-    cpu_total_usage=$(echo  "scale=4; $cpu_total_usage / $num_cores"  | bc -l )
+  # Get the total CPU usage from the ps command
+  cpu_total_usage=$(ps -A -o %cpu | awk '{s+=$1} END {print s}')
+  num_cores=$(cpu_get_num_cores)
+  cpu_total_usage=$(echo "scale=4; $cpu_total_usage / $num_cores" | bc -l)
 
-    echo "Total CPU usage per core: $cpu_total_usage%"
+  echo "Total CPU usage per core: $cpu_total_usage%"
 }
 # cpu_get_avg_usage
 
-
 function cpu_get_avg_usage2() {
-    period=$1 && [ -z $1 ] && period=600      ###  print folder size
-    local avg_cpu_usage=$(sar -u 1 $period | grep "Average" | awk '{print 100-$8}')
-    echo "Average CPU usage over $period : $avg_cpu_usage%"
+  period=$1 && [ -z $1 ] && period=600 ###  print folder size
+  local avg_cpu_usage=$(sar -u 1 $period | grep "Average" | awk '{print 100-$8}')
+  echo "Average CPU usage over $period : $avg_cpu_usage%"
 }
-
 
 function ram_get_usage() {
 
@@ -196,7 +176,7 @@ function ram_get_usage() {
     pages_purgeable=$(vm_stat | grep 'Pages purgeable:' | awk '{print $3}' | tr -d '.')
 
     # total_used=$((pages_active + pages_inactive + pages_speculative + pages_wired_down))
-    total_used=$((pages_active ))
+    total_used=$((pages_active))
     total_free=$((pages_free + pages_purgeable))
     total_memory=$((total_used + total_free))
 
@@ -206,54 +186,125 @@ function ram_get_usage() {
 
     ram_total_usage=$(free | grep Mem | awk '{print $3/$2 * 100.0}')
 
-  fi  
-  
+  fi
+
   echo "Ram usage: $ram_total_usage"
 
 }
 
 ####################################################################################
 function date_extract() {
-    #  date_extract "20230401-34563435"
-    input_string="$1"
-    date_regex='[0-9]{4}[0-9]{2}[0-9]{2}'
+  #  date_extract "20230401-34563435"
+  input_string="$1"
+  date_regex='[0-9]{4}[0-9]{2}[0-9]{2}'
 
-    if [[ $input_string =~ $date_regex ]]; then
-         extracted_date=$(grep -oE "$date_regex" <<< "$input_string" | head -n 1)
-        echo $extracted_date
-    else
-        echo "-1"
-    fi
+  if [[ $input_string =~ $date_regex ]]; then
+    extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    echo $extracted_date
+  else
+    echo "-1"
+  fi
 
 }
 
+function date_ymd_extract() {
+  input_string="$1"
+  date_regex='[0-9]{4}[0-9]{2}[0-9]{2}'
+
+  if [[ $input_string =~ $date_regex ]]; then
+    extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    date="${extracted_date}-0000"
+    folder_date=$(date_to_unix_timestamp "$date")
+    echo $folder_date
+  else
+    echo "-1"
+  fi
+}
+
+function date_ymdhm_extract() {
+  input_string="$1"
+  date_regex='[0-9]{4}[0-9]{2}[0-9]{2}-[0-2][0-9][0-5][0-9]'
+
+  if [[ $input_string =~ $date_regex ]]; then
+    extracted_date=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    date="${extracted_date}"
+    folder_date=$(date_to_unix_timestamp "$date")
+    echo $folder_date
+  else
+    echo "-1"
+  fi
+
+}
+
+function date_today_extract() {
+  input_string="$1"
+  date_regex='[0-2][0-9][0-5][0-9]'
+
+  if [[ $input_string =~ $date_regex ]]; then
+    extracted_time=$(grep -oE "$date_regex" <<<"$input_string" | head -n 1)
+    date="$(TZ='Asia/Tokyo' date +'%Y%m%d')-${extracted_time}"
+    folder_date=$(date_to_unix_timestamp "$date")
+    echo $folder_date
+  else
+    echo "-1"
+  fi
+}
+
+function get_folder_pattern() {
+  input="$1"
+  if [[ $input =~ [0-9]{4}[0-9]{2}[0-9]{2}-[0-2][0-9][0-5][0-9] ]]; then
+    echo "YMD-HM"
+  elif [[ $input =~ [0-9]{4}[0-9]{2}[0-9]{2} ]]; then
+    echo "YMD"
+  elif [[ $input =~ [0-2][0-9][0-5][0-9] ]]; then
+    echo "HM"
+  else
+    echo "-1"
+  fi
+
+}
+
+function date_extract_from_foldername() {
+  folder_name="$1"
+  folder_pattern=$(get_folder_pattern "$dirk")
+  if [[ $folder_pattern == "YMD" ]]; then
+    dtscript=$(date_ymd_extract "$dirk")
+  elif [[ $folder_pattern == "YMD-HM" ]]; then
+    dtscript=$(date_ymdhm_extract "$dirk")
+  elif [[ $folder_pattern == "HM" ]]; then
+    dtscript=$(date_today_extract "$dirk")
+  fi
+  echo $dtscript
+
+}
+
+function date_to_unix_timestamp() {
+  local date_str="$1"
+  local format="%Y%m%d-%H%M"
+  date -u -d "$date_str" +"%s" 2>/dev/null || date -u -j -f "$format" "$date_str" +"%s" 2>/dev/null || echo "-1"
+}
 
 function is_smaller_float {
-    if (( $(echo "$1 <= $2" | bc -l) )); then
-        echo "$1 is less than or equal to $2"
-    else
-        echo "$1 is greater than $2"
-    fi
+  if (($(echo "$1 <= $2" | bc -l))); then
+    echo "$1 is less than or equal to $2"
+  else
+    echo "$1 is greater than $2"
+  fi
 }
 
+# bash script to extract %Y%m%d date from string
 
+function mlinstance_stop() {
+  echo "stop instance"
 
+  if [[ $instance_mode == "stop" ]]; then
+    sleep 300 ### safety
 
-# bash script to extract %Y%m%d date from string 
+    sudo shutdown -h now
 
-
-function  mlinstance_stop() {
-    echo "stop instance"
-
-    if [[ $instance_mode ==  *"stop"*  ]]; then
-       sleep 300 ### safety
-
-       sudo shutdown -h now           
-
-    fi 
+  fi
 
 }
-
 
 function rm_empty_folder() {
   # Set the path to the folder to be checked
@@ -270,8 +321,8 @@ function rm_empty_folder() {
 }
 
 function date_tounix() {
-  date_string=$1         ###  "20220101_1200"
-  timezone="Asia/Tokyo"  ###  2
+  date_string=$1        ###  "20220101_1200"
+  timezone="Asia/Tokyo" ###  2
   #format="%Y%m%d_%H%M"
 
   timestamp=$(TZ=≈"$timezone" date -d "${date_string}" +"%s")
@@ -279,12 +330,9 @@ function date_tounix() {
 
 }
 
-
 function nowjp() {
-  echo  $(TZ='Asia/Tokyo' date +'%Y%m%d_%H%M%S')
+  echo $(TZ='Asia/Tokyo' date +'%Y%m%d_%H%M%S')
 }
-
-
 
 function gitpushforce() {
   git add --all
@@ -293,82 +341,73 @@ function gitpushforce() {
 
 }
 
-
-
-
 function get_current_shell_pid() {
   echo $$
 }
 
-
 function get_subprocess() {
-    # curr_pid="$(get_current_shell_pid)"
-    # get_subprocess $curr_pid
-    # local pid="$1"   && [ -z $1 ] &&  local_pid="$(get_current_shell_pid)" 
-    # echo "current_shell_pid: $local_pid"
-    local pid="$1"
-    local result=""
-    for spid in $(pgrep -P "$pid"); do
-        # local cmd=$(ps -p "$spid" -o comm=)   ## short cmd
-        local cmd=$(ps -p "$spid" -o args=)    ### long cmd  
-        result+="$spid: $cmd;"
-        result+=$(get_subprocess "$spid")
-    done
-    echo "$result"
+  # curr_pid="$(get_current_shell_pid)"
+  # get_subprocess $curr_pid
+  # local pid="$1"   && [ -z $1 ] &&  local_pid="$(get_current_shell_pid)"
+  # echo "current_shell_pid: $local_pid"
+  local pid="$1"
+  local result=""
+  for spid in $(pgrep -P "$pid"); do
+    # local cmd=$(ps -p "$spid" -o comm=)   ## short cmd
+    local cmd=$(ps -p "$spid" -o args=) ### long cmd
+    result+="$spid: $cmd;"
+    result+=$(get_subprocess "$spid")
+  done
+  echo "$result"
 }
 
 function get_current_shell_pid_all() {
-   ### All PID and cmd on this current shell 
-   local curr_pid="$(get_current_shell_pid)"
-   get_subprocess $curr_pid > "./ztmp.txt"
-   local cmd_list=$(cat  "./ztmp.txt" )
-   echo $cmd_list 
+  ### All PID and cmd on this current shell
+  local curr_pid="$(get_current_shell_pid)"
+  get_subprocess $curr_pid >"./ztmp.txt"
+  local cmd_list=$(cat "./ztmp.txt")
+  echo $cmd_list
 
 }
-
-
 
 function log_report_push() {
 
-    dirlog_report="$HOME/D/gitdev/log_report/"    
-    echo "push $dirlog_report" 
+  dirlog_report="$HOME/D/gitdev/log_report/"
+  echo "push $dirlog_report"
 
-    local CURRENT_DIR=$(pwd)
-    cd  $dirlog_report
+  local CURRENT_DIR=$(pwd)
+  cd $dirlog_report
 
-    gitignore 
-    git pull --all
-    git add --all 
-    git commit -m "update"
-    gitpushsecure
+  gitignore
+  git pull --all
+  git add --all
+  git commit -m "update"
+  gitpushsecure
 
-    cd "$CURRENT_DIR"
+  cd "$CURRENT_DIR"
 }
 
-
 function mkdir2() {
-    local dirfile="$1"
-    if [[ -d "$dirfile" ]]; then
-        mkdir -p "$dirfile"
-        
-    elif [[ -f "$dirfile" ]]; then
-        local parentdir="$(dirname "$dirfile")"
-        mkdir -p "$parentdir"
-    fi
+  local dirfile="$1"
+  if [[ -d "$dirfile" ]]; then
+    mkdir -p "$dirfile"
+
+  elif [[ -f "$dirfile" ]]; then
+    local parentdir="$(dirname "$dirfile")"
+    mkdir -p "$parentdir"
+  fi
 }
 
 function get_subfolder_list() {
 
-   #myfolder="/path/to/folder"
-   local myfolder="$1"
-   subfolders=$(find "$myfolder" -maxdepth 1 -mindepth 1 -type d | sort)
-   echo $subfolders
-   #for folder in $subfolders; do
-   #   echo "$folder"
-   #done
+  #myfolder="/path/to/folder"
+  local myfolder="$1"
+  subfolders=$(find "$myfolder" -maxdepth 1 -mindepth 1 -type d | sort)
+  echo $subfolders
+  #for folder in $subfolders; do
+  #   echo "$folder"
+  #done
 }
-
-
 
 function get_file_list() {
 
@@ -381,11 +420,4 @@ function get_file_list() {
 
 }
 
-
-
 echo "bin/utils.sh loaded"
-
-
-
-
-
