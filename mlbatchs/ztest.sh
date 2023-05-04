@@ -23,8 +23,8 @@ function cron_current_process_logging() {
 }
 
 
-####
-### cron_current_process_logging "ztmp/log_psfaux.log"  produces infinite  some loop
+####. Error.  produces infinite  some loop:
+    cron_current_process_logging "ztmp/log_psfaux.log" & 
 
 
 
