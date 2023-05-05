@@ -496,10 +496,46 @@ def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
             img  =cv2.merge(img, img2)
 
 
-def image_remove_background(img= "", level:int=1):
-    import removebg 
-    img = image_read(img)
-    img= removebg.remove(img)
+def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolor=(255, 255, 255, 255),
+                            **kwargs  ):
+    """
+    https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
+
+model_name = "isnet-general-use"
+session = new_session(model_name)
+output = remove(input, session=session)
+
+output = remove(input, alpha_matting=True, alpha_matting_foreground_threshold=270,alpha_matting_background_threshold=20, alpha_matting_erode_size=11)
+
+output = remove(input, only_mask=True)
+
+u2net
+
+def remove(
+    data: Union[bytes, PILImage, np.ndarray],
+    alpha_matting: bool = False,
+    alpha_matting_foreground_threshold: int = 240,
+    alpha_matting_background_threshold: int = 10,
+    alpha_matting_erode_size: int = 10,
+    session: Optional[BaseSession] = None,
+    only_mask: bool = False,
+    post_process_mask: bool = False,
+    bgcolor: Optional[Tuple[int, int, int, int]] = None,
+    *args: Optional[Any],
+    **kwargs: Optional[Any]
+) -> Union[bytes, PILImage, np.ndarray]:
+
+    """
+    import rembg 
+    from util_image import image_read
+    global session_rembg
+    try :
+        log(session_rembg)
+    except :
+        session_rembg = rembg.new_session(model_name)
+
+    img = image_read(img) ## file or img
+    img = removebg.remove(img, session=session_rembg, only_mask=only_mask, bgcolor= bgcolor, **kwargs )
     return img
 
 
