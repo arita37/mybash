@@ -1184,6 +1184,8 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     dirout  = dirout0 + f"/{t0}_{modeltag}/"
     os_makedirs(dirout)
     json_save(cc, dirout + "/cc_config.json")
+    json_save(cc, dirout + f"/{prompt}.txt")
+    
     dirout2  = dirout + f"/img/"
     os_makedirs(dirout2 +"/png/")
 
@@ -1195,9 +1197,9 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
         #### fine tuning Colab PRO: 100 - 500 images
         # images = pipe([prompt] * num_samples, height=height, width=width ,
         #               num_inference_steps=num_inference_steps).images
-        image = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
+        images = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
                         guidance_scale=6,  num_inference_steps=num_inference_steps).images
-        image=image[0]
+        # image=image[0]
 
         # display and save images
         for image in images:
