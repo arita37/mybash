@@ -422,7 +422,7 @@ def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
 #####################################################################################################
 
-def img_pipe_v0(dirimg="ztmp/*.png", nmax=5):
+def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
     """ 
 
     git clone 
@@ -460,7 +460,7 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5):
             fname     = imgfilek.split("/")[-1] 
             imgfile2 = dirp + f"/{dirparent}_{tag}/{fname}"
             os_makedirs(imgfile2)
-            image_save(img, dirfile=imgfile2)
+            if dry != 0 : image_save(img, dirfile=imgfile2)
             log(imgfile2)
 
         except Exception as e :
@@ -469,11 +469,7 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5):
 
 
 
-
-def  image_add_bike_color(img, co
-
-
-def img_pipe_v1(dirimg, nmax=5):
+def img_pipe_v1(dirimg, nmax=5, dry=1):
     """ 
 
     git clone 
@@ -493,26 +489,31 @@ def img_pipe_v1(dirimg, nmax=5):
 
      imgfiles = glob_glob(dirimg)
 
+    tag="sanmple"
     for ii, imgfilek in enuemrate(imgfiles) :
         try :
             img = image_read(imgfilek)
 
-            img = image_invert_colors(img)
-
-            img = image_remove_background(img)
+            img = image_resize_ratio(img, width=64, height= 64)
 
             img = image_add_border(img, colorname=color_random(), bordersize=1)
 
             img = image_add_bike_color(img, color_wheels= "black", color_frame= color_random(), )
 
-            img = image_resize_ratio(img, width=64, height= 64)
 
 
             t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
-            imgfile2 = imgfilek.replace("/imgs/", f"/imgs/{t0}")
+            #### Save New file
+            dirp      = "/".join(imgfilek.split("/")[:-2])
+            dirparent = imgfilek.split("/")[-2]
+            fname     = imgfilek.split("/")[-1] 
+            imgfile2 = dirp + f"/{dirparent}_{tag}/{fname}"
+            os_makedirs(imgfile2)
             image_save(img, dirfile=imgfile2)
+            if dry != 0 : image_save(img, dirfile=imgfile2)            
             log(imgfile2)
+
 
         except Exception as e :
             log(e)
