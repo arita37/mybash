@@ -452,7 +452,7 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
             if img2 is not None : ### Inverted from Black background to white one
                 img = img2
 
-            img = image_remove_background(img , bgcolor=(255,255,255)) ## white
+            img = image_remove_background(img , bgcolor=(255,255,255)) ## white background
 
             img = image_resize_ratio(img, width=64, height= 64)
 
