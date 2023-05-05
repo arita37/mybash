@@ -1149,6 +1149,8 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     from huggingface_hub import login
     login(hugging_token) ### alloe to fetch model details
 
+    dirmodel = os.path.abspath(dirmodel) ### huggingFace needs full absolute path, otherwise had issue.
+    log(dirmodel)
     stage_1 = DiffusionPipeline.from_pretrained(dirmodel)
     print("LOADED")
     stage_1.to(device)
