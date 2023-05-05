@@ -680,6 +680,18 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 
 
+###################################################################################################
+def imgdir_delete_empty(dirin="ztmp/dirout_img/*", dry=1):
+  from utilmy import glob_glob    
+  f2 = glob_glob( dirin  )
+  for fi in f2:
+    fcheck = glob_glob(fi  +"/**/*.*")
+    if len(fcheck)  < 3  :
+        log(fcheck)
+        fi2 =  fi.replace("/img/png", "/").replace("/img/", "/")
+        log(fi2)
+        if dry == 0 : os.system(f" rm -rf {fi2}")
+
 
 
 
