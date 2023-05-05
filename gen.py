@@ -1199,13 +1199,15 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
         #               num_inference_steps=num_inference_steps).images
         images = stage_1(prompt_embeds=prompt_embeds, negative_prompt_embeds=negative_embeds,
                         guidance_scale=6,  num_inference_steps=num_inference_steps).images
-        # image=image[0]
+        # image=images[0]
 
         # display and save images
         for image in images:
             prefix = prompt[:25].replace(" ", "_").replace(",", "-").replace(".", "-")
             image_name = dirout2 + f"/png/{prefix}--{ii}.png"
+            image.save(image_name)
             log(image_name)
+
             ii = ii +1
 
             if ii > max_image : return
