@@ -422,6 +422,55 @@ def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
 #####################################################################################################
 
+def img_pipe_v0(dirimg="ztmp/*.png", nmax=5):
+    """ 
+
+    git clone 
+    pip install -r py38img.txt
+
+
+    python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
+
+
+    iamge are locatd in
+          imgs/img-black_bike_white_background/*.*  
+
+
+    """
+    from utilmy import (glob_glob, os_makedirs, date_now)
+    from util_image import image_read,  image_resize_ratio
+
+    tag = "v0"  ## processing ID tag
+    imgfiles = glob_glob(dirimg)
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+
+    for ii, imgfilek in enuemrate(imgfiles) :
+        try :
+            img = image_read(imgfilek)
+
+            img = image_invert_colors(img)
+
+            img = image_remove_background(img , bgcolor=(255,255,255,255))
+
+            img = image_resize_ratio(img, width=64, height= 64)
+
+            #### Save New file
+            dirp      = "/".join(imgfilek.split("/")[:-2])
+            dirparent = imgfilek.split("/")[-2]
+            fname     = imgfilek.split("/")[-1] 
+            imgfile2 = dirp + f"/{dirparent}_{tag}/{fname}"
+            os_makedirs(imgfile2)
+            image_save(img, dirfile=imgfile2)
+            log(imgfile2)
+
+        except Exception as e :
+            log(e)
+            log(imgfilek)
+
+
+
+
+def  image_add_bike_color(img, co
 
 
 def img_pipe_v1(dirimg, nmax=5):
@@ -444,7 +493,7 @@ def img_pipe_v1(dirimg, nmax=5):
 
      imgfiles = glob_glob(dirimg)
 
-    for ii, imgfilek in enuemrate(imgfiles :
+    for ii, imgfilek in enuemrate(imgfiles) :
         try :
             img = image_read(imgfilek)
 
