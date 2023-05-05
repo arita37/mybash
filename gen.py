@@ -1127,6 +1127,8 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     max_image           = cc.pred.get('max_image', 1) if max_image is None else max_image
     max_loop               = cc.pred.get("max_loop", 1)
 
+    huggingtoken  = cc.pred.get("hugging_token", os.environ['hugging_token'] ) ### HUFFING token
+    
     if prompt is None :
        prompt       = cc.pred.get("prompt", " Design a black and white simple flat vector icon of a svg bicycle with 2 wheels with plain white background")
     prompt_negative = cc.pred.get('prompt_negative', " multiple bicyle with unclear background")
@@ -1143,6 +1145,10 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     import torch
     log("STAGE 1")
     modeltag="dfloyd10"
+
+    from huggingface_hub import login
+    login(huggingtoken) ### alloe to fetch model details
+
     stage_1 = DiffusionPipeline.from_pretrained(dirmodel)
     print("LOADED")
     stage_1.to(device)
