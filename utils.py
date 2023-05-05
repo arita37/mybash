@@ -448,6 +448,8 @@ def img_pipe_v1(dirimg, nmax=5):
         try :
             img = image_read(imgfilek)
 
+            img = image_invert_colors(img)
+
             img = image_remove_background(img)
 
             img = image_add_border(img, colorname=color_random(), bordersize=1)
