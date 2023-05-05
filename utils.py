@@ -450,7 +450,7 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
 
             img = image_invert_colors(img)
 
-            img = image_remove_background(img , bgcolor=(255,255,255,255))
+            img = image_remove_background(img , bgcolor=(255,255,255)) ## white
 
             img = image_resize_ratio(img, width=64, height= 64)
 
