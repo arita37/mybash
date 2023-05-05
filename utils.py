@@ -448,7 +448,9 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
         try :
             img = image_read(imgfilek)
 
-            img = image_invert_colors(img)
+            img2 = image_invert_colors(img)
+            if img2 is not None : ### Inverted from Black background to white one
+                img = img2
 
             img = image_remove_background(img , bgcolor=(255,255,255)) ## white
 
@@ -693,7 +695,7 @@ def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   save(list_invertcolor, "ztmp/list_invertcolor")       
 
 
-def image_invert_colors(image_path):
+def image_invert_colors(image_path, invert_only_dark_bg=1):
     ### Dark background --> white background  
     from PIL import Image
     import cv2
