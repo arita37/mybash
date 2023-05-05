@@ -468,6 +468,8 @@ def img_pipe_v1(dirimg, nmax=5):
             log(imgfilek)
 
 
+
+
 def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
     """
 
@@ -490,10 +492,6 @@ def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
             img2 = cv2.bitxor(maski, img)
             ## set color to img2 to black
             img  =cv2.merge(img, img2)
-
-
-
-
 
 
 def image_remove_background(img= "", level:int=1):
@@ -559,6 +557,17 @@ def color_getname(requested_colour=(255,0,0)):
 
 
 ##########################################################################################
+def global_index_create(name="list_invertcolor"):    
+  try :
+      # len(removebg_list)
+      globals()[name] = load( f"ztmp/{name}")
+      if globals()[name] is None :
+         globals()[name] = set()    
+
+  except :
+      globals()[name] = set() 
+
+
 def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   """ Ok, good to use for images
   
@@ -592,18 +601,6 @@ def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
          log("dry: ", fi)
   
   save(list_invertcolor, "ztmp/list_invertcolor")       
- 
-
-def global_index_create(name="list_invertcolor"):    
-  try :
-      # len(removebg_list)
-      globals()[name] = load( f"ztmp/{name}")
-      if globals()[name] is None :
-         globals()[name] = set()    
-
-  except :
-      globals()[name] = set() 
-
 
 
 def image_invert_colors(image_path):
@@ -643,6 +640,46 @@ def image_invert_colors(image_path):
         return inverted_image
     else:
         return None
+
+
+def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
+  """ Ok, not good creates some issues on ivnerted image
+  
+  """  
+  from utilmy import glob_glob, save, load, log
+  from util_image import image_read, image_save    
+  from rembg import remove
+
+
+  global list_removebg
+  global_index_create(name="list_removebg")
+
+  ii = 0
+  flist = glob_glob( dirin  )
+  flist = flist[:nmax]
+  # log(flist)
+  for  fi in flist:
+      if ii > nmax : return
+      if fi in list_removebg: continue
+
+      img = image_read(fi)  
+      img = remove(img)
+      if img is None : continue
+
+      ii = ii +1
+      if dry ==0 :
+         image_save(img, fi)
+         log(fi)
+         list_removebg.add(fi)
+      else :
+         log("dry: ", fi)
+  
+  save(list_removebg, "ztmp/list_removebg")       
+
+
+
+
+
 
 
 
