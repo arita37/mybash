@@ -1111,6 +1111,12 @@ def run_inference_deepfloyd(cfg="params_test", prompt=None, dirmodel=None, max_i
     # prompt = "Create a clean and simple color illustration of a bicycle in black, centered on a transparent background."
     # prompt ="Create a clean and simple SVG illustration of a bicycle on plain clear and clean white background."
 
+   ### for Floyd: 
+   prompt 'bicycle svg with border on the image edges with white color on white background" prompt
+   prompt "create a complete bicycle svg, all parts are inside image" negative="cropped, cropped wheel, semi wheel visible, zoom in,wheel cut at the right and left edge"
+
+YN
+
 
     """
     import torch
