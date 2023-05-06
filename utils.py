@@ -208,9 +208,6 @@ def img_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None,  dirout
     return masks
 
 
-
-
-
 def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict:
     """ tricks to get pints 
 
@@ -294,6 +291,9 @@ def show_all(image, masks, ddict):
     show_points(ddict['input_points'], ddict['input_labels_id'], plt.gca())
     plt.axis('off')
     plt.show() 
+
+
+
 
 
 
@@ -420,8 +420,8 @@ def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
     return seg_wheels
 
-#####################################################################################################
 
+#####################################################################################################
 def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
     """ 
 
@@ -523,31 +523,7 @@ def img_pipe_v1(dirimg, nmax=5, dry=1):
 
 
 
-
-def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
-    """
-
-    'right-wheel,left-wheel,bike,frame')
-
-    """
-    img = image_read(img)
-    maskdict = img_get_mask_bike(img_dir= img,     method="sam01")
-
-    for labeli, maski in maskdict.items()
-
-         if labeli == 'bike' :
-            img2 = cv2.bitxor(maski, img)
-            ## set color to img2 to red
-            img  =cv2.merge(img, img2)
-
-
-
-         if 'wheel' in label :
-            img2 = cv2.bitxor(maski, img)
-            ## set color to img2 to black
-            img  =cv2.merge(img, img2)
-
-
+#####################################################################################################
 def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolor=(255, 255, 255),
                             **kwargs  ):
     """
@@ -593,59 +569,49 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
     return img
 
 
+def image_get_mask_bike_v2(img= "", model_name="u2net", bgcolor=(255, 255, 255),
+                            **kwargs  ):
+    """ Return Mask only
+    https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
-def img_add_border(img, colorname='navy'):
+    https://github.com/danielgatis/rembg/blob/main/USAGE.md
 
-    img0 = image_read(img) ## nd array or filestring 
+        model_name = "isnet-general-use"
+        session = new_session(model_name)
+        output = remove(input, session=session)
 
-    colborder  = webcolors.name_to_rgb(colorname)
-    image = cv2.copyMakeBorder(img0, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, colborder)
-    image = image[:, :, ::-1]
-    img_arr = np.array(image)
-    img_arr[10: 50, 300 :370] = (255, 255, 255)
-    img_arr[10: 50, 10 :60] = (255, 255, 255)
-    img12 = Image.fromarray(img_arr)
+        output = remove(input, alpha_matting=True, alpha_matting_foreground_threshold=270,alpha_matting_background_threshold=20, alpha_matting_erode_size=11)
 
-    if os.environ.get('img_show', '0') = '1' :
-       plt.imshow(img12)
-       plt.axis('off')
-       plt.show()
+        output = remove(input, only_mask=True)
 
-    return img12
+        u2net
 
+        def remove(
+            data: Union[bytes, PILImage, np.ndarray],
+            alpha_matting: bool = False,
+            alpha_matting_foreground_threshold: int = 240,
+            alpha_matting_background_threshold: int = 10,
+            alpha_matting_erode_size: int = 10,
+            session: Optional[BaseSession] = None,
+            only_mask: bool = False,
+            post_process_mask: bool = False,
+            bgcolor: Optional[Tuple[int, int, int, int]] = None,
+            *args: Optional[Any],
+            **kwargs: Optional[Any]
+        ) -> Union[bytes, PILImage, np.ndarray]:
 
+    """
+    import rembg 
+    from util_image import image_read
+    global session_rembg
+    try :
+        session_rembg_mask
+    except :
+        session_rembg_mask = rembg.new_session(model_name)
 
-#####################################################################################################
-def test_color():
-   requested_colour = (119, 172, 152)
-   actual_name, closest_name = get_colour_name(requested_colour)
-   print("Actual colour name:", actual_name, ", closest colour name:", closest_name)
-
-
-def color_closest_color(requested_colour):
-    import webcolors    
-    min_colours = {}
-    for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
-        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-        rd = (r_c - requested_colour[0]) ** 2
-        gd = (g_c - requested_colour[1]) ** 2
-        bd = (b_c - requested_colour[2]) ** 2
-        min_colours[(rd + gd + bd)] = name
-    return min_colours[min(min_colours.keys())]
-
-
-def color_getname(requested_colour=(255,0,0)):
-    import webcolors    
-    try:
-        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
-    except ValueError:
-        closest_name = color_closest_color(requested_colour)
-        actual_name = None
-    return actual_name, closest_name
-
-
-
-
+    img = image_read(img) ## file or img
+    img = removebg.remove(img, session=session_rembg_mask, only_mask=True, bgcolor= bgcolor, **kwargs )
+    return img
 
 
 ##########################################################################################
@@ -769,6 +735,83 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   save(list_removebg, "ztmp/list_removebg")       
 
 
+
+
+#####################################################################################################
+def img_add_border(img, colorname='navy'):
+
+    img0 = image_read(img) ## nd array or filestring 
+
+    colborder  = webcolors.name_to_rgb(colorname)
+    image = cv2.copyMakeBorder(img0, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, colborder)
+    image = image[:, :, ::-1]
+    img_arr = np.array(image)
+    img_arr[10: 50, 300 :370] = (255, 255, 255)
+    img_arr[10: 50, 10 :60] = (255, 255, 255)
+    img12 = Image.fromarray(img_arr)
+
+    if os.environ.get('img_show', '0') = '1' :
+       plt.imshow(img12)
+       plt.axis('off')
+       plt.show()
+
+    return img12
+
+
+
+def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
+    """
+
+    'right-wheel,left-wheel,bike,frame')
+
+    """
+    img = image_read(img)
+    maskdict = img_get_mask_bike(img_dir= img,     method="sam01")
+
+    for labeli, maski in maskdict.items()
+
+         if labeli == 'bike' :
+            img2 = cv2.bitxor(maski, img)
+            ## set color to img2 to red
+            img  =cv2.merge(img, img2)
+
+
+
+         if 'wheel' in label :
+            img2 = cv2.bitxor(maski, img)
+            ## set color to img2 to black
+            img  =cv2.merge(img, img2)
+
+
+
+
+#####################################################################################################
+def test_color():
+   requested_colour = (119, 172, 152)
+   actual_name, closest_name = get_colour_name(requested_colour)
+   print("Actual colour name:", actual_name, ", closest colour name:", closest_name)
+
+
+def color_closest_color(requested_colour):
+    import webcolors    
+    min_colours = {}
+    for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
+        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+        rd = (r_c - requested_colour[0]) ** 2
+        gd = (g_c - requested_colour[1]) ** 2
+        bd = (b_c - requested_colour[2]) ** 2
+        min_colours[(rd + gd + bd)] = name
+    return min_colours[min(min_colours.keys())]
+
+
+def color_getname(requested_colour=(255,0,0)):
+    import webcolors    
+    try:
+        closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
+    except ValueError:
+        closest_name = color_closest_color(requested_colour)
+        actual_name = None
+    return actual_name, closest_name
 
 
 
