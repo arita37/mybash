@@ -154,9 +154,7 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
     python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
 
-
-    iamge are locatd in
-          imgs/img-black_bike_white_background/*.*
+    iamge are locatd in imgs/
 
 
     """
