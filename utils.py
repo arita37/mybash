@@ -78,7 +78,6 @@ def test3(dirimg="imgs/", name=""):
 
 
     image = cv2.imread( dirimg1 )
-    # (optional) resize the image if it is too big
     image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -104,14 +103,10 @@ def test3(dirimg="imgs/", name=""):
 
 
 #####################################################################################################
-def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
+def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
     """
 
-    git clone
-    pip install -r py38img.txt
-
-
-    python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
+    python utils.py  imp_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5   --tag "_v0"  --dry 1
 
 
     iamge are locatd in
@@ -122,27 +117,26 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
     from utilmy import (glob_glob, os_makedirs, date_now)
     from util_image import image_read,  image_resize_ratio
 
-    tag = "v0"  ## processing ID tag
     imgfiles = glob_glob(dirimg)
+    log('N files', len(imgfiles))
+    # log(imgfiles)
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
     for ii, imgfilek in enumerate(imgfiles) :
         try :
-            img = image_read(imgfilek)
+            img  = image_read(imgfilek)
 
             img2 = image_invert_colors(img)
-            if img2 is not None : ### Inverted from Black background to white one
-                img = img2
+            img  = img2 if img2 is not None  else img  ### Inverted from Black background to white one
 
             img = image_remove_background(img , bgcolor=(255,255,255)) ## white background
 
-            img = image_resize_ratio(img, width=64, height= 64)
+            img = image_resize_ratio(img,       width=64, height= 64)
+
 
             #### Save New file
-            dirp      = "/".join(imgfilek.split("/")[:-2])
-            dirparent = imgfilek.split("/")[-2]
-            fname     = imgfilek.split("/")[-1]
-            imgfile2 = dirp + f"/{dirparent}_{tag}/{fname}"
+            dirp, dirparent, fname = os_path_split(imgfilek)
+            imgfile2 = dirp + f"/{dirparent}{tag}/{fname}"
             os_makedirs(imgfile2)
             if dry != 0 : image_save(img, dirfile=imgfile2)
             log(imgfile2)
@@ -153,7 +147,7 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
 
 
 
-def img_pipe_v1(dirimg, nmax=5, dry=1):
+def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
     """
 
     git clone
@@ -172,8 +166,10 @@ def img_pipe_v1(dirimg, nmax=5, dry=1):
     from util_image import image_read,  image_resize_ratio
 
     imgfiles = glob_glob(dirimg)
+    log('N files: ', len(imgfiles))
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
-    tag="sanmple"
+
     for ii, imgfilek in enumerate(imgfiles) :
         try :
             img = image_read(imgfilek)
@@ -185,7 +181,6 @@ def img_pipe_v1(dirimg, nmax=5, dry=1):
             img = bike_add_color(img, color_wheels="black", color_bike=color_random_rgb(), )
 
 
-            t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
             #### Save New file
             dirp, dirparent, fname = os_path_split(imgfilek)
@@ -222,21 +217,16 @@ def test1():
     img_dir = 'imgs/bik5.png'
     bike_get_mask_wheel_v1(img_path=img_dir, verbose=1)
 
-
-def test2():
     dirimg1 = 'imgs/bik5.png'
     img = cv2.imread(dirimg1, cv2.IMREAD_COLOR)
 
     ret, img2 = cv2.threshold(img, 150, 255, cv2.THRESH_BINARY_INV)
-    cv2.imwrite('Image1.jpg', img2)
-    plt.imshow(img2)
-    plt.title('Image1');
-
     gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
     plt.imshow(gray)
 
 
-def bike_add_color(img, color_wheels="black", color_bike="red", ):
+
+def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
     """
 
     'right-wheel,left-wheel,bike,frame')
@@ -533,8 +523,8 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
     return img
 
 
-def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),
-                   **kwargs):
+
+def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),  **kwargs):
     """ Return Mask only
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
@@ -636,6 +626,8 @@ def global_index_create(name="list_invertcolor"):
   except :
       globals()[name] = set()
 
+  return  globals()[name]
+
 
 def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   """ Ok, good to use for images
@@ -648,7 +640,7 @@ def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 
   global list_invertcolor
-  global_index_create(name="list_invertcolor")
+  list_invertcolor = global_index_create(name="list_invertcolor")
 
   ii = 0
   flist = glob_glob( dirin  )
@@ -672,6 +664,7 @@ def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   save(list_invertcolor, "ztmp/list_invertcolor")
 
 
+
 def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   """ Ok, not good creates some issues on ivnerted image
 
@@ -682,7 +675,7 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 
   global list_removebg
-  global_index_create(name="list_removebg")
+  list_removebg = global_index_create(name="list_removebg")
 
   ii = 0
   flist = glob_glob( dirin  )
@@ -705,6 +698,7 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
          log("dry: ", fi)
 
   save(list_removebg, "ztmp/list_removebg")
+
 
 
 def imgdir_remove_badfiles(img_paths):
