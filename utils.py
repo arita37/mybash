@@ -56,7 +56,7 @@ def test10():
     input_points = np.array([[117, 771], [879, 738], [473, 320]])
     input_labels = np.array([1, 1, 0])
 
-    image = image_read("ztmp/imgs/bk5.png")
+    image = image_read("imgs/bk5.png")
 
     plt.figure(figsize=(10,10))
     plt.imshow(image)
@@ -69,7 +69,7 @@ def test10():
 
 def test11():
     log("""### Read the image and display it""")
-    image = cv2.imread('images/BTgKexLec.png')
+    image = cv2.imread('imgs/bik5.png')
     # (optional) resize the image if it is too big
     image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -295,7 +295,7 @@ def test1():
     plt.imshow(wheel)
     plt.title('Wheels')
 
-    img_dir = 'sample_data/images.png'
+    img_dir = 'imgs/bik5.png'
     bike_get_mask_wheel_v1(img_path=img_dir, verbose=1)
 
 
