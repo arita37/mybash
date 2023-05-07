@@ -720,7 +720,6 @@ def imgdir_remove_badfiles(dirin="imgs/**/*.png", dry=1):
 
 
 
-
 def imgdir_delete_empty(dirin="ztmp/dirout_img/*", dry=1):
   from utilmy import glob_glob
   f2 = glob_glob( dirin  )
