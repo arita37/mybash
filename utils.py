@@ -22,14 +22,18 @@
 
 
 """
-import fire, os, sys, cv2
-from box import Box
-import numpy as np, webcolors
+import os
+import sys
+
+import cv2
+import fire
 import matplotlib.pyplot as plt
+import numpy as np
+import webcolors
+from box import Box
 from PIL import Image
+from utilmy import log, os_makedirs
 
-
-from utilmy import (log, os_makedirs)
 from util_image import image_read, image_save
 
 
@@ -112,8 +116,9 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
 
 
     """
-    from utilmy import (glob_glob, os_makedirs, date_now)
-    from util_image import image_read,  image_resize_ratio
+    from utilmy import date_now, glob_glob, os_makedirs
+
+    from util_image import image_read, image_resize_ratio
 
     imgfiles = glob_glob(dirimg)
     log('N files', len(imgfiles))
@@ -121,13 +126,12 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
     for ii, imgfilek in enumerate(imgfiles) :
-        try :
             img  = image_read(imgfilek)
 
             img2 = image_invert_colors(img)
             img  = img2 if img2 is not None  else img  ### Inverted from Black background to white one
 
-            img = image_remove_background(img , bgcolor=(255,255,255)) ## white background
+            img = image_remove_background(img , bgcolor=(255,255,255, 255)) ## white background
 
             img = image_resize_ratio(img,       width=64, height= 64)
 
@@ -138,10 +142,6 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
             os_makedirs(imgfile2)
             if dry != 0 : image_save(img, dirfile=imgfile2)
             log(imgfile2)
-
-        except Exception as e :
-            log(e)
-            log(imgfilek)
 
 
 
@@ -160,8 +160,9 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
 
     """
-    from utilmy import (glob_glob, os_makedirs, date_now)
-    from util_image import image_read,  image_resize_ratio
+    from utilmy import date_now, glob_glob, os_makedirs
+
+    from util_image import image_read, image_resize_ratio
 
     imgfiles = glob_glob(dirimg)
     log('N files: ', len(imgfiles))
@@ -169,7 +170,7 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
 
     for ii, imgfilek in enumerate(imgfiles) :
-        try :
+        # try :
             img = image_read(imgfilek)
 
             img = image_resize_ratio(img, width=64, height= 64)
@@ -182,15 +183,15 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
             #### Save New file
             dirp, dirparent, fname = os_path_split(imgfilek)
-            imgfile2 = dirp + f"/{dirparent}_{tag}/{fname}"
+            imgfile2 = dirp + f"./{dirparent}_{tag}/{fname}"
             os_makedirs(imgfile2)
             if dry != 0 : image_save(img, dirfile=imgfile2)
             log(imgfile2)
 
 
-        except Exception as e :
-            log(e)
-            log(imgfilek)
+        # except Exception as e :
+        #     log(e)
+        #     log(imgfilek)
 
 
 def os_path_split(path):
@@ -246,7 +247,7 @@ def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
             img  =cv2.merge(img, img2)
 
 
-def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png'):
+def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png', verbose=0):
     image = cv2.imread(img_dir, cv2.IMREAD_COLOR)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -263,7 +264,10 @@ def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png'):
         # Loop through the detected circles and draw them on the image
         for (x, y, radius) in circles:
             cv2.circle(image, (x, y), radius, (255, 0, 0), 2)
-
+    
+    if verbose>0: 
+        plt.imshow(image)
+        plt.show()
     return circles
 
 
@@ -310,7 +314,8 @@ def bike_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
     res = cv2.merge([seg_wheels, red, thresh])
     plt.imshow(res)
     plt.title('Annotated image')
-
+    if verbose > 0:
+        plt.show()
     return seg_wheels
 
 
@@ -318,17 +323,18 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
     ####. get wheel mask
     # 04) Segmentation using SegmentAnything Model (SAM)
 
-    image = cv2.imread(img_dir)
+    image = image_read(img_dir)
     # (optional) resize the image if it is too big
     image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     if points is None:
         ddict = bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')
-        points  = ddict['input_points']
-        labels  = ddict['input_labels_id']
+        points  = np.array(ddict['input_points'])
+        labels  = np.array(ddict['input_labels_id'])
 
-
+    print(points, labels, multimask_output)
+    print(type(points), type(labels))
     if method == "sam01":
         global predictor ### 1 Single Global model
         if "predictor" not in globals() :  #### Not yet initialized
@@ -340,7 +346,7 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
             point_labels=labels,
             multimask_output=multimask_output, # default True which returns 3 masks with scores
         )
-
+    
     return masks
 
 
@@ -349,7 +355,7 @@ def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict
 
     """
     h, w = image.shape[:2]
-
+    print(h, w)
     partlist = part.split(",")
     ddict = {}
     for part in partlist :
@@ -360,7 +366,7 @@ def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict
             for i in range(int(w / 2)):
                 # if we find a black pixel, break the loop, otherwise, keep looping until we reach the
                 # end of the image (image is supposed to have 3 channels with black and white pixels)
-                if image[y, x][0] == 0:
+                if image[y, min(x, w-1)][0] == 0:
                     break
                 x += int(w / 32)
 
@@ -369,7 +375,7 @@ def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict
             x = 0
 
             for i in range(int(w / 2)):
-                if image[y, x][0] == 0:
+                if image[y, min(x, w-1)][0] == 0:
                     break
                 x += int(w / 32)
 
@@ -378,7 +384,7 @@ def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict
             x = int(w / 2)
 
             for i in range(h):
-                if image[y, x][0] == 0:
+                if image[y, min(x, w-1)][0] == 0:
                     break
                 y += 1
 
@@ -393,10 +399,10 @@ def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict
             ddict[part] = (x,y)
 
     dd= Box({ 'input_points':   [],
-              'input_label_id': [],
+              'input_labels_id': [],
               'input_labels':   [],
     })
-    for ii, label, xy in enumerate(ddict.items()):
+    for ii, (label, xy) in enumerate(ddict.items()):
        dd['input_points'].append( xy ) #= np.array([[xr, yr], [xl, yl], [xb, yb]])
        dd['input_labels_id'].append( ii ) #= np.array([1, 1, 1])
        dd['input_labels'].append( label ) #= np.array([1, 1, 1])
@@ -476,7 +482,7 @@ def image_add_border(img, colorname='navy', bordersize=1):
     return img2
 
 
-def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolor=(255, 255, 255),
+def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolor=(255, 255, 255, 255),
                             **kwargs  ):
     """
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
@@ -509,6 +515,7 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
 
     """
     import rembg
+
     from util_image import image_read
     global session_rembg
     try :
@@ -554,6 +561,7 @@ def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),  **kwarg
 
     """
     import rembg
+
     from util_image import image_read
     global session_rembg_mask
     try :
@@ -568,13 +576,13 @@ def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),  **kwarg
 
 def image_invert_colors(img, invert_only_dark_bg=1):
     ### Dark background --> white background
-    from PIL import Image
     import cv2
     import numpy as np
+    from PIL import Image
+
     from util_image import image_read
-
     image = image_read(img)
-
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2RGBA)
     # Split the image into its 4 channels (R, G, B, and A)
     b, g, r, a = cv2.split(image)
 
@@ -632,9 +640,10 @@ def imgdir_invertcolor(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 
   """
-  from utilmy import glob_glob, save, load, log
-  from util_image import image_read, image_save
   from rembg import remove
+  from utilmy import glob_glob, load, log, save
+
+  from util_image import image_read, image_save
 
 
   global list_invertcolor
@@ -667,9 +676,10 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
   """ Ok, not good creates some issues on ivnerted image
 
   """
-  from utilmy import glob_glob, save, load, log
-  from util_image import image_read, image_save
   from rembg import remove
+  from utilmy import glob_glob, load, log, save
+
+  from util_image import image_read, image_save
 
 
   global list_removebg
@@ -701,8 +711,9 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 def imgdir_remove_badfiles(dirin="imgs/**/*.png", dry=1):
   import os
+
   from PIL import Image
-  from  utilmy import (glob_glob)
+  from utilmy import glob_glob
 
   imglist = glob_glob(dirin)
   log('Nfiles', len(imglist))
@@ -753,10 +764,10 @@ def mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", 
     :return:
     """
     import torch
-    from segment_anything import sam_model_registry, SamPredictor
+    from segment_anything import SamPredictor, sam_model_registry
     sam_checkpoint = same_checkpoint
     model_type = model_type
-    device = device
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device=device)
@@ -837,14 +848,13 @@ def setup_colab():
     print("Torchvision version:", torchvision.__version__)
     print("CUDA is available:", torch.cuda.is_available())
     import sys
+
     #!{sys.executable} -m pip install opencv-python matplotlib
     #!{sys.executable} -m pip install 'git+https://github.com/facebookresearch/segment-anything.git'
-
     # download some images
     # !mkdir images
     #!wget -P images http://clipart-library.com/images/BTgKexLec.png
     #!wget -P images http://clipart-library.com/newimages/bicycle-clip-art-15.png
-
     #!wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
 
 
@@ -854,7 +864,7 @@ def setup_colab():
 
 ###################################################################################################
 if __name__ == "__main__":
-    fire.Fire()
+    img_pipe_v0()
 
 
 
