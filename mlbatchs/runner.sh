@@ -1,30 +1,6 @@
 #!/bin/bash
 info=" Generic Batch launcher
 
-################ TODO
-ask with those folders patterns
-
-   latest/
-
-        YMD_task01/run.sh  :     Only starts > YMD_0000 date (at midnight YMD, in Japan time)
-                                 Done
-
-        YMD-HM_task01/run.sh  :  Only starts > YMD_HM date (in Japan time)
-        HM_task01/run.sh  :      Only starts >  H hour M minutes on today's  date ( in Japan time)
-
-       
-        task01/run.sh  :              Starts at any time.
-        task01_nodelete/run.sh  :     Starts at any time.
-
-
-
-
-
-
-
-
-
-
      ## Example
      ###### Run all scripts in test/  in debug modee,  1 hour maxttime,  below CPU 20% usage,  below 50% ram usage
      ./runner.sh debug  test/  3600   20   50
@@ -70,14 +46,15 @@ maxtime=$3         && [ -z $3 ] &&  maxtime=60
 mincpu=$4          && [ -z $4 ] &&  mincpu=15 
 minram=$5          && [ -z $5 ] &&  minram=100
 
-echo $mmode
+maxtime=36000
+
 if  [[  "$mmode" == *"debug"* ]]; then
    mincpu=60
    minram=100
    maxtime=30
 fi
-
 instance_mode="$mmode"
+
 
 
 ########## LOGS ######################################################
@@ -88,19 +65,30 @@ echo  -e "###Start ${ymdhs} \n" 2>&1 | tee  "${LOGFILE7}"
 
 
 
+
 ########## Source ####################################################
 source ../bins/utils.sh
 nowjp || exit 1
 
 echo "RAM usage $(ram_get_usage)"
-  
+
+
+
+###########Check Parms ###############################################
+echo2   "mode: $mmode"            
+echo2   "Task folder: $dirin"     
+echo2   "MaxTime:     $maxtime"   
+echo2  "\n#########Batch Loop #######################\n"
+
 
 ######################################################################
-# Run Script in each sub-folder. #####################################
+echo2  "\n#########Run batch loop ####################################\n"
+
+mkdir -p "ztmp/" &&  echo "" > "ztmp/ztmp_pid.txt"    
 t0_unix=$(date +%s)
 subfolders=$(find "$dirin" -maxdepth 1 -mindepth 1 -type d | sort)
 for dirk0 in $subfolders; do
-#for dirk0 in  $dirin/* ;  do
+
    dirk=${dirk0%*/}      # remove the trailing "/"  
    dirk="${dirk##*/}"    # print everything after the final "
    echo2 "## $dirk"
@@ -108,7 +96,9 @@ for dirk0 in $subfolders; do
    if [[ $dirk == *"readme"* ]]; then continue; fi  
 
    dirnew="done/$ymd/$dirk/"    #### If dir exist prevent 2nd runs for _nodelete
-   if [ -d "$dirnew" ]; then  continue; fi  
+   if [ -d "$dirnew" ]; then  
+      echo "task already done, skipping" ; continue; 
+   fi  
 
    #### Check if script date is below than today's date
    dtscript=$(date_extract "$dirk")
@@ -120,7 +110,6 @@ for dirk0 in $subfolders; do
    echo2  "### $dirk  start: $(nowjp)"    
    subfolders2=$(find "$dirin/$dirk" -name "*.sh" -maxdepth 1 -mindepth 1 -type f | sort)
    for script in $subfolders2; do 
-   #for script in $dirin/$dirk/*.sh;  do
 
       if [[ $script == *"*"* ]]; then continue; fi    
 
@@ -136,11 +125,8 @@ for dirk0 in $subfolders; do
       # echo $dirnew
 
       mkdir -p $dirnew
-      if [[  $mmode   == *"debug"* ]]; then
+      if [[  $mmode   == *"debug"* || $script == *"nodelete"*  ]]; then
           cp "$script" "$dirnew" ;    echo2  "COPY $script TO $dirnew"  
-
-      elif [[ $script == *"nodelete"* ]]; then
-          cp $script "$dirnew" ;      echo2  "COPY $script TO $dirnew"  
 
       else
           mv $script $dirnew ;        echo2  "MOVE $script TO $dirnew"            
@@ -166,27 +152,26 @@ for dirk0 in $subfolders; do
     time_diff=$((tnow - t0_unix))
     echo $time_diff
     if [[ $time_diff -gt $maxtime ]]; then
-       echo2 "#### Max Time Limit: $maxtime, Stop Instance in 300s "  
-       gitpushforce  "from batch: $(nowjp) - stop instance"
-       sleep 300 #### Safety              
-       mlinstance_stop   2>&1 | tee -a "${LOGFILE7}"
+          echo2 "#### Max Time Limit, Stop Instance "  
+          gitpushforce  "from batch: $(nowjp) - stop instance"
+          sleep 300 #### Safety              
+          mlinstance_stop   2>&1 | tee -a "${LOGFILE7}"
 
        exit 1
     fi
 
-
-    # bin/bash runner.sh ---> All the (sub-PIDS, cmd_name)
-    #### Exit if not more python process running ##################### 
+    #### Exit if not more python process running :  ##################### 
     curr_pid="$(get_current_shell_pid)"
-    get_subprocess "$curr_pid" > "./ztmp.txt"
-    cmd_list=$(cat  "./ztmp.txt" )
+    get_subprocess "$curr_pid" > "ztmp/ztmp_pid.txt"  ### BE Careful this is a recursive call, cannot embed in other function
+    cmd_list=$(cat  "ztmp/ztmp_pid.txt" )
     echo "##cmd: $cmd_list"
 
     if [[  "$cmd_list" != *"python"* &&  "$cmd_list" != *"latest"*  ]]; then
-       echo2 "No more python, latest/run.sh process running"
-       break
+         echo2 "No more python, latest/run.sh process running"
+         break
     fi
     sleep 20
+
 
 
     cpu_get_avg_usage   2>&1 | tee -a "${LOGFILE7}"
@@ -212,7 +197,7 @@ if [[ "$mmode" == *"stop"*  ]]; then
     echo "Instance Stopped in 300sec" 2>&1 | tee -a "${LOGFILE7}"
     gitpushforce  "batch_runner: $(nowjp) - stop instance"       
 
-    sleep 300  ### Safety , dont lower this level
+    sleep 400  ### Safety , dont lower this level
     mlinstance_stop    
 
 else 
