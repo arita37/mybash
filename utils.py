@@ -543,8 +543,8 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
     return img
 
 
-def bike_get_mask_v2(img="", model_name="u2net", bgcolor=(255, 255, 255),
-                           **kwargs):
+def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),
+                   **kwargs):
     """ Return Mask only
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
