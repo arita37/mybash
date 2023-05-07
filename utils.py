@@ -701,16 +701,24 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 
 
-def imgdir_remove_badfiles(img_paths):
+def imgdir_remove_badfiles(dirin="imgs/**/*.png", dry=1):
   import os
   from PIL import Image
-  for filename in img_paths:
+  from  utilmy import (glob_glob)
+  
+  imglist = glob_glob(dirin)
+  log('Nfiles', len(imglist))
+  
+  
+  for filename in imglist:
     try :
         with Image.open( filename) as im:
              a = 1
     except :
-        print("img corrupted, del ", filename)
-        os.remove(filename)
+        if dry == 0 : os.remove(filename)
+        print("img corrupeted, del ", filename)
+
+
 
 
 def imgdir_delete_empty(dirin="ztmp/dirout_img/*", dry=1):
