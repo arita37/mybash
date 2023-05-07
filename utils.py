@@ -46,7 +46,7 @@ from PIL import Image
 
 
 from utilmy import (log, os_makedirs)
-from util_image import image_read 
+from util_image import image_read, image_save
 
 
 ####################################################################################
@@ -56,25 +56,7 @@ def test10():
     input_points = np.array([[117, 771], [879, 738], [473, 320]])
     input_labels = np.array([1, 1, 0])
 
-    plt.figure(figsize=(10,10))
-    plt.imshow(image)
-    show_points(input_points, input_labels, plt.gca())
-    plt.axis('on')
-    plt.show()
-
-    log("""### Get the mask of the wheels and display it""")
-    masks = img_get_mask_wheel(points=input_points, labels=input_labels, img_dir='images/BTgKexLec.png', dirout="", method="sam01")
-
-    plt.figure(figsize=(10,10))
-    # plt.imshow(image)
-    show_mask(masks, plt.gca())
-    # show_points(input_points, input_labels, plt.gca())
-    plt.axis('off')
-    plt.show()
-
-    log("""### Display the points and labels of the bike""")
-    input_points = np.array([[117, 771], [879, 738], [473, 320]])
-    input_labels = np.array([1, 1, 1])
+    image = image_read("ztmp/imgs/bk5.png")
 
     plt.figure(figsize=(10,10))
     plt.imshow(image)
@@ -82,15 +64,7 @@ def test10():
     plt.axis('on')
     plt.show()
 
-    log("""### Get the mask of the bike and display it""")
-    masks = img_get_mask_frame(points=input_points, labels=input_labels, img_dir='images/BTgKexLec.png', dirout="", method="one")
 
-    plt.figure(figsize=(10,10))
-    # plt.imshow(image)
-    show_mask(masks, plt.gca())
-    # show_points(input_points, input_labels, plt.gca())
-    plt.axis('off')
-    plt.show()
 
 
 def test11():
@@ -115,7 +89,7 @@ def test3(dirimg="imgs/", name=""):
     #### Find one image
     from utilmy import glob_glob
     flist = glob_glob(dirimg + "/**/*")
-    flist = [fi.replace("\\", "/") for fir in flist]
+    flist = [fi.replace("\\", "/") for fi in flist]
     flist = [ fi for fi in flist if name in fi.split("/")[-1] ]
     dirimg1 = flist[0]
 
@@ -129,8 +103,8 @@ def test3(dirimg="imgs/", name=""):
     log("### All   ")
     ddict = bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')
     # ddict['input_points']  ddict['input_labels_id']  ddict['input_labels']
-    masks = img_get_mask(points=ddict['input_points'], labels=ddict['input_labels_id'], 
-                         img_dir= dirimg1,    dirout="ztmp/out/", method="sam01")
+    masks = bike_get_mask_bike(points=ddict['input_points'], labels=ddict['input_labels_id'],
+                                     img_dir= dirimg1, dirout="ztmp/out/", method="sam01")
 
     show_all(image, masks, ddict)
 
@@ -138,8 +112,8 @@ def test3(dirimg="imgs/", name=""):
 
     log("### Left Wheel   ")
     ddict = bike_get_input_points(image, part='right-wheel')
-    masks = img_get_mask(points=ddict['input_points'], labels=ddict['input_labels_id'], 
-                         img_dir= dirimg1,    dirout="ztmp/out/", method="sam01")
+    masks = bike_get_mask_bike(points=ddict['input_points'], labels=ddict['input_labels_id'],
+                                     img_dir= dirimg1, dirout="ztmp/out/", method="sam01")
  
     show_all(image, masks, ddict)
 
@@ -179,7 +153,7 @@ def model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", devic
     return predictor
 
 
-def img_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None,  dirout="", method="sam01", multimask_output=False):
+def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout="", method="sam01", multimask_output=False):
     ####. get wheel mask
 
     image = cv2.imread(img_dir)
@@ -299,7 +273,7 @@ def show_all(image, masks, ddict):
 
 
 ####################################################################################
-def img_files_badfile(img_paths):
+def imgdir_remove_badfiles(img_paths):
   import os 
   from PIL import Image
   for filename in img_paths:
@@ -316,13 +290,13 @@ def img_files_badfile(img_paths):
 #########################################################################################
 # 01) OpenCV 1 Segmentation"""
 def test1():
-    wheel = img_get_mask_wheel()
+    wheel = bike_get_mask_wheel_v1()
 
     plt.imshow(wheel)
     plt.title('Wheels')
 
     img_dir = 'sample_data/images.png'
-    img_get_mask_wheel(img_path=img_dir, verbose=1)
+    bike_get_mask_wheel_v1(img_path=img_dir, verbose=1)
 
 
 def test2():
@@ -340,9 +314,9 @@ def test2():
     img3 =img[50:280, 55:415]
     plt.imshow(img3[:, :, ::-1]);
 
-    plt.imshow(image)
+    plt.imshow(img)
 
-    img = cv2.imread('/content/drive/MyDrive/image_bicycle.png', cv2.IMREAD_COLOR)
+    img = cv2.imread(dirimg1, cv2.IMREAD_COLOR)
 
     image = img
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -352,7 +326,7 @@ def test2():
     min(gray.shape)
 
 
-def img_get_mask_wheel_v1(img_dir='imgs/bik5.png'):
+def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png'):
     image = cv2.imread(img_dir, cv2.IMREAD_COLOR)    
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -374,7 +348,7 @@ def img_get_mask_wheel_v1(img_dir='imgs/bik5.png'):
 
 
 
-def img_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
+def bike_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
 
     # Load input image
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
@@ -444,7 +418,7 @@ def img_pipe_v0(dirimg="ztmp/*.png", nmax=5, dry=1):
     imgfiles = glob_glob(dirimg)
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
-    for ii, imgfilek in enuemrate(imgfiles) :
+    for ii, imgfilek in enumerate(imgfiles) :
         try :
             img = image_read(imgfilek)
 
@@ -492,15 +466,15 @@ def img_pipe_v1(dirimg, nmax=5, dry=1):
     imgfiles = glob_glob(dirimg)
 
     tag="sanmple"
-    for ii, imgfilek in enuemrate(imgfiles) :
+    for ii, imgfilek in enumerate(imgfiles) :
         try :
             img = image_read(imgfilek)
 
             img = image_resize_ratio(img, width=64, height= 64)
 
-            img = image_add_border(img, colorname=color_random(), bordersize=1)
+            img = image_add_border(img, colorname=color_random_rgb(), bordersize=1)
 
-            img = image_add_bike_color(img, color_wheels= "black", color_frame= color_random(), )
+            img = bike_add_color(img, color_wheels="black", color_frame=color_random_rgb(), )
 
 
 
@@ -565,12 +539,12 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
         session_rembg = rembg.new_session(model_name)
 
     img = image_read(img) ## file or img
-    img = removebg.remove(img, session=session_rembg, only_mask=only_mask, bgcolor= bgcolor, **kwargs )
+    img = rembg.remove(img, session=session_rembg, only_mask=only_mask, bgcolor= bgcolor, **kwargs )
     return img
 
 
-def image_get_mask_bike_v2(img= "", model_name="u2net", bgcolor=(255, 255, 255),
-                            **kwargs  ):
+def bike_get_mask_v2(img="", model_name="u2net", bgcolor=(255, 255, 255),
+                           **kwargs):
     """ Return Mask only
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
@@ -603,24 +577,28 @@ def image_get_mask_bike_v2(img= "", model_name="u2net", bgcolor=(255, 255, 255),
     """
     import rembg 
     from util_image import image_read
-    global session_rembg
+    global session_rembg_mask
     try :
         session_rembg_mask
     except :
         session_rembg_mask = rembg.new_session(model_name)
 
     img = image_read(img) ## file or img
-    img = removebg.remove(img, session=session_rembg_mask, only_mask=True, bgcolor= bgcolor, **kwargs )
+    img = rembg.remove(img, session=session_rembg_mask, only_mask=True, bgcolor= bgcolor, **kwargs )
     return img
 
 
 ##########################################################################################
-def global_index_create(name="list_invertcolor"):    
+def global_index_create(name="list_invertcolor"):
+  """ Global VAR from disk to prevent duplicate processing
+
+  """
   try :
       # len(removebg_list)
+      from utilmy import load
       globals()[name] = load( f"ztmp/{name}")
       if globals()[name] is None :
-         globals()[name] = set()    
+         globals()[name] = set()   ### This is a dict
 
   except :
       globals()[name] = set() 
@@ -738,46 +716,41 @@ def imgdir_removebg(dirin="ztmp/dirout_img/**/*.png", nmax=1, dry=1):
 
 
 #####################################################################################################
-def img_add_border(img, colorname='navy'):
+def image_add_border(img, colorname='navy', bordersize=1):
 
     img0 = image_read(img) ## nd array or filestring 
 
-    colborder  = webcolors.name_to_rgb(colorname)
-    image = cv2.copyMakeBorder(img0, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, colborder)
-    image = image[:, :, ::-1]
-    img_arr = np.array(image)
-    img_arr[10: 50, 300 :370] = (255, 255, 255)
-    img_arr[10: 50, 10 :60] = (255, 255, 255)
-    img12 = Image.fromarray(img_arr)
 
-    if os.environ.get('img_show', '0') = '1' :
-       plt.imshow(img12)
+    colborder  = webcolors.name_to_rgb(colorname) if isinstance(colorname, str) else colorname
+
+    img2 = cv2.copyMakeBorder(img0, bordersize, bordersize, bordersize, bordersize, cv2.BORDER_CONSTANT, None, colborder)
+
+    if os.environ.get('image_show', '0') == '1' :
+       plt.imshow(img2)
        plt.axis('off')
        plt.show()
 
-    return img12
+    return img2
 
 
 
-def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
+def  bike_add_color(img, color_wheels="black", color_bike="red", ):
     """
 
     'right-wheel,left-wheel,bike,frame')
 
     """
     img = image_read(img)
-    maskdict = img_get_mask_bike(img_dir= img,     method="sam01")
+    maskdict = bike_get_mask_bike(img_dir= img, method="sam01")
 
-    for labeli, maski in maskdict.items()
+    for labeli, maski in maskdict.items():
 
          if labeli == 'bike' :
             img2 = cv2.bitxor(maski, img)
             ## set color to img2 to red
             img  =cv2.merge(img, img2)
 
-
-
-         if 'wheel' in label :
+         if 'wheel' in labeli :
             img2 = cv2.bitxor(maski, img)
             ## set color to img2 to black
             img  =cv2.merge(img, img2)
@@ -785,14 +758,24 @@ def  image_add_bike_color(img, color_wheels= "black", color_bike= "red", ):
 
 
 
+
 #####################################################################################################
 def test_color():
    requested_colour = (119, 172, 152)
-   actual_name, closest_name = get_colour_name(requested_colour)
+   actual_name, closest_name = color_getname_fromrgb(requested_colour)
    print("Actual colour name:", actual_name, ", closest colour name:", closest_name)
 
 
-def color_closest_color(requested_colour):
+def color_random_rgb():
+    import random
+    r = random.randint(0, 255)
+    g = random.randint(0, 255)
+    b = random.randint(0, 255)
+    return (r, g, b)
+
+
+
+def color_getname_closest_fromrgb(requested_colour=(255, 0, 0)):
     import webcolors    
     min_colours = {}
     for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
@@ -804,12 +787,12 @@ def color_closest_color(requested_colour):
     return min_colours[min(min_colours.keys())]
 
 
-def color_getname(requested_colour=(255,0,0)):
+def color_getname_fromrgb(requested_colour=(255, 0, 0)):
     import webcolors    
     try:
         closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
     except ValueError:
-        closest_name = color_closest_color(requested_colour)
+        closest_name = color_getname_closest_fromrgb(requested_colour)
         actual_name = None
     return actual_name, closest_name
 
