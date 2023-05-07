@@ -154,7 +154,9 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
     python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
 
-    iamge are locatd in imgs/
+
+    iamge are locatd in
+          imgs/img-black_bike_white_background/*.*
 
 
     """
@@ -235,14 +237,17 @@ def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
     for labeli, maski in maskdict.items():
 
          if labeli == 'bike' :
-            img2 = cv2.bitxor(maski, img)
+            img2 = cv2.bitwise_xor(img, img, np.array(maski, dtype=np.uint8))
             ## set color to img2 to red
             img  =cv2.merge(img, img2)
 
          if 'wheel' in labeli :
-            img2 = cv2.bitxor(maski, img)
+            img2 = cv2.bitwise_xor(img, img, np.array(maski, dtype=np.uint8))
             ## set color to img2 to black
             img  =cv2.merge(img, img2)
+    plt.imshow(img)
+    plt.show()
+    return img
 
 
 def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png', verbose=0):
@@ -323,7 +328,7 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
 
     image = image_read(img_dir)
     # (optional) resize the image if it is too big
-    image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
+    # image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     if points is None:
@@ -342,10 +347,10 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
         masks, scores, logits = predictor.predict(
             point_coords=points,
             point_labels=labels,
-            multimask_output=multimask_output, # default True which returns 3 masks with scores
+            multimask_output=True, # default True which returns 3 masks with scores
         )
     
-    return masks
+    return dict(zip(ddict['input_labels'], masks))
 
 
 def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict:
