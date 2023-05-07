@@ -182,19 +182,15 @@ def img_pipe_v1(dirimg, nmax=5, dry=1):
 
             img = image_add_border(img, colorname=color_random_rgb(), bordersize=1)
 
-            img = bike_add_color(img, color_wheels="black", color_frame=color_random_rgb(), )
-
+            img = bike_add_color(img, color_wheels="black", color_bike=color_random_rgb(), )
 
 
             t0 = date_now(fmt="%Y%m%d_%H%M%S")
 
             #### Save New file
-            dirp      = "/".join(imgfilek.split("/")[:-2])
-            dirparent = imgfilek.split("/")[-2]
-            fname     = imgfilek.split("/")[-1]
+            dirp, dirparent, fname = os_path_split(imgfilek)
             imgfile2 = dirp + f"/{dirparent}_{tag}/{fname}"
             os_makedirs(imgfile2)
-            image_save(img, dirfile=imgfile2)
             if dry != 0 : image_save(img, dirfile=imgfile2)
             log(imgfile2)
 
@@ -204,7 +200,13 @@ def img_pipe_v1(dirimg, nmax=5, dry=1):
             log(imgfilek)
 
 
+def os_path_split(path):
+    path = path.replace("\\", "/")
+    dirp      = "/".join(path.split("/")[:-2])
+    dirparent = path.split("/")[-2]
+    fname     = path.split("/")[-1]
 
+    return dirp, dirparent, fname
 
 
 
@@ -460,7 +462,7 @@ def bike_clean_v1(img0):
 
     # Merge the masked original image and the masked white background image
     result = cv2.add(masked_img, white_bg_masked)
-    
+
     return result
 
     # Show the result
