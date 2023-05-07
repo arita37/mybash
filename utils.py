@@ -10,8 +10,6 @@
        pip install reqs.txt
 
    ### Example:
-       python utils.py test3  --dirimg imgs/    --name ""
-
        python utils.py test10
 
 
@@ -568,14 +566,14 @@ def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),  **kwarg
     return img
 
 
-def image_invert_colors(image_path, invert_only_dark_bg=1):
+def image_invert_colors(img, invert_only_dark_bg=1):
     ### Dark background --> white background
     from PIL import Image
     import cv2
     import numpy as np
+    from util_image import image_read
 
-    image = Image.open(image_path).convert('RGBA')
-    image = np.array(image)
+    image = image_read(img)
 
     # Split the image into its 4 channels (R, G, B, and A)
     b, g, r, a = cv2.split(image)
@@ -705,11 +703,11 @@ def imgdir_remove_badfiles(dirin="imgs/**/*.png", dry=1):
   import os
   from PIL import Image
   from  utilmy import (glob_glob)
-  
+
   imglist = glob_glob(dirin)
   log('Nfiles', len(imglist))
-  
-  
+
+
   for filename in imglist:
     try :
         with Image.open( filename) as im:
@@ -717,6 +715,7 @@ def imgdir_remove_badfiles(dirin="imgs/**/*.png", dry=1):
     except :
         if dry == 0 : os.remove(filename)
         print("img corrupeted, del ", filename)
+
 
 
 
