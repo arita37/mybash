@@ -416,6 +416,57 @@ def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict
 
 
 
+def bike_clean_v1(img0):
+    ### One way to clean image
+
+    img = image_read((img0))
+    # Convert the image to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply thresholding to obtain a binary image
+    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    # Use morphological operations to fill holes and remove noise
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+
+    # Find the contours of the connected components in the binary image
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Identify the contour with the largest area, which corresponds to the background
+    max_contour = max(contours, key=cv2.contourArea)
+
+    # Create a new image with the same size as the original image and fill it with white color
+    new_img = np.full_like(img, (255, 255, 255))
+
+    # Draw the identified background contour on the new image
+    cv2.drawContours(new_img, [max_contour], -1, (0, 0, 0), -1)
+
+    # Create a mask of the background contour
+    mask = np.zeros(gray.shape, dtype=np.uint8)
+    cv2.drawContours(mask, [max_contour], -1, 255, -1)
+
+    # Apply the mask to the original image
+    masked_img = cv2.bitwise_and(img, img, mask=mask)
+
+    # Invert the mask
+    mask_inv = cv2.bitwise_not(mask)
+
+    # Create a white background image
+    white_bg = np.full_like(img, (255, 255, 255))
+
+    # Apply the inverted mask to the white background image
+    white_bg_masked = cv2.bitwise_and(white_bg, white_bg, mask=mask_inv)
+
+    # Merge the masked original image and the masked white background image
+    result = cv2.add(masked_img, white_bg_masked)
+    
+    return result
+
+    # Show the result
+    #cv2_imshow(result)
+
+
 
 #####################################################################################################
 def image_add_border(img, colorname='navy', bordersize=1):
@@ -565,6 +616,9 @@ def image_invert_colors(image_path, invert_only_dark_bg=1):
 
 
 
+
+
+
 ##########################################################################################
 def global_index_create(name="list_invertcolor"):
   """ Global VAR from disk to prevent duplicate processing
@@ -692,9 +746,9 @@ def mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", 
     tqdm
     gdown
     # https://pypi.org/project/segment-anything-py/1.0/
-    
-    
-    :return: 
+
+
+    :return:
     """
     import torch
     from segment_anything import sam_model_registry, SamPredictor
