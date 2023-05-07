@@ -146,7 +146,7 @@ for dirk0 in $subfolders; do
    rm_empty_folder "$dirin/$dirk/"
 
 
-  ### Check if the CPU usage is low. #################################
+  ### Max Run time limit #################################
   while true; do
     tnow=$(date +%s)
     time_diff=$((tnow - t0_unix))
@@ -155,7 +155,7 @@ for dirk0 in $subfolders; do
           echo2 "#### Max Time Limit, Stop Instance "  
           gitpushforce  "from batch: $(nowjp) - stop instance"
           sleep 300 #### Safety              
-          mlinstance_stop   2>&1 | tee -a "${LOGFILE7}"
+          instance_stop   2>&1 | tee -a "${LOGFILE7}"
 
        exit 1
     fi
@@ -198,7 +198,7 @@ if [[ "$mmode" == *"stop"*  ]]; then
     gitpushforce  "batch_runner: $(nowjp) - stop instance"       
 
     sleep 400  ### Safety , dont lower this level
-    mlinstance_stop    
+    instance_stop    
 
 else 
     gitpushforce  "batch_runner: $(nowjp) "       
