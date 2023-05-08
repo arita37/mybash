@@ -170,7 +170,7 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
 
     for ii, imgfilek in enumerate(imgfiles) :
-        # try :
+        try :
             img = image_read(imgfilek)
 
             img = image_resize_ratio(img, width=64, height= 64)
@@ -189,9 +189,9 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
             log(imgfile2)
 
 
-        # except Exception as e :
-        #     log(e)
-        #     log(imgfilek)
+        except Exception as e :
+             log(e)
+             log(imgfilek)
 
 
 def os_path_split(path):
