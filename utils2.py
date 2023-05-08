@@ -103,6 +103,7 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
     """
 
     python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5   --tag "_v0"  --dry 1
+    python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/Design_a_single_black_bic--9 --nmax 5   --tag "_v0"  --dry 1
 
 
     iamge are locatd in
@@ -144,8 +145,8 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
     pip install -r py38img.txt
 
 
-    python utils.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
-
+    python utils2.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
+    python utils2.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/Image_0.png  --nmax 5
 
     iamge are locatd in
           imgs/img-black_bike_white_background/*.*
@@ -468,9 +469,11 @@ def image_add_border(img, colorname='navy', bordersize=1):
     return img2
 
 
-def image_remove_background(img="", model_name="u2net", only_mask=False, bgcolor=(255, 255, 255, 255),
+def image_remove_background(img="", model_name="isnet-general-use", only_mask=False, bgcolor=(255, 255, 255, 255),
                             **kwargs):
     """
+    python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/Design_a_single_black_bic--37.png --nmax 5   --tag "_v0"  --dry 1
+
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
     https://github.com/danielgatis/rembg/blob/main/USAGE.md
@@ -503,6 +506,7 @@ def image_remove_background(img="", model_name="u2net", only_mask=False, bgcolor
     import rembg
 
     from util_image import image_read
+
     global session_rembg
     try:
         session_rembg
@@ -510,11 +514,18 @@ def image_remove_background(img="", model_name="u2net", only_mask=False, bgcolor
         session_rembg = rembg.new_session(model_name)
 
     img = image_read(img)  ## file or img
-    img = rembg.remove(img, session=session_rembg, only_mask=only_mask, bgcolor=bgcolor, **kwargs)
+    img = rembg.remove(img,
+                       #alpha_matting=True,
+                       alpha_matting_foreground_threshold=220,
+                       alpha_matting_background_threshold=10,
+                       alpha_matting_erode_size=6,
+                       session=session_rembg)
+    img = rembg.remove(img, only_mask=only_mask, bgcolor=bgcolor, kwargs=kwargs)
+
     return img
 
 
-def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255), **kwargs):
+def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255, 255), **kwargs):
     """ Return Mask only
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
