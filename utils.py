@@ -181,6 +181,7 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
                 continue
 
             img = image_resize_ratio(img, width=64, height= 64)
+            # img = image_png_to_svg4(  png_file_path="",  png_output_file_path="",  xmax=64 , ymax= 64)
 
             img = image_add_border(img, colorname=color_random_rgb(), bordersize=1)
 
