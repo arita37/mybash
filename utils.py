@@ -841,6 +841,92 @@ def color_getname_fromrgb(requested_colour=(255, 0, 0)):
     return actual_name, closest_name
 
 
+########################################################################################
+def img_rescale(dirimg, scale=1):
+    #image_name2 =   dirout2 + "/svg/"+str(int(time.time())) +".png"
+    #image_png_to_svg3(image_name, svg_file_path=image_name2, scale_factor= resolution)
+
+
+    # ppm_path=image_name.replace("png","ppm")
+    # svg_path=ppm_path.replace("ppm","svg")
+    # svg_scaled =svg_path.replace(".svg","_20.svg")
+    
+    #subprocess.call(["convert","-flatten",image_name,ppm_path])
+    #subprocess.call(["potrace","-s",ppm_path,"-o",svg_path])
+    #svg_scale(svg_path,svg_scaled,resolution)
+    
+    #os.remove(svg_path)
+    #os.remove(ppm_path)
+    # image.show()
+    pass
+
+
+
+
+def image_png_to_svg1(png_file_path: str, svg_file_path: str):
+    from cairosvg import svg2png
+    from PIL import Image
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path)
+
+    # Convert the PNG image to SVG format
+    svg_image = svg2png(bytestring=png_image.tobytes(), write_to=svg_file_path)
+
+
+    # Save the SVG image to disk
+    with open(svg_file_path, 'wb') as f:
+        f.write(svg_image)
+
+
+def image_png_to_svg3(png_file_path: str, svg_file_path: str, scale_factor=0.25):
+    """
+
+     brew install cairo
+     brew install py3cairo
+     pip install pycairo
+
+     conda install -c conda-forge pygobject
+     png_file_path="imgs/img-black_bike_white_background/bik5.png"
+     svg_file_path="ztmp/bik.png"
+     scale_factor=10
+
+     image_png_to_svg3(png_file_path, svg_file_path, scale_factor=0.25)
+
+    """
+    import cairo
+
+    surface = cairo.ImageSurface.create_from_png(png_file_path)
+    ctx = cairo.Context(surface)
+
+    ctx.scale(scale_factor, scale_factor)
+    surface.write_to_png(svg_file_path)
+
+
+
+def image_png_to_svg2(png_file_path: str, svg_file_path: str, xmax: int, ymax: int):
+
+    from svglib.svglib import svg2rlg
+    from reportlab.graphics import renderPDF, renderPM
+    from PIL import Image
+
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path)
+
+    # Convert the PNG image to SVG format
+    drawing = svg2rlg(png_file_path)
+    scale_x = float(xmax) / drawing.width
+    scale_y = float(ymax) / drawing.height
+    drawing.width, drawing.height = xmax, ymax
+    drawing.scale(scale_x, scale_y)
+    renderPM.drawToFile(drawing, svg_file_path, fmt='SVG')
+
+
+def image_svg_scale(input1,output,resolution):
+  fig = sg.fromfile(input1)
+  fig.set_size((str(resolution),str(resolution)))
+  fig.save(output)
 
 
 ########################################################################################
