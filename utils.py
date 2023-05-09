@@ -133,7 +133,7 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
 
             img = image_remove_background(img , bgcolor=(255,255,255, 255)) ## white background
 
-            img = image_resize_ratio(img,       width=64, height= 64)
+            # img = image_resize_ratio(img,       width=64, height= 64)
 
 
             #### Save New file
