@@ -100,7 +100,7 @@ def test3(dirimg="imgs/", name=""):
 
 
 #####################################################################################################
-def img_pipe_v0(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v0"):
+def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
     """
 
     python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5   --tag "_v0"  --dry 1
@@ -147,7 +147,7 @@ def img_pipe_v1(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v1"):
 
 
     python utils2.py  img_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
-    python utils2.py  img_pipe_v1  ---imgs/toclean/*/*.png  --nmax 5 dry=1, tag="_v1"
+    python utils2.py  img_pipe_v1  ---imgs/toclean/*.png  --nmax 5 dry=1, tag="_v1"
 
     iamge are locatd in
           imgs/img-black_bike_white_background/*.*
@@ -163,11 +163,11 @@ def img_pipe_v1(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v1"):
     imgfiles = glob_glob(dirimg)
     log('N files: ', len(imgfiles))
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
-    print('img_pipv1')
+
     for ii, imgfilek in enumerate(imgfiles):
         try:
 
-            print('img_pipv1')
+
             img = image_read(imgfilek)
             isok = classify_image_v2(img)
             if isok == 0:
@@ -228,7 +228,7 @@ def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
     'right-wheel,left-wheel,bike,frame')
 
     """
-    print('bike_add_color')
+
     img = image_read(img)
     maskdict = bike_get_mask_bike(img_dir= img, method="sam01")
 
@@ -469,7 +469,7 @@ def image_add_border(img, colorname='navy', bordersize=1):
 
     #img0 = image_read(img) ## nd array or filestring
     img = image_read(img)
-    print('border')
+
     colborder  = webcolors.name_to_rgb(colorname) if isinstance(colorname, str) else colorname
 
     img2 = cv2.copyMakeBorder(img, bordersize, bordersize, bordersize, bordersize, cv2.BORDER_CONSTANT, None, colborder)
