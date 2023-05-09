@@ -485,7 +485,7 @@ def image_add_border(img, colorname='navy', bordersize=1):
     return img2
 
 
-def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolor=(255, 255, 255, 255),
+def image_remove_background(img= "", model_name="isnet-general-use", only_mask=False, bgcolor=(255, 255, 255, 255),
                             **kwargs  ):
     """
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
@@ -500,7 +500,7 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
 
         output = remove(input, only_mask=True)
 
-        u2net
+        isnet-general-use
 
         def remove(
             data: Union[bytes, PILImage, np.ndarray],
@@ -532,7 +532,7 @@ def image_remove_background(img= "", model_name="u2net", only_mask=False, bgcolo
 
 
 
-def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),  **kwargs):
+def image_get_mask(img="", model_name="isnet-general-use", bgcolor=(255, 255, 255),  **kwargs):
     """ Return Mask only
     https://github.com/danielgatis/rembg/blob/main/rembg/bg.py
 
@@ -546,7 +546,7 @@ def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255),  **kwarg
 
         output = remove(input, only_mask=True)
 
-        u2net
+        isnet-general-use
 
         def remove(
             data: Union[bytes, PILImage, np.ndarray],
