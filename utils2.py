@@ -169,6 +169,7 @@ def img_pipe_v1(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v1"):
 
 
             img = image_read(imgfilek)
+
             isok = classify_image_v2(img)
             if isok == 0:
                 log('bad image, skip', imgfilek)
@@ -229,20 +230,32 @@ def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
 
     """
 
-    img = image_read(img)
+
     maskdict = bike_get_mask_bike(img_dir= img, method="sam01")
+
+
+    #img = image_read(img)
+
+    color_wheels = webcolors.name_to_rgb(color_wheels) if isinstance(color_wheels, str) else color_wheels
+
+    color_bike = webcolors.name_to_rgb(color_bike) if isinstance(color_bike, str) else color_bike
 
     for labeli, maski in maskdict.items():
 
          if labeli == 'bike' :
-            img2 = cv2.bitwise_xor(img, img, np.array(maski, dtype=np.uint8))
-            ## set color to img2 to red
-            img  =cv2.merge(img, img2)
+             maski = np.array(maski, dtype=np.uint8)
+             img2 = cv2.bitwise_and(img, img, mask=maski)
+             img2[np.where((img2 == [0, 0, 0]).all(axis=2))] = color_bike
+             img = cv2.addWeighted(img, 1, img2, 0.7, 0)
 
          if 'wheel' in labeli :
-            img2 = cv2.bitwise_xor(img, img, np.array(maski, dtype=np.uint8))
-            ## set color to img2 to black
-            img  =cv2.merge(img, img2)
+             maski = np.array(maski, dtype=np.uint8)
+             img2 = cv2.bitwise_and(img, img, mask=maski)
+             img2[np.where((img2 == [0, 0, 0]).all(axis=2))] = color_wheels
+             img = cv2.addWeighted(img, 1, img2, 0.7, 0)
+
+
+
     plt.imshow(img)
     plt.show()
     return img
@@ -339,7 +352,7 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
     if method == "sam01":
         global predictor  ### 1 Single Global model
         if "predictor" not in globals():  #### Not yet initialized
-            predictor = mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda")
+            predictor = mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h") #, device="cuda"
         predictor.set_image(image)
 
         masks, scores, logits = predictor.predict(
@@ -751,7 +764,7 @@ def imgdir_delete_empty(dirin="ztmp/dirout_img/*", dry=1):
 
 
 ####################################################################################
-def mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda"):
+def mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h"): #, device="cuda"
     """
    ### SAM
     segment-anything-py
