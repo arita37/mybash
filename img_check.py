@@ -27,7 +27,7 @@ from utilmy.images.util_image import image_read
 
 
 ####################################################################################
-def run_classifier(dirin="", dirout="ztmp/classifier/", mode="v2")
+def run_classifier(dirin="", dirout="ztmp/classifier/", mode="v2"):
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
     dirout2 = dirout + f"/{t0}/"
     os_makedirs(dirout2)
