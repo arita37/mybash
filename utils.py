@@ -869,6 +869,52 @@ def img_rescale(dirimg, scale=1):
 
 
 
+def image_png_to_svg4(  png_file_path: str,  png_output_file_path: str,  xmax: int, ymax: int,):
+    import potrace
+    import numpy as np
+    from PIL import Image
+    import cairosvg
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path).convert("L")  # Convert to grayscale
+    # Threshold the image and convert it to a numpy array
+    bitmap = np.array(png_image) > 128
+
+    # Create a potrace bitmap from the numpy array
+    potrace_bitmap = potrace.Bitmap(bitmap)
+
+    # Create a potrace path from the bitmap
+    path = potrace_bitmap.trace()
+
+    # Calculate the scaling factors
+    scale_x = float(xmax) / png_image.width
+    scale_y = float(ymax) / png_image.height
+
+    # Create the SVG file
+    svg_file_path="ztmp/tmp.svg"
+    with open(svg_file_path, "w") as f:
+        f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+        f.write(
+            f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{xmax}" height="{ymax}">\n'
+        )
+        for curve in path:
+            f.write(
+                f'<path d="M{curve.start_point.x * scale_x},{curve.start_point.y * scale_y}'
+            )
+            for segment in curve:
+                if segment.is_corner:
+                    f.write(f"L{segment.c.x * scale_x},{segment.c.y * scale_y}")
+                else:
+                    f.write(
+                        f"C{segment.c1.x * scale_x},{segment.c1.y * scale_y} {segment.c2.x * scale_x},{segment.c2.y * scale_y} {segment.end_point.x * scale_x},{segment.end_point.y * scale_y}"
+                    )
+            f.write(f'" fill="none" stroke="black" stroke-width="{10}"/>\n')
+
+        f.write("</svg>\n")
+
+    # Convert the SVG file to PNG
+    cairosvg.svg2png(url=svg_file_path, write_to=png_output_file_path)
+
 
 def image_png_to_svg1(png_file_path: str, svg_file_path: str):
     from cairosvg import svg2png
