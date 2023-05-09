@@ -30,6 +30,7 @@ import fire
 import matplotlib.pyplot as plt
 import numpy as np
 import webcolors
+import torch
 from box import Box
 from PIL import Image
 from utilmy import log, os_makedirs
@@ -99,11 +100,11 @@ def test3(dirimg="imgs/", name=""):
 
 
 #####################################################################################################
-def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
+def img_pipe_v0(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v0"):
     """
 
     python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5   --tag "_v0"  --dry 1
-    python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/Design_a_single_black_bic--9 --nmax 5   --tag "_v0"  --dry 1
+    python utils2.py  img_pipe_v0  ---dirimg imgs/toclean/*.* --nmax 5   --tag "_v0"  --dry 1
 
 
     iamge are locatd in
@@ -128,7 +129,7 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
 
         img = image_remove_background(img, bgcolor=(255, 255, 255, 255))  ## white background
 
-        img = image_resize_ratio(img, width=64, height=64)
+        #img = image_resize_ratio(img, width=64, height=64)
 
         #### Save New file
         dirp, dirparent, fname = os_path_split(imgfilek)
@@ -138,15 +139,15 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
         log(imgfile2)
 
 
-def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
+def img_pipe_v1(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v1"):
     """
 
     git clone
     pip install -r py38img.txt
 
 
-    python utils2.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
-    python utils2.py  imp_pipe_v1  ---dirimg imgs/img-black_bike_white_background/Image_0.png  --nmax 5
+    python utils2.py  img_pipe_v1  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5
+    python utils2.py  img_pipe_v1  ---imgs/toclean/*/*.png  --nmax 5 dry=1, tag="_v1"
 
     iamge are locatd in
           imgs/img-black_bike_white_background/*.*
@@ -157,15 +158,25 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
 
     from util_image import image_read, image_resize_ratio
 
+    from img_check import classify_image_v2, classify_image_v1
+
     imgfiles = glob_glob(dirimg)
     log('N files: ', len(imgfiles))
     t0 = date_now(fmt="%Y%m%d_%H%M%S")
-
+    print('img_pipv1')
     for ii, imgfilek in enumerate(imgfiles):
         try:
-            img = image_read(imgfilek)
 
-            img = image_resize_ratio(img, width=64, height=64)
+            print('img_pipv1')
+            img = image_read(imgfilek)
+            isok = classify_image_v2(img)
+            if isok == 0:
+                log('bad image, skip', imgfilek)
+                continue
+
+
+
+            #img = image_resize_ratio(img, width=64, height=64)
 
             img = image_add_border(img, colorname=color_random_rgb(), bordersize=1)
 
@@ -211,26 +222,27 @@ def test1():
     plt.imshow(gray)
 
 
-def bike_add_color(img, color_wheels=(0, 0, 0), color_bike=(255, 0, 0), ):
+def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
     """
 
     'right-wheel,left-wheel,bike,frame')
 
     """
+    print('bike_add_color')
     img = image_read(img)
-    maskdict = bike_get_mask_bike(img_dir=img, method="sam01")
+    maskdict = bike_get_mask_bike(img_dir= img, method="sam01")
 
     for labeli, maski in maskdict.items():
 
-        if labeli == 'bike':
+         if labeli == 'bike' :
             img2 = cv2.bitwise_xor(img, img, np.array(maski, dtype=np.uint8))
             ## set color to img2 to red
-            img = cv2.merge(img, img2)
+            img  =cv2.merge(img, img2)
 
-        if 'wheel' in labeli:
+         if 'wheel' in labeli :
             img2 = cv2.bitwise_xor(img, img, np.array(maski, dtype=np.uint8))
             ## set color to img2 to black
-            img = cv2.merge(img, img2)
+            img  =cv2.merge(img, img2)
     plt.imshow(img)
     plt.show()
     return img
@@ -454,17 +466,19 @@ def bike_clean_v1(img0):
 
 #####################################################################################################
 def image_add_border(img, colorname='navy', bordersize=1):
-    img0 = image_read(img)  ## nd array or filestring
 
-    colborder = webcolors.name_to_rgb(colorname) if isinstance(colorname, str) else colorname
+    #img0 = image_read(img) ## nd array or filestring
+    img = image_read(img)
+    print('border')
+    colborder  = webcolors.name_to_rgb(colorname) if isinstance(colorname, str) else colorname
 
-    img2 = cv2.copyMakeBorder(img0, bordersize, bordersize, bordersize, bordersize, cv2.BORDER_CONSTANT, None,
-                              colborder)
+    img2 = cv2.copyMakeBorder(img, bordersize, bordersize, bordersize, bordersize, cv2.BORDER_CONSTANT, None, colborder)
+
 
     if os.environ.get('image_show', '0') == '1':
-        plt.imshow(img2)
-        plt.axis('off')
-        plt.show()
+       plt.imshow(img2)
+       plt.axis('off')
+       plt.show()
 
     return img2
 
@@ -849,4 +863,4 @@ def setup_colab():
 
 ###################################################################################################
 if __name__ == "__main__":
-    img_pipe_v0()
+    img_pipe_v1()
