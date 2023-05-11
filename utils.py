@@ -108,7 +108,7 @@ def test3(dirimg="imgs/", name=""):
 def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
     """
 
-    python utils.py  imp_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5   --tag "_v0"  --dry 1
+    python utils.py  imp_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 500   --tag "_v0"  --dry 1
 
 
     iamge are locatd in
@@ -142,7 +142,6 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
             os_makedirs(imgfile2)
             if dry != 0 : image_save(img, dirfile=imgfile2)
             log(imgfile2)
-
 
 
 def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
@@ -200,6 +199,242 @@ def img_pipe_v1(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v1"):
         except Exception as e :
              log(e)
              log(imgfilek)
+
+
+def img_pipe_v2(dirimg="imgs/**/*.png", dirout="ztmp/img_v1/", 
+                nmax=5, dry=0, tag="_v1"):
+    """
+    git clone
+    pip install -r py38img.txt
+
+
+    python utils.py  img_pipe_v1  ---dirimg "ztmp/img_v0/*"  --nmax 500
+
+
+    iamge are locatd in
+          imgs/img-black_bike_white_background/*.*
+
+
+    """
+    from utilmy import date_now, glob_glob, os_makedirs
+
+    from util_image import image_read, image_resize_ratio
+    from img_check import  classify_image_v2,  classify_image_v1, classify_voters
+
+
+    imgfiles = glob_glob(dirimg)
+    log('N files: ', len(imgfiles))
+    t0 = date_now(fmt="%Y%m%d_%H%M%S")
+
+
+    for ii, imgfilek in enumerate(imgfiles) :
+        try :
+            if ii > nmax: continue
+            img = image_read(imgfilek)
+
+            isok =  classify_voters(img, modellist=None)
+            if isok ==0 :
+                log('bad image, skip', imgfilek)
+                continue
+
+            # img = image_resize_ratio(img, width=64, height= 64)
+            # img = image_png_to_svg4(  png_file_path="",  png_output_file_path="",  xmax=64 , ymax= 64)
+            mask = BikeExtractor(img)
+            # img2 = image_invert_colors(img)
+            # img  = img2 if img2 is not None  else img  ### Inverted from Black background to white one            
+ 
+            #img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+            #img[:,:,0] = img[:,:,0] * 25
+
+            # Create a red background image
+            red_background = np.zeros_like(img)
+            red_background[:, :, 0] = np.random.randint(40, 100)
+
+            # Merge the image with the mask and red background
+            result = cv2.bitwise_and(img, img, mask=mask)
+            img = cv2.add(result, cv2.bitwise_and(red_background, red_background, mask=cv2.bitwise_not(mask)))
+
+
+
+            img = image_add_border(img, colorname=color_random_rgb(), bordersize=30)
+
+            # img = bike_add_color(img, color_wheels="black", color_bike="black", )
+
+
+
+            #### Save New file
+            dirp, dirparent, fname = os_path_split(imgfilek)
+            # imgfile2 = dirout + f"./{dirparent}_{tag}/{fname}"
+            imgfile2 = dirout + f"/{fname}"
+
+            os_makedirs(imgfile2)
+            if dry != 1 : image_save(img, dirfile=imgfile2)
+            log(imgfile2)
+
+
+        except Exception as e :
+             log(e)
+             log(imgfilek)
+
+
+def BikeExtractor(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    img = frame
+    # Histogram Analysis------------------------------------------
+    bins = np.zeros(256, np.int32)
+    L1 = round(img.shape[0]/4)
+    L2 = round(img.shape[0]-img.shape[0]/4)
+    L3 = round(img.shape[1]/4)
+    L4 = round(img.shape[1]-img.shape[1]/4)
+    for i in range(L1,L2): # use loop for extracting the histogram data
+        for j in range(L3,L4):
+            intensity = img[i,j,2]
+            bins[intensity] += 1
+
+    # Analysis of Corner of Image---------------------------------
+    L = len(hsv[0])
+    L_10p = round(L/10) # 10% of the actual length from corner
+    four_v = [np.sum(hsv[L_10p:L_10p+5,L_10p:L_10p+5,2])/25,
+              np.sum(hsv[L_10p:L_10p+5,L-L_10p:L-L_10p-5,2])/25,
+              np.sum(hsv[L-L_10p:L-L_10p-5,L_10p:L_10p+5,2])/25,
+              np.sum(hsv[L-L_10p:L-L_10p-5,L-L_10p:L-L_10p-5,2])/25]
+    
+    vmax_corner = round(np.max(four_v))
+    vmid_corner = round(np.mean(four_v))
+
+    
+    # Use 3 Strategies for dark/ light/ mid-graybackground--------
+    hmin = 0
+    hmax = 180
+    smin = 0
+    smax = 255
+    vmin = 0
+    vmax = 255
+    
+    InverseFlag = False
+    if(vmax_corner<100):
+        #dark
+        vmin = vmax_corner*2 - round(vmid_corner*1.7)
+        vmax = 255
+    elif(vmax_corner>200):
+        #light
+        vmin = 0
+        vmax = vmax_corner - vmid_corner
+    else:
+        #mid
+        vmin = vmid_corner*2
+        vmax = vmax_corner + vmid_corner
+        InverseFlag = True
+
+    A1 =  round(np.sum(bins[0:45]) / ((img.shape[0]*img.shape[1]/2)/5),2)
+    A2 =  round(np.sum(bins[-45:]) / ((img.shape[0]*img.shape[1]/2)/5),2)
+    
+    if (A1 + A2) > 1 and vmax_corner<220 and vmax_corner> 80:
+        vmin = vmid_corner*2
+        vmax = vmax_corner + vmid_corner
+        InverseFlag = True
+
+    
+    # Extract the Bike with HSV-------------------------------------
+    lower_hsv = np.array([hmin, smin, vmin])
+    upper_hsv = np.array([hmax, smax, vmax])
+    
+    mask = cv2.inRange(hsv, lower_hsv, upper_hsv) # extract mask
+
+    if not InverseFlag:
+        mask2 = mask.copy()
+        for i in range(len(mask)):
+            for j in range(len(mask[0])):
+                mask2[i,j] = 255 if mask[i,j]==0 else 0
+        mask = mask2.copy()
+        
+    # res = cv2.bitwise_and(frame, frame, mask = mask)# Extract bike from image - turn background black
+    return mask
+
+
+
+
+def BikeExtractor2(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    img = frame
+    # Histogram Analysis------------------------------------------
+    bins = np.zeros(256, np.int32)
+    L1 = round(img.shape[0]/4)
+    L2 = round(img.shape[0]-img.shape[0]/4)
+    L3 = round(img.shape[1]/4)
+    L4 = round(img.shape[1]-img.shape[1]/4)
+    for i in range(L1,L2): # use loop for extracting the histogram data
+        for j in range(L3,L4):
+            intensity = img[i,j,2]
+            bins[intensity] += 1
+
+    # Analysis of Corner of Image---------------------------------
+    L = len(hsv[0])
+    L_10p = round(L/10) # 10% of the actual length from corner
+    four_v = [np.sum(hsv[L_10p:L_10p+5,L_10p:L_10p+5,2])/25,
+              np.sum(hsv[L_10p:L_10p+5,L-L_10p:L-L_10p-5,2])/25,
+              np.sum(hsv[L-L_10p:L-L_10p-5,L_10p:L_10p+5,2])/25,
+              np.sum(hsv[L-L_10p:L-L_10p-5,L-L_10p:L-L_10p-5,2])/25]
+    
+    vmax_corner = round(np.max(four_v))
+    vmid_corner = round(np.mean(four_v))
+
+    
+    # Use 3 Strategies for dark/ light/ mid-graybackground--------
+    hmin = 0
+    hmax = 180
+    smin = 0
+    smax = 255
+    vmin = 0
+    vmax = 255
+    
+    InverseFlag = False
+    if(vmax_corner<100):
+        #dark
+        vmin = vmax_corner*2 - round(vmid_corner*1.7)
+        vmax = 255
+    elif(vmax_corner>200):
+        #light
+        vmin = 0
+        vmax = vmax_corner - vmid_corner
+    else:
+        #mid
+        vmin = vmid_corner*2
+        vmax = vmax_corner + vmid_corner
+        InverseFlag = True
+
+    A1 =  round(np.sum(bins[0:45]) / ((img.shape[0]*img.shape[1]/2)/5),2)
+    A2 =  round(np.sum(bins[-45:]) / ((img.shape[0]*img.shape[1]/2)/5),2)
+    
+    if (A1 + A2) > 1 and vmax_corner<220 and vmax_corner> 80:
+        vmin = vmid_corner*2
+        vmax = vmax_corner + vmid_corner
+        InverseFlag = True
+        # InverseFlag = False        
+
+    
+    # Extract the Bike with HSV-------------------------------------
+    lower_hsv = np.array([hmin, smin, vmin])
+    upper_hsv = np.array([hmax, smax, vmax])
+    
+    mask = cv2.inRange(hsv, lower_hsv, upper_hsv) # extract mask
+
+    if InverseFlag:
+        mask2 = mask.copy()
+        for i in range(len(mask)):
+            for j in range(len(mask[0])):
+                mask2[i,j] = 255 if mask[i,j]==0 else 0
+                # mask2[i,j] = 0 if mask[i,j]==0 else 255
+
+        mask = mask2.copy()
+     
+    return mask    
+    #res = cv2.bitwise_and(frame, frame, mask = mask)# Extract bike from image - turn background black
+    #return res
+
+
+
+
 
 
 def os_path_split(path):
@@ -330,10 +565,15 @@ def bike_get_mask_wheel_v2(img_path='imgs/bik5.png', verbose=1):
     return seg_wheels
 
 
-def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout="", method="sam01", multimask_output=False):
-    ####. get wheel mask
-    # 04) Segmentation using SegmentAnything Model (SAM)
+def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout="", method="sam01", multimask_output=False,
 
+
+    ):
+    """ Segmentation using SegmentAnything Model (SAM)
+
+
+
+    """
     image = image_read(img_dir)
     # (optional) resize the image if it is too big
     # image = cv2.resize(image, None, fx=0.2, fy=0.2, interpolation=cv2.INTER_AREA)
@@ -344,12 +584,13 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
         points  = np.array(ddict['input_points'])
         labels  = np.array(ddict['input_labels_id'])
 
-    print(points, labels, multimask_output)
-    print(type(points), type(labels))
+    log(points, labels, multimask_output)
+    # log(type(points), type(labels))
     if method == "sam01":
         global predictor ### 1 Single Global model
         if "predictor" not in globals() :  #### Not yet initialized
-            predictor = mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda")
+            sam_checkpoint= os.environ.get("sam_checkpoint", "sam_vit_h_4b8939.pth" )
+            predictor = mask_model_load(sam_checkpoint=sam_checkpoint, model_type="vit_h", device="cuda")
         predictor.set_image(image)
 
         masks, scores, logits = predictor.predict(
@@ -357,8 +598,9 @@ def bike_get_mask_bike(img_dir='imgs/bik5.png', points=None, labels=None, dirout
             point_labels=labels,
             multimask_output=True, # default True which returns 3 masks with scores
         )
-    
-    return dict(zip(ddict['input_labels'], masks))
+        return dict(zip(ddict['input_labels'], masks))
+
+
 
 
 def bike_get_input_points(image, part='right-wheel,left-wheel,bike,frame')->dict:
@@ -757,9 +999,8 @@ def imgdir_delete_empty(dirin="ztmp/dirout_img/*", dry=1):
 
 
 ####################################################################################
-def mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda"):
-    """
-   ### SAM
+def mask_model_load(sam_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", device="cuda"):
+    """ SAM
     segment-anything-py
     opencv-python
     pycocotools
@@ -771,17 +1012,34 @@ def mask_model_load(same_checkpoint="sam_vit_h_4b8939.pth", model_type="vit_h", 
     gdown
     # https://pypi.org/project/segment-anything-py/1.0/
 
+    wget  'https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth'
 
-    :return:
+    https://blog.roboflow.com/how-to-use-segment-anything-model-sam/
+
+        o generate masks automatically, use the SamAutomaticMaskGenerator. This utility generates a list of dictionaries describing individual segmentations. Each dict in the result list has the following format:
+        segmentation - [np.ndarray] - the mask with (W, H) shape, and bool type, where W and H are the width and height of the original image, respectively
+        area - [int] - the area of the mask in pixels
+        bbox - [List[int]] - the boundary box detection in xywh format
+        predicted_iou - [float] - the model's own prediction for the quality of the mask
+        point_coords - [List[List[float]]] - the sampled input point that generated this mask
+        stability_score - [float] - an additional measure of mask quality
+        crop_box - List[int] - the crop of the image used to generate this mask in xywh format
+
     """
     import torch
     from segment_anything import SamPredictor, sam_model_registry
-    sam_checkpoint = same_checkpoint
+    sam_checkpoint = sam_checkpoint
     model_type = model_type
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-    sam.to(device=device)
+    try :
+       sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+       sam.to(device=device)
+    except Exception as e:
+       log(e)
+       log("download model from here")
+       log("wget -q 'https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth")
+    
 
     predictor = SamPredictor(sam)
     return predictor
@@ -868,6 +1126,170 @@ def img_rescale(dirimg, scale=1):
     # image.show()
     pass
 
+
+
+def image_png_to_svg2a(
+    png_file_path: str,
+    png_output_file_path: str,
+    xmax= 128,
+    ymax=128,
+    color_interior="white",
+    color_shape="blue"):
+    """
+    https://pypi.org/project/pypotrace/
+    https://anaconda.org/bioconda/potrace
+    https://anaconda.org/conda-forge/cairosvg
+
+    conda install -c conda-forge cairosvg
+    conda install -c bioconda potrace
+
+
+    img_paths = glob.glob("./test/*")
+
+    for img_path in img_paths:
+        image_png_to_svg2(img_path, img_path.replace(".png", "_converted.png"), 64, 64)
+
+
+    """
+    import potrace
+    import glob
+    import numpy as np
+    from PIL import Image
+    import cairosvg
+    from io import StringIO
+
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path).convert("L")  # Convert to grayscale
+    # Threshold the image and convert it to a numpy array
+    bitmap = np.array(png_image) > 128
+
+    # Create a potrace bitmap from the numpy array
+    potrace_bitmap = potrace.Bitmap(bitmap)
+
+    # Create a potrace path from the bitmap
+    path = potrace_bitmap.trace()
+
+    # Calculate the scaling factors
+    scale_x = float(xmax) / png_image.width
+    scale_y = float(ymax) / png_image.height
+
+    # Create the SVG content in a string
+    svg_string_io = StringIO()
+    svg_string_io.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+    svg_string_io.write(
+        f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{xmax}" height="{ymax}">\n'
+    )
+    for curve in path:
+        svg_string_io.write(
+            f'<path d="M{curve.start_point.x * scale_x},{curve.start_point.y * scale_y}'
+        )
+        for segment in curve:
+            if segment.is_corner:
+                svg_string_io.write(f"L{segment.c.x * scale_x},{segment.c.y * scale_y}")
+            else:
+                svg_string_io.write(
+                    f"C{segment.c1.x * scale_x},{segment.c1.y * scale_y} {segment.c2.x * scale_x},{segment.c2.y * scale_y} {segment.end_point.x * scale_x},{segment.end_point.y * scale_y}"
+                )
+        svg_string_io.write(f'" fill="{color_interior}" stroke="{color_shape}" stroke-width="{1}"/>\n')
+    svg_string_io.write("</svg>\n")
+    svg_content = svg_string_io.getvalue()
+
+    # Convert the SVG file to PNG
+    cairosvg.svg2png(bytestring=svg_content, write_to=png_output_file_path)
+
+
+
+def image_png_to_svg2b(
+    png_file_path: str,
+    svg_file_path: str,
+    png_output_file_path: str,
+    xmax: int,
+    ymax: int,
+):
+    # Open the PNG file
+    png_image = Image.open(png_file_path).convert("L")  # Convert to grayscale
+    # Threshold the image and convert it to a numpy array
+    bitmap = np.array(png_image) > 128
+
+    # Create a potrace bitmap from the numpy array
+    potrace_bitmap = potrace.Bitmap(bitmap)
+
+    # Create a potrace path from the bitmap
+    path = potrace_bitmap.trace()
+
+    # Calculate the scaling factors
+    scale_x = float(xmax) / png_image.width
+    scale_y = float(ymax) / png_image.height
+
+    # Create the SVG file
+    with open(svg_file_path, "w") as f:
+        f.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+        f.write(
+            f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{xmax}" height="{ymax}">\n'
+        )
+        for curve in path:
+            f.write(
+                f'<path d="M{curve.start_point.x * scale_x},{curve.start_point.y * scale_y}'
+            )
+            for segment in curve:
+                if segment.is_corner:
+                    f.write(f"L{segment.c.x * scale_x},{segment.c.y * scale_y}")
+                else:
+                    f.write(
+                        f"C{segment.c1.x * scale_x},{segment.c1.y * scale_y} {segment.c2.x * scale_x},{segment.c2.y * scale_y} {segment.end_point.x * scale_x},{segment.end_point.y * scale_y}"
+                    )
+            f.write(f'" fill="none" stroke="black" stroke-width="{10}"/>\n')
+
+        f.write("</svg>\n")
+
+
+
+def image_png_to_svg0( png_file_path: str,    png_output_file_path: str,    xmax: int,    ymax: int,):
+    import potrace
+    import numpy as np
+    from PIL import Image
+    import cairosvg
+    from io import StringIO
+
+    # Open the PNG file
+    png_image = Image.open(png_file_path).convert("L")  # Convert to grayscale
+    # Threshold the image and convert it to a numpy array
+    bitmap = np.array(png_image) > 128
+
+    # Create a potrace bitmap from the numpy array
+    potrace_bitmap = potrace.Bitmap(bitmap)
+
+    # Create a potrace path from the bitmap
+    path = potrace_bitmap.trace()
+
+    # Calculate the scaling factors
+    scale_x = float(xmax) / png_image.width
+    scale_y = float(ymax) / png_image.height
+
+    # Create the SVG content in a string
+    svg_string_io = StringIO()
+    svg_string_io.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
+    svg_string_io.write(
+        f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="{xmax}" height="{ymax}">\n'
+    )
+    for curve in path:
+        svg_string_io.write(
+            f'<path d="M{curve.start_point.x * scale_x},{curve.start_point.y * scale_y}'
+        )
+        for segment in curve:
+            if segment.is_corner:
+                svg_string_io.write(f"L{segment.c.x * scale_x},{segment.c.y * scale_y}")
+            else:
+                svg_string_io.write(
+                    f"C{segment.c1.x * scale_x},{segment.c1.y * scale_y} {segment.c2.x * scale_x},{segment.c2.y * scale_y} {segment.end_point.x * scale_x},{segment.end_point.y * scale_y}"
+                )
+        svg_string_io.write(f'" fill="none" stroke="black" stroke-width="{10}"/>\n')
+    svg_string_io.write("</svg>\n")
+    svg_content = svg_string_io.getvalue()
+
+    # Convert the SVG file to PNG
+    cairosvg.svg2png(bytestring=svg_content, write_to=png_output_file_path)
 
 
 def image_png_to_svg4(  png_file_path: str,  png_output_file_path: str,  xmax: int, ymax: int,):
@@ -1007,7 +1429,8 @@ def setup_colab():
 
 ###################################################################################################
 if __name__ == "__main__":
-    img_pipe_v0()
+    import fire
+    fire.Fire()
 
 
 
