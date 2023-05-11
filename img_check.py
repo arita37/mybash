@@ -70,6 +70,26 @@ def run_classifier(dirin="", dirout="ztmp/classifier/", mode="v2"):
 
 
 ####################################################################################
+def classify_voters(img, modellist=None):
+    """ Meta Classifier for good/bad images
+
+
+    """
+    modelist = [ "classify_image_v1", "classify_image_v2"] if modelist is None else modelist
+
+    res = []
+    for mname in modelist : 
+       if name =="classify_image_v1":
+         res.append( classify_image_v1(img) )
+       else :
+         res.append( globals()[ mname ](img) )
+
+    avg_score = np.mean(res)
+    if avg_score > 0.5 : return 1 #### good
+    else : return 0
+
+
+
 def classify_image_v1(img):
     _, binary_img = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
     black_pixels_count = np.sum(binary_img == 0)
