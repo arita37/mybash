@@ -100,7 +100,7 @@ def test3(dirimg="imgs/", name=""):
 
 
 #####################################################################################################
-def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
+def img_pipe_v0(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v0"):
     """
 
     python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/*.*  --nmax 5   --tag "_v0"  --dry 1
@@ -127,7 +127,7 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
         img2 = image_invert_colors(img)
         img = img2 if img2 is not None else img  ### Inverted from Black background to white one
 
-        img = image_remove_background(img, bgcolor=(255, 255, 255, 255))  ## white background
+        img = image_remove_background(img, bgcolor=(255, 255, 255, 255)) ## white background
 
         #img = image_resize_ratio(img, width=64, height=64)
 
@@ -139,7 +139,7 @@ def img_pipe_v0(dirimg="imgs/**/*.png", nmax=5, dry=1, tag="_v0"):
         log(imgfile2)
 
 
-def img_pipe_v1(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v1"):
+def img_pipe_v1(dirimg="imgs/toclean_v0/*.png", nmax=5, dry=1, tag="_v1"):
     """
 
     git clone
@@ -179,9 +179,13 @@ def img_pipe_v1(dirimg="imgs/toclean/*.png", nmax=5, dry=1, tag="_v1"):
 
             #img = image_resize_ratio(img, width=64, height=64)
 
-            img = image_add_border(img, colorname=color_random_rgb(), bordersize=1)
 
-            img = bike_add_color(img, color_wheels="black", color_bike=color_random_rgb(), )
+
+            #img = bike_add_color(img, color_wheels="black", color_bike=color_random_rgb(), )
+
+            img = bike_add_color_2(img, color_bike=color_random_rgb(), color_background="yellow", ) #BikeExtractor()
+
+            img = image_add_border(img, colorname=color_random_rgb(), bordersize=10)
 
             #### Save New file
             dirp, dirparent, fname = os_path_split(imgfilek)
@@ -222,6 +226,37 @@ def test1():
     gray = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
     plt.imshow(gray)
 
+def bike_add_color_2(img, color_bike=(255,0,0), color_background=(255,0,0)):
+
+    color_background = webcolors.name_to_rgb(color_background) if isinstance(color_background, str) else color_background
+    color_bike = webcolors.name_to_rgb(color_bike) if isinstance(color_bike, str) else color_bike
+
+    mask = BikeExtractor(img)
+
+
+    img2 = cv2.bitwise_and(img, img, mask=mask)
+
+    img2[np.where((img2 == [0, 0, 0]).all(axis=2))] = color_bike
+    img = cv2.addWeighted(img, 1, img2, 0.7, 0)
+
+    # define the white color
+    upper_white = np.array([255, 255, 255], dtype=np.uint8)
+
+    # create a mask for white pixels
+
+    mask = np.all(img == upper_white, axis=2).astype(np.uint8) * 255
+
+    # set the yellow color (BGR value) for the white pixels
+    #yellow_color = (255, 255, 0)
+    img[np.where(mask != 0)] = color_background
+
+    plt.imshow(img)
+    plt.show()
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    return img
+
+
 
 def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
     """
@@ -236,29 +271,121 @@ def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
 
     #img = image_read(img)
 
-    color_wheels = webcolors.name_to_rgb(color_wheels) if isinstance(color_wheels, str) else color_wheels
 
+    color_wheels = webcolors.name_to_rgb(color_wheels) if isinstance(color_wheels, str) else color_wheels
     color_bike = webcolors.name_to_rgb(color_bike) if isinstance(color_bike, str) else color_bike
 
     for labeli, maski in maskdict.items():
 
-         if labeli == 'bike' :
+         if labeli == 'frame' :
+             print('frame')
              maski = np.array(maski, dtype=np.uint8)
              img2 = cv2.bitwise_and(img, img, mask=maski)
+             plt.imshow(img2)
+             plt.show()
              img2[np.where((img2 == [0, 0, 0]).all(axis=2))] = color_bike
              img = cv2.addWeighted(img, 1, img2, 0.7, 0)
 
-         if 'wheel' in labeli :
+         if 'wheel' in labeli:
+             print('wheel')
              maski = np.array(maski, dtype=np.uint8)
              img2 = cv2.bitwise_and(img, img, mask=maski)
+             plt.imshow(img2)
+             plt.show()
              img2[np.where((img2 == [0, 0, 0]).all(axis=2))] = color_wheels
+             #img2[np.where((img2 != [0, 0, 0]).all(axis=2))] = (0, 255, 255)
              img = cv2.addWeighted(img, 1, img2, 0.7, 0)
 
+    # define the white color range in BGR format
+    lower_white = np.array([200, 200, 200], dtype=np.uint8)
+    upper_white = np.array([255, 255, 255], dtype=np.uint8)
+
+    # create a mask for white pixels
+    mask = cv2.inRange(img, lower_white, upper_white)
+
+    # set the yellow color (BGR value) for the white pixels
+    yellow_color = (255, 255, 0)
+    img[np.where(mask != 0)] = yellow_color
 
 
     plt.imshow(img)
     plt.show()
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return img
+
+
+def BikeExtractor(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    img = frame
+    # Histogram Analysis------------------------------------------
+    bins = np.zeros(256, np.int32)
+    L1 = round(img.shape[0] / 4)
+    L2 = round(img.shape[0] - img.shape[0] / 4)
+    L3 = round(img.shape[1] / 4)
+    L4 = round(img.shape[1] - img.shape[1] / 4)
+    for i in range(L1, L2):  # use loop for extracting the histogram data
+        for j in range(L3, L4):
+            intensity = img[i, j, 2]
+            bins[intensity] += 1
+
+    # Analysis of Corner of Image---------------------------------
+    L = len(hsv[0])
+    L_10p = round(L / 10)  # 10% of the actual length from corner
+    four_v = [np.sum(hsv[L_10p:L_10p + 5, L_10p:L_10p + 5, 2]) / 25,
+              np.sum(hsv[L_10p:L_10p + 5, L - L_10p:L - L_10p - 5, 2]) / 25,
+              np.sum(hsv[L - L_10p:L - L_10p - 5, L_10p:L_10p + 5, 2]) / 25,
+              np.sum(hsv[L - L_10p:L - L_10p - 5, L - L_10p:L - L_10p - 5, 2]) / 25]
+
+    vmax_corner = round(np.max(four_v))
+    vmid_corner = round(np.mean(four_v))
+
+    # Use 3 Strategies for dark/ light/ mid-graybackground--------
+    hmin = 0
+    hmax = 180
+    smin = 0
+    smax = 255
+    vmin = 0
+    vmax = 255
+
+    InverseFlag = False
+    if (vmax_corner < 100):
+        # dark
+        vmin = vmax_corner * 2 - round(vmid_corner * 1.7)
+        vmax = 255
+    elif (vmax_corner > 200):
+        # light
+        vmin = 0
+        vmax = vmax_corner - vmid_corner
+    else:
+        # mid
+        vmin = vmid_corner * 2
+        vmax = vmax_corner + vmid_corner
+        InverseFlag = True
+
+    A1 = round(np.sum(bins[0:45]) / ((img.shape[0] * img.shape[1] / 2) / 5), 2)
+    A2 = round(np.sum(bins[-45:]) / ((img.shape[0] * img.shape[1] / 2) / 5), 2)
+
+    if (A1 + A2) > 1 and vmax_corner < 220 and vmax_corner > 80:
+        vmin = vmid_corner * 2
+        vmax = vmax_corner + vmid_corner
+        InverseFlag = True
+
+    # Extract the Bike with HSV-------------------------------------
+    lower_hsv = np.array([hmin, smin, vmin])
+    upper_hsv = np.array([hmax, smax, vmax])
+
+    mask = cv2.inRange(hsv, lower_hsv, upper_hsv)  # extract mask
+
+    if not InverseFlag:
+        mask2 = mask.copy()
+        for i in range(len(mask)):
+            for j in range(len(mask[0])):
+                mask2[i, j] = 255 if mask[i, j] == 0 else 0
+        mask = mask2.copy()
+
+    # res = cv2.bitwise_and(frame, frame, mask = mask)# Extract bike from image - turn background black
+    return mask
 
 
 def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png', verbose=0):
@@ -481,7 +608,7 @@ def bike_clean_v1(img0):
 def image_add_border(img, colorname='navy', bordersize=1):
 
     #img0 = image_read(img) ## nd array or filestring
-    img = image_read(img)
+    #img = image_read(img)
 
     colborder  = webcolors.name_to_rgb(colorname) if isinstance(colorname, str) else colorname
 
@@ -496,7 +623,7 @@ def image_add_border(img, colorname='navy', bordersize=1):
     return img2
 
 
-def image_remove_background(img="", model_name="isnet-general-use", only_mask=False, bgcolor=(255, 255, 255, 255),
+def image_remove_background(img="", model_name="isnet-general-use", only_mask=False, bgcolor=(255, 255, 255),
                             **kwargs):
     """
     python utils2.py  img_pipe_v0  ---dirimg imgs/img-black_bike_white_background/Design_a_single_black_bic--37.png --nmax 5   --tag "_v0"  --dry 1
@@ -540,16 +667,22 @@ def image_remove_background(img="", model_name="isnet-general-use", only_mask=Fa
     except:
         session_rembg = rembg.new_session(model_name)
 
+      ## file or img
+
     img = image_read(img)  ## file or img
     img = rembg.remove(img,
-                       #alpha_matting=True,
+                       # alpha_matting=True,
                        alpha_matting_foreground_threshold=220,
                        alpha_matting_background_threshold=10,
                        alpha_matting_erode_size=6,
                        session=session_rembg)
     img = rembg.remove(img, only_mask=only_mask, bgcolor=bgcolor, kwargs=kwargs)
 
+
+
     return img
+
+
 
 
 def image_get_mask(img="", model_name="u2net", bgcolor=(255, 255, 255, 255), **kwargs):
@@ -876,4 +1009,5 @@ def setup_colab():
 
 ###################################################################################################
 if __name__ == "__main__":
+    #img_pipe_v0()
     img_pipe_v1()
