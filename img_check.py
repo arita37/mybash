@@ -12,6 +12,13 @@
     python img_check.py run_classifier  --dirin "img_bad/;imgs/"  --dirout "ztmp/classfier/
 
 
+SVG Classifier
+   https://github.com/arita37/deepsvg
+
+   https://magenta.tensorflow.org/svg-vae
+
+   
+
 
 """
 import cv2
