@@ -219,7 +219,7 @@ def img_pipe_v2(dirimg="imgs/**/*.png", dirout="ztmp/img_v1/",
     from utilmy import date_now, glob_glob, os_makedirs
 
     from util_image import image_read, image_resize_ratio
-    from img_check import  classify_image_v2,  classify_image_v1
+    from img_check import  classify_image_v2,  classify_image_v1, classify_voters
 
 
     imgfiles = glob_glob(dirimg)
@@ -232,7 +232,7 @@ def img_pipe_v2(dirimg="imgs/**/*.png", dirout="ztmp/img_v1/",
             if ii > nmax: continue
             img = image_read(imgfilek)
 
-            isok =  classify_image_v2(img)
+            isok =  classify_voters(img, modellist=None)
             if isok ==0 :
                 log('bad image, skip', imgfilek)
                 continue
