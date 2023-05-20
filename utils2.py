@@ -34,7 +34,7 @@ import torch
 from box import Box
 from PIL import Image
 from utilmy import log, os_makedirs
-
+import random
 from util_image import image_read, image_save
 
 
@@ -175,17 +175,18 @@ def img_pipe_v1(dirimg="imgs/toclean_v0/*.png", nmax=5, dry=1, tag="_v1"):
                 log('bad image, skip', imgfilek)
                 continue
 
-
+            #img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
 
             #img = image_resize_ratio(img, width=64, height=64)
-
-
+            color_list_bike = [(251,217,200), (250,186,0), (225,238,199), (255,219,194), (174,166,162), (211,231,246),(241,158,180)]
+            #color_bike=color_random_rgb()
+            color_list_border = [(233,97,25),(250,190,0),(25,44,121),(230,0,18),(0,91,172)]
 
             #img = bike_add_color(img, color_wheels="black", color_bike=color_random_rgb(), )
 
-            img = bike_add_color_2(img, color_bike=color_random_rgb(), color_background="yellow", ) #BikeExtractor()
+            img = bike_add_color_2(img, color_bike=random.choice(color_list_bike), color_background=(255,213,123) ) #BikeExtractor()
 
-            img = image_add_border(img, colorname=color_random_rgb(), bordersize=10)
+            img = image_add_border(img, colorname=random.choice(color_list_border), bordersize=10)
 
             #### Save New file
             dirp, dirparent, fname = os_path_split(imgfilek)
@@ -237,14 +238,8 @@ def bike_add_color_2(img, color_bike=(255,0,0), color_background=(255,0,0)):
     img2 = cv2.bitwise_and(img, img, mask=mask)
 
     img2[np.where((img2 == [0, 0, 0]).all(axis=2))] = color_bike
-    img = cv2.addWeighted(img, 1, img2, 0.7, 0)
-
-    # define the white color
-    upper_white = np.array([255, 255, 255], dtype=np.uint8)
-
-    # create a mask for white pixels
-
-    mask = np.all(img == upper_white, axis=2).astype(np.uint8) * 255
+    img = cv2.addWeighted(img, 0.5, img2, 0.7, 0)
+    #img = cv2.bitwise_or(img, img2)
 
     # set the yellow color (BGR value) for the white pixels
     #yellow_color = (255, 255, 0)
@@ -316,7 +311,16 @@ def bike_add_color(img, color_wheels=(0,0,0), color_bike=(255,0,0), ):
 
 
 def BikeExtractor(frame):
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #equalized = cv2.equalizeHist(gray)
+    clahe = cv2.createCLAHE(clipLimit=15.0, tileGridSize=(1, 1))
+    adaptive_equalized = clahe.apply(gray)
+    frame = cv2.cvtColor(adaptive_equalized, cv2.COLOR_GRAY2BGR)
+
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    #hsv[:, :, 2] = cv2.equalizeHist(hsv[:, :, 2])
+
     img = frame
     # Histogram Analysis------------------------------------------
     bins = np.zeros(256, np.int32)
@@ -386,6 +390,7 @@ def BikeExtractor(frame):
 
     # res = cv2.bitwise_and(frame, frame, mask = mask)# Extract bike from image - turn background black
     return mask
+
 
 
 def bike_get_mask_wheel_v1(img_dir='imgs/bik5.png', verbose=0):
