@@ -1,5 +1,30 @@
 
 
+ can use the cdk-spot-one library to start a spot instance using AWS CDK in Python:
+
+from aws_cdk import core
+from cdk_spot_one import SpotInstance
+
+app = core.App()
+stack = core.Stack(app, "cdk-spot-one-example")
+
+# Create a spot instance
+instance = SpotInstance(
+    stack, "SpotInstance",
+    instance_type="t3.micro",
+    block_duration_minutes=60,
+    machine_image_id="ami-0123456789abcdef0"
+)
+
+app.synth()
+
+
+Copy
+This code creates a spot instance with the specified instance type and machine image ID. You will need to replace ami-0123456789abcdef0 with the ID of the AMI you want to use. The block_duration_minutes parameter specifies the duration for which the spot instance will run.
+
+
+
+
 
 Here is an example of how you can start a spot instance using AWS CDK in Python:
 
