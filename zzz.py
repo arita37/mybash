@@ -1,5 +1,30 @@
 
 
+#### Normal EC2 Instance ################################################################
+node_launch_template = ec2.CfnLaunchTemplate(
+            self,
+            "dsfdsfsLaunchTemplate",
+            launch_template_data=ec2.CfnLaunchTemplate.LaunchTemplateDataProperty(
+                image_id=image_ids[eks_node_version],
+                user_data=Fn.base64(worker_node_user_data),
+                block_device_mappings=[
+                    ec2.CfnLaunchTemplate.BlockDeviceMappingProperty(
+                        device_name="/dev/xvda",
+                        ebs=ec2.CfnLaunchTemplate.EbsProperty(
+                            delete_on_termination=False,
+                            encrypted=False,
+                            volume_size=disk_size,
+                            volume_type="gp3",
+                        ),
+                    )
+                ],
+                key_name=key_pair.key_pair_name,
+            ),
+        )
+ 
+ 
+ 
+ ############## SpotInstance Fleet ####################################################
  can use the cdk-spot-one library to start a spot instance using AWS CDK in Python:
 
 from aws_cdk import core
