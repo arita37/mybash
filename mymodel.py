@@ -1,19 +1,21 @@
-""""
+"""
  LightGBm + Logistic regression
   
  pip install fire utilmy
 
 
-""""
+"""
 # -*- coding: utf-8 -*-
 
 import os
 import pandas as pd
 import numpy as np
 import sklearn
+import scipy
 import fire
 
 from lightgbm import LGBMModel, LGBMRegressor, LGBMClassifier
+from sklearn.linear_model import LogisticRegression
 
 ####################################################################################################
 from utilmy import log, log2
@@ -150,6 +152,10 @@ num_leaf = 64
     
 ################################################################################################
 def test():
+    from sklearn.datasets import load_breast_cancer  # breast cancer wisconsin dataset(classification)
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import roc_auc_score
+    
     print('Load data...')
     df = load_breast_cancer()
     X = df.data  # (569, 30)
@@ -157,11 +163,13 @@ def test():
 
     X_train, X_test, y_train, y_test = train_test_split(df.data, df.target, test_size=0.3)
   
-    model1 = Model()
-    model1.fit(Xtrain, ytrain)
-    ypred, yproba =     model1.predict(Xtest)    
+    global model
+    model = Model()
+    fit(X_train, y_train)
+    ypred, yproba =     predict(X_test)    
   
     #### Calciualte AUC 
+    return roc_auc_score(y_test, np.max(yproba, axis=1))
   
   
   
@@ -177,38 +185,30 @@ class Model(object):
     def __init__(self, model_pars=None, data_pars=None, compute_pars=None):
         self.model_pars, self.compute_pars, self.data_pars = model_pars, compute_pars, data_pars
 
-        if model_pars is None:
-            self.model = None
-        else:
-           self.model_gbm = lightGBMClassifier()
-           self.mdoel_lr  = LogisticRegression(penalty='l2',C=0.1)
+        self.model_lightgbm = LGBMClassifier()
+        self.model_lr  = LogisticRegression(penalty='l2',C=0.1)
 
-           global num_leaf
-           num_leaf = 64
+        global num_leaf
+        num_leaf = 64
 
           
 def data_create_sparse_csr(yleaf_pred,  mode='sparse'):          
-   global num_leaf
-   
-  if mode == 'dense' :
+    global num_leaf
+    
     # feature transformation and write result
     print('Writing transformed testing data...')
     matrix = np.zeros([len(yleaf_pred),len(yleaf_pred[0]) * num_leaf], 
-                                           dtype=np.int32)
+                                            dtype=np.int32)
     for i in range(0,len(yleaf_pred)):
         temp_test = np.arange(len(yleaf_pred[0])) * num_leaf - 1 + np.array(yleaf_pred[i])
         matrix[i][temp_test] += 1
+    if mode == 'dense' :
         return matrix
-
-  else :  ## Sparse    
-    matrix = scipy.coo() ## scipy sparse matrix
-    for i in range(0,len(yleaf_pred)):
-        temp_test = np.arange(len(yleaf_pred[0])) * num_leaf - 1 + np.array(yleaf_pred[i])
-        matrix[i][temp_test] += 1
-        return matrix
-          
-                
-def fit(Xtrain, Ytest, **kw):
+    else:
+        return scipy.sparse.coo_matrix(matrix)
+        
+        
+def fit(Xtrain, ytrain, **kw):
     """
     """
     global model, session
@@ -268,5 +268,5 @@ def load_model(path=""):
         
                                      
 if __name__ == "__main__":
-    fire.Fire()
+    print(test())
                                      
