@@ -130,8 +130,6 @@ def example_lightgbm_lr():
     print(y_pred_est_test)
 
 
-    
-
 ###########################################################################################################
 
 
@@ -207,7 +205,7 @@ def data_create_sparse_csr(yleaf_pred,  mode='sparse'):
            matrix[i][temp_test] += 1
 
         return matrix
-        
+
     else:
        matrix = np.zeros([nsample, mdim * num_leaf], dtype=np.int32)
        for i in range(0, nsample):
