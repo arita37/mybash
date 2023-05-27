@@ -196,16 +196,25 @@ def data_create_sparse_csr(yleaf_pred,  mode='sparse'):
     global num_leaf
     
     # feature transformation and write result
-    print('Writing transformed testing data...')
-    matrix = np.zeros([len(yleaf_pred),len(yleaf_pred[0]) * num_leaf], 
-                                            dtype=np.int32)
-    for i in range(0,len(yleaf_pred)):
-        temp_test = np.arange(len(yleaf_pred[0])) * num_leaf - 1 + np.array(yleaf_pred[i])
-        matrix[i][temp_test] += 1
-    if mode == 'dense' :
+    nsample = len(yleaf_pred)
+    mdim    = len(yleaf_pred.shape[0]
+
+   if mode == 'dense' :
+ 
+       matrix = np.zeros([nsample, mdim * num_leaf], dtype=np.int32)
+       for i in range(0, nsample):
+          temp_test = np.arange(len(yleaf_pred[0])) * num_leaf - 1 + np.array(yleaf_pred[i])
+           matrix[i][temp_test] += 1
+
         return matrix
+        
     else:
-        return scipy.sparse.coo_matrix(matrix)
+       matrix = np.zeros([nsample, mdim * num_leaf], dtype=np.int32)
+       for i in range(0, nsample):
+          temp_test = np.arange(len(yleaf_pred[0])) * num_leaf - 1 + np.array(yleaf_pred[i])
+           matrix[i][temp_test] += 1
+
+       return scipy.sparse.coo_matrix(matrix)
         
         
 def fit(Xtrain, ytrain, **kw):
